@@ -1,14 +1,12 @@
 import React from "react";
-import Navbar from "./navBar";
-import { Button } from "./components/ui/button";
+import Background from "./components/custom/Background";
+
+
 
 function App(){
-  return(
-    <div> 
-      <Navbar/>
-          <Button variant="destructive">Red Button</Button>
-      <Button variant="secondary">Gray Button</Button>
-      <Button variant="outline">Outline Button</Button>
+  return (
+    <div>
+      <Background/>
     </div>
   )
 }
