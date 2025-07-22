@@ -3,9 +3,10 @@ import React from 'react'
 
 const Background = () => {
   return (
-    <div className="min-h-[100vw] max-h-[200vh]  w-full bg-gradient-to-br from-[#0F0F0F] via-[#1C1C1C] to-[#2B2B2B] text-white">
+    <div className="fixed inset-0 -z-10  min-h-[100vw] max-h-[200vh]  w-full bg-gradient-to-r from-gray-900 via-cyan-900 to-neutral-900">
     </div>
   )
 }
 
 export default Background
+

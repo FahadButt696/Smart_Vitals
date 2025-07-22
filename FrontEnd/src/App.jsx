@@ -8,10 +8,11 @@ import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
+// import { ThreeDMarqueeDemoSecond } from "./components/custom/ThreeDMarquee";
 
 function App(){
   return (
-    <div>
+    <div className="relative min-h-screen overflow-hidden">
       <Background/>
       
       <Routes>

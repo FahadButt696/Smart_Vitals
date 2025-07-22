@@ -1,5 +1,6 @@
 // src/components/customs/Navbar.jsx
 "use client";
+import {logo3} from "../../assets/Assets";
 
 import React, { useState, useRef, useEffect } from "react";
 import {
@@ -15,24 +16,15 @@ function cn(...classes) {
 }
 
 export const Navbar = ({ children, className }) => {
-  const ref = useRef(null);
-  const { scrollY } = useScroll({
-    target: ref,
-    offset: ["start start", "end start"],
-  });
+  const { scrollY } = useScroll(); // ✅ window scroll
   const [visible, setVisible] = useState(false);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
-    if (latest > 100) {
-      setVisible(true);
-    } else {
-      setVisible(false);
-    }
+    setVisible(latest > 100);
   });
 
   return (
     <motion.div
-      ref={ref}
       className={cn("fixed inset-x-0 top-0 z-50 w-full", className)}
     >
       {React.Children.map(children, (child) =>
@@ -43,6 +35,7 @@ export const Navbar = ({ children, className }) => {
     </motion.div>
   );
 };
+
 
 export const NavBody = ({ children, className, visible }) => {
   return (
@@ -97,7 +90,7 @@ export const NavItems = ({ items, className, onItemClick }) => {
           {hovered === idx && (
             <motion.div
               layoutId="hovered"
-              className="absolute inset-0 h-full w-full rounded-full bg-gray-700/50 dark:bg-gray-700/50"
+              className="absolute inset-0 h-full w-full rounded-full bg-white/10 dark:bg-white/10"
             />
           )}
           <span className="relative z-20">{item.name}</span>
@@ -191,14 +184,16 @@ export const NavbarLogo = () => {
       href="#"
       className="relative z-20 mr-4 flex items-center space-x-2 px-2 py-1 text-sm font-normal text-white"
     >
-      <img
-        src="https://assets.aceternity.com/logo-dark.png"
-        alt="logo"
-        width={30}
-        height={30}
-        className="rounded-full"
-      />
-      <span className="font-medium text-white dark:text-white">Startup</span>
+   
+  <img
+    src={logo3}
+    alt="logo3"
+    width={30}
+    height={30}
+    className="rounded-full filter invert"
+  />
+
+      <span className="font-medium italic FONT text-white dark:text-white">SMART VITALS</span>
     </a>
   );
 };
@@ -243,9 +238,9 @@ export default function CustomNavbar() {
 
   const navItems = [
     { name: "Home", link: "/" },
-    { name: "About", link: "/about" },
-    { name: "Services", link: "/services" },
-    { name: "Contact", link: "/contact" },
+    { name: "Features", link: "/Features" },
+    { name: "About", link: "/About" },
+    { name: "Contact", link: "/Contact" },
   ];
 
   return (
@@ -282,7 +277,7 @@ export default function CustomNavbar() {
             </a>
           ))}
           <div className="flex flex-col space-y-4 w-full mt-4 border-t border-neutral-700 pt-4">
-            <NavbarButton href="#" variant="secondary" className="w-full">
+            <NavbarButton href="#" variant="secondary" className="w-full ">
               Sign In
             </NavbarButton>
             <NavbarButton href="#" variant="primary" className="w-full">
