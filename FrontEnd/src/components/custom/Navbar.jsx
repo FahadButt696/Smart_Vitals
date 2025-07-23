@@ -246,14 +246,14 @@ export default function CustomNavbar() {
   return (
     <Navbar className="top-0 fixed z-50">
       {/* Desktop Navigation */}
-      <NavBody className="max-w-7xl px-8">
+      <NavBody className="max-w-screen px-8">
         <NavbarLogo />
         <NavItems items={navItems} onItemClick={() => setIsMobileMenuOpen(false)} />
         <div className="flex items-center space-x-4">
-          <NavbarButton href="#" variant="secondary" className="px-4 py-2">
+          <NavbarButton href="/Login" variant="secondary" className="px-4 py-2">
             Sign In
           </NavbarButton>
-          <NavbarButton href="#" variant="primary" className="px-4 py-2">
+          <NavbarButton href="Signup" variant="primary" className="px-4 py-2">
             Sign Up
           </NavbarButton>
         </div>
@@ -277,10 +277,10 @@ export default function CustomNavbar() {
             </a>
           ))}
           <div className="flex flex-col space-y-4 w-full mt-4 border-t border-neutral-700 pt-4">
-            <NavbarButton href="#" variant="secondary" className="w-full ">
+            <NavbarButton href="Login" variant="secondary" className="w-full ">
               Sign In
             </NavbarButton>
-            <NavbarButton href="#" variant="primary" className="w-full">
+            <NavbarButton href="Signup" variant="primary" className="w-full">
               Sign Up
             </NavbarButton>
           </div>

@@ -34,8 +34,18 @@ import dark28 from './dark28.png';
 import dark29 from './dark29.jpeg';
 import dark30 from './dark30.png';
 import dark31 from './dark31.jpeg';
+import feature1 from './feature1.jpeg'
+import feature2 from './feature2.jpeg'
+import calorieImage from './calorieImage.webp'
+import DietPlanAi from './DietPlanAi.jpeg'
+import AiMeal from './AiMeal.png'
 
 export {
+  AiMeal,
+  DietPlanAi,
+  calorieImage,
+  feature1,
+  feature2,
   logo3,  
   logo,
   hero,

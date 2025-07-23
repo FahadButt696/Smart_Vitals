@@ -79,7 +79,7 @@ const GridLineHorizontal = ({
           "--fade-stop": "90%",
 
           //-100px if you want to keep the line inside
-          "--offset": offset || "200px",
+          "--offset": offset || "100px",
 
           "--color-dark": "rgba(255, 255, 255, 0.2)",
           maskComposite: "exclude"
@@ -92,7 +92,7 @@ const GridLineHorizontal = ({
         "[mask:linear-gradient(to_left,var(--background)_var(--fade-stop),transparent),_linear-gradient(to_right,var(--background)_var(--fade-stop),transparent),_linear-gradient(black,black)]",
         "[mask-composite:exclude]",
         "z-30",
-        "dark:bg-[linear-gradient(to_right,var(--color-dark),var(--color-dark)_50%,transparent_0,transparent)]",
+        "dark:bg-[linear-gradient(to_right,var(--color-dark),var(--color-dark)_50%,)]",
         className
       )}></div>
   );
