@@ -1,7 +1,7 @@
 import React, { useEffect,useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { FiArrowUpRight } from "react-icons/fi";
-import { AiMeal, AiMental, AiSymptom, calorieImage,  } from "@/assets/Assets";
+import { AiCalorieCounter, AiMeal, AiMental, AiSymptom, calorieImage,  } from "@/assets/Assets";
 import { useAnimation } from "framer-motion";
 import { useInView } from "framer-motion";
 import { NavLink } from "react-router-dom";
@@ -22,10 +22,10 @@ const MotionNavLink= motion(NavLink);
 export const TextParallaxContentExample = () => {
     
   return (
-    <div className="my-[5rem]">
+    <div className="mt-[5rem]">
       <TextParallaxContent
-        imgUrl={calorieImage}
-        subheading="CALORIE CONVERTER"
+        imgUrl={AiCalorieCounter}
+        subheading="CALORIE COUNTER"
         heading="EAT WITH MEASUREMENTS"
       >
         <ImageCalorie/>
@@ -271,7 +271,7 @@ const AIMeal = () => {
   initial="hidden"
   animate={controls}
   transition={{ delay: 0.4 }}
-  className="w-full bg-black text-white  px-9 py-4 text-xl font-bold text-center transition-all duration-300 ease-in-out hover:bg-white hover:text-black focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-black focus:outline-none cursor-pointer"
+  className="w-full bg-black text-white  px-9 py-4 text-xl font-bold text-center hover:text-cyan-400 transition all duration-300 ease-in-out focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-black focus:outline-none cursor-pointer"
 >
   LEARN MORE <FiArrowUpRight className="inline" />
 </MotionNavLink>

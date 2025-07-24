@@ -46,8 +46,25 @@ import track from './track.jpg'
 import mealLog from './mealLog.jpg'
 import workout from './workout.jpg'
 import water from './waterIntake.jpg'
-
+import AiCalorieCounter from './AiCalorieCounter.jpg'
+import CalorieTracker from './CalorieTracker.jpg'
+import CalorieTracker2 from './CalorieTracker2.webp'
+import SleepTracker from './SleepTracker.jpg';
+import WeightProgress from './WeightProgress.avif'; 
+import healthReport from './healthReport.avif'; 
+import MealLogger from './MealLogger2.jpg'; 
+import weightTracker from './weightTracker.jpg'; 
+import weightTracker2 from './weightTracker.avif'; 
 export {
+  weightTracker2,
+  weightTracker,
+  MealLogger,
+  healthReport,
+  WeightProgress,
+  SleepTracker,
+  CalorieTracker2,
+  CalorieTracker,
+  AiCalorieCounter,
   water,
   workout,
   mealLog,

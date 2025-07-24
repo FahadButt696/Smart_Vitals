@@ -4,6 +4,7 @@ import { motion, useAnimation } from "framer-motion";
 import { useInView } from "framer-motion";
 import { DirectionAwareHoverDemo } from '../DirectionAwareSection';
 import { NavLink } from 'react-router-dom';
+import StepperSection from '../StepperSection';
 
 const MotionNavLink = motion(NavLink);
 const fadeUp = {
@@ -30,10 +31,10 @@ const FeatureCard = () => {
 
   return (
     <div
-      className="flex flex-col-reverse lg:flex-row lg:justify-center  items-center justify-center w-full px-4 sm:px-8 md:px-12 lg:px-20 gap-8"
+      className="flex flex-col-reverse sm:w-[100rem] lg:flex-row lg:justify-center  items-center justify-center w-full px-4 sm:px-8 md:px-12 lg:px-20 gap-8"
       ref={ref}
     >
-      <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
+      <div className="flex flex-col sm:w-[35%] items-center lg:items-start text-center lg:text-left">
         <motion.div
           variants={fadeUp}
           initial="hidden"
@@ -69,22 +70,9 @@ const FeatureCard = () => {
         >
            Smart Vitals help you take control of your health journey by tracking workouts, monitoring calories, and building smart habits. Personalized tools. Smarter living.
         </motion.div>
-        
-
-    
-        <MotionNavLink
-  to="/Signup"
-  variants={fadeUp}
-  initial="hidden"
-  animate={controls}
-  transition={{ delay: 0.4 }}
-  className="w-full sm:w-[60%] bg-black text-white px-6 py-3 text-md font-bold text-center transition-all duration-300 ease-in-out hover:bg-white hover:text-black focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-black focus:outline-none cursor-pointer"
->
-  GET STARTED
-</MotionNavLink>
 
       </div>
-      <DirectionAwareHoverDemo/>
+      <StepperSection/>
       {/* <motion.div
         variants={fadeUp}
         initial="hidden"
