@@ -39,8 +39,22 @@ import feature2 from './feature2.jpeg'
 import calorieImage from './calorieImage.webp'
 import DietPlanAi from './DietPlanAi.jpeg'
 import AiMeal from './AiMeal.png'
+import AiSymptom from './AiSymptomChecker.webp'
+import AiMental from './AIMentalHealth.png'
+import Chart from './Chart.webp'
+import track from './track.jpg'
+import mealLog from './mealLog.jpg'
+import workout from './workout.jpg'
+import water from './waterIntake.jpg'
 
 export {
+  water,
+  workout,
+  mealLog,
+  track,
+  Chart,
+  AiMental,
+  AiSymptom,
   AiMeal,
   DietPlanAi,
   calorieImage,

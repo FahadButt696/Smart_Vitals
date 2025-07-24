@@ -1,7 +1,7 @@
 import React, { useEffect,useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { FiArrowUpRight } from "react-icons/fi";
-import { AiMeal, calorieImage, DietPlanAi, } from "@/assets/Assets";
+import { AiMeal, AiMental, AiSymptom, calorieImage,  } from "@/assets/Assets";
 import { useAnimation } from "framer-motion";
 import { useInView } from "framer-motion";
 import { NavLink } from "react-router-dom";
@@ -32,39 +32,26 @@ export const TextParallaxContentExample = () => {
       </TextParallaxContent>
       <TextParallaxContent
         imgUrl={AiMeal}
-        subheading="Collaborate"
-        heading="Built for all of us."
+        subheading=" AI DIET PLAN GENERATOR"
+        heading="GENERATE DIET PLAN FOR YOU"
       >
-        <ExampleContent />
+        <AIMeal/>
       </TextParallaxContent>
       <TextParallaxContent
-        imgUrl="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2671&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-        subheading="Collaborate"
-        heading="Built for all of us."
+        imgUrl={AiSymptom}
+        subheading="AI SYMPTOM CHECKER"
+        heading="REGULAR CHECKUP IS IMPORTANT!"
       >
-        <ExampleContent />
+        <AISymptom/>
       </TextParallaxContent>
       <TextParallaxContent
-        imgUrl="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2671&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-        subheading="Collaborate"
-        heading="Built for all of us."
+        imgUrl={AiMental}
+        subheading="MENTAL HEALTH CHATBOT"
+        heading="SHARE YOUR THOUGHTS WITH AI"
       >
-        <ExampleContent />
+        <AIMental />
       </TextParallaxContent>
-      <TextParallaxContent
-        imgUrl="https://images.unsplash.com/photo-1530893609608-32a9af3aa95c?q=80&w=2564&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-        subheading="Quality"
-        heading="Never compromise."
-      >
-        <ExampleContent />
-      </TextParallaxContent>
-      <TextParallaxContent
-        imgUrl="https://images.unsplash.com/photo-1504610926078-a1611febcad3?q=80&w=2416&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-        subheading="Modern"
-        heading="Dress for the best."
-      >
-        <ExampleContent />
-      </TextParallaxContent>
+      
     </div>
   );
 };
@@ -231,6 +218,177 @@ const ImageCalorie = () => {
                 >
                     Learn more <FiArrowUpRight className="inline" />
                 </motion.button> */}
+            </div>
+        </div>
+    );
+};
+
+
+const AIMeal = () => {
+    const ref = useRef(null);
+    
+    const inView = useInView(ref, { threshold: 0.3 }); 
+    
+    const controls = useAnimation();
+
+    
+    useEffect(() => {
+        if (inView) {
+            controls.start("visible"); 
+        } else {
+            
+            controls.start("hidden");
+        }
+    }, [inView, controls]); 
+
+    return (
+        
+        <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 px-4 pb-24 pt-12 md:grid-cols-12" ref={ref}>
+        
+            <motion.div
+                variants={fadeUp}
+                initial="hidden"
+                animate={controls}
+                className="col-span-1 md:col-span-4 text-xl font-bold text-white md:text-2xl lg:text-3xl my-1"
+            >
+                SMART MEALS TAILORED TO YOUR GOALS.
+            </motion.div>
+
+            <div className="col-span-1 md:col-span-8">
+                <motion.p
+                    variants={fadeUp}
+                    initial="hidden"
+                    animate={controls}
+                    transition={{ delay: 0.1 }} 
+                    className="mb-10 text-xl text-neutral-200 md:text-2xl
+                    "
+                >
+                    Generate personalized, healthy meal plans using GPT-3.5 or Edamam APIs. Whether your goal is weight loss, muscle gain, or maintenance, the AI builds a daily plan suited to your dietary preferences and fitness targets.
+                </motion.p>
+                <MotionNavLink
+  to="/Feature/CalorieGenerator"
+  variants={fadeUp}
+  initial="hidden"
+  animate={controls}
+  transition={{ delay: 0.4 }}
+  className="w-full bg-black text-white  px-9 py-4 text-xl font-bold text-center transition-all duration-300 ease-in-out hover:bg-white hover:text-black focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-black focus:outline-none cursor-pointer"
+>
+  LEARN MORE <FiArrowUpRight className="inline" />
+</MotionNavLink>
+            </div>
+        </div>
+    );
+};
+
+
+const AISymptom = () => {
+    const ref = useRef(null);
+    
+    const inView = useInView(ref, { threshold: 0.3 }); 
+    
+    const controls = useAnimation();
+
+    
+    useEffect(() => {
+        if (inView) {
+            controls.start("visible"); 
+        } else {
+            
+            controls.start("hidden");
+        }
+    }, [inView, controls]); 
+
+    return (
+        
+        <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 px-4 pb-24 pt-12 md:grid-cols-12" ref={ref}>
+        
+            <motion.div
+                variants={fadeUp}
+                initial="hidden"
+                animate={controls}
+                className="col-span-1 md:col-span-4 text-xl font-bold text-white md:text-2xl lg:text-3xl my-1"
+            >
+                YOUR PERSONAL HEALTH GUIDE.
+            </motion.div>
+
+            <div className="col-span-1 md:col-span-8">
+                <motion.p
+                    variants={fadeUp}
+                    initial="hidden"
+                    animate={controls}
+                    transition={{ delay: 0.1 }} 
+                    className="mb-10 text-xl text-neutral-200 md:text-2xl
+                    "
+                >
+                    Powered by the Infermedica API, users can input symptoms and receive possible health insights instantly. It mimics a mini medical assistant—helping you make better decisions before visiting a doctor.
+                </motion.p>
+                <MotionNavLink
+  to="/Feature/CalorieGenerator"
+  variants={fadeUp}
+  initial="hidden"
+  animate={controls}
+  transition={{ delay: 0.4 }}
+  className="w-full bg-black text-white  px-9 py-4 text-xl font-bold text-center transition-all duration-300 ease-in-out hover:bg-white hover:text-black focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-black focus:outline-none cursor-pointer"
+>
+  LEARN MORE <FiArrowUpRight className="inline" />
+</MotionNavLink>
+            </div>
+        </div>
+    );
+};
+
+
+const AIMental = () => {
+    const ref = useRef(null);
+    
+    const inView = useInView(ref, { threshold: 0.3 }); 
+    
+    const controls = useAnimation();
+
+    
+    useEffect(() => {
+        if (inView) {
+            controls.start("visible"); 
+        } else {
+            
+            controls.start("hidden");
+        }
+    }, [inView, controls]); 
+
+    return (
+        
+        <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 px-4 pb-24 pt-12 md:grid-cols-12" ref={ref}>
+        
+            <motion.div
+                variants={fadeUp}
+                initial="hidden"
+                animate={controls}
+                className="col-span-1 md:col-span-4 text-xl font-bold text-white md:text-2xl lg:text-3xl my-1"
+            >
+                TALK IT OUT, FEEL LIGHTER.
+            </motion.div>
+
+            <div className="col-span-1 md:col-span-8">
+                <motion.p
+                    variants={fadeUp}
+                    initial="hidden"
+                    animate={controls}
+                    transition={{ delay: 0.1 }} 
+                    className="mb-10 text-xl text-neutral-200 md:text-2xl
+                    "
+                >
+                    Built using ChatGPT or HuggingFace models, this conversational AI offers mental and emotional support. Whether you're feeling anxious, sad, or stressed—you're never alone with a friendly bot to talk to.
+                </motion.p>
+                <MotionNavLink
+  to="/Feature/CalorieGenerator"
+  variants={fadeUp}
+  initial="hidden"
+  animate={controls}
+  transition={{ delay: 0.4 }}
+  className="w-full bg-black text-white  px-9 py-4 text-xl font-bold text-center transition-all duration-300 ease-in-out hover:bg-white hover:text-black focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-black focus:outline-none cursor-pointer"
+>
+  LEARN MORE <FiArrowUpRight className="inline" />
+</MotionNavLink>
             </div>
         </div>
     );
