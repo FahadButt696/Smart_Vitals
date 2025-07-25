@@ -55,7 +55,9 @@ import healthReport from './healthReport.avif';
 import MealLogger from './MealLogger2.jpg'; 
 import weightTracker from './weightTracker.jpg'; 
 import weightTracker2 from './weightTracker.avif'; 
+import About from './AboutUs.jpg'; 
 export {
+  About,
   weightTracker2,
   weightTracker,
   MealLogger,

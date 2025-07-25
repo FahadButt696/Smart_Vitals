@@ -5,7 +5,7 @@ import FeatureCard from './FeatureCard_1'
 const FeatureSection = () => {
   return (
     <div>
-        <FeatureCard/>
+        {/* <FeatureCard/> */}
         {/* <DirectionAwareHoverDemo/> */}
     </div>
   )

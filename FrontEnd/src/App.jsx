@@ -8,12 +8,15 @@ import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
+import Footer from "./components/custom/Footer";
+import CustomNavbar from "./components/custom/Navbar";
 // import { ThreeDMarqueeDemoSecond } from "./components/custom/ThreeDMarquee";
 
 function App(){
   return (
     <div className="relative min-h-screen overflow-hidden">
       <Background/>
+      <CustomNavbar/>
       
       <Routes>
         <Route path="/" element={<Home/>}/>
@@ -24,6 +27,7 @@ function App(){
         <Route path="/Signup" element={<Signup/>}/>
         <Route path="/Dashboard" element={<Dashboard/>}/>
       </Routes>
+      <Footer/>
     </div>
   )
 }

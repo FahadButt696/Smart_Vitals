@@ -12,13 +12,12 @@ import Footer from '@/components/custom/Footer'
 const Home = () => {
   return (
         <div>
-            <CustomNavbar/>
+            
             <Hero/>
             <CarouselDemo/>
             <TextParallaxContentExample/>
             <Features/>
             <WhyChooseUsSection/>
-            <Footer/>
           
         </div>
   )
