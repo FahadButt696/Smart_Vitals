@@ -56,7 +56,11 @@ import MealLogger from './MealLogger2.jpg';
 import weightTracker from './weightTracker.jpg'; 
 import weightTracker2 from './weightTracker.avif'; 
 import About from './AboutUs.jpg'; 
+import Contact from './ContactUs.png'; 
+import Contact2 from './ContactUs.webp';
 export {
+  Contact2,
+  Contact,
   About,
   weightTracker2,
   weightTracker,
