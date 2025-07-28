@@ -58,7 +58,9 @@ import weightTracker2 from './weightTracker.avif';
 import About from './AboutUs.jpg'; 
 import Contact from './ContactUs.png'; 
 import Contact2 from './ContactUs.webp';
+import logoChat from './logoChat.png';
 export {
+  logoChat,
   Contact2,
   Contact,
   About,

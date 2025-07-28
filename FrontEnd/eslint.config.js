@@ -4,6 +4,17 @@ import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
+module.exports = {
+  theme: {
+    extend: {
+      screens: {
+        '3xl': '1800px',
+      },
+    },
+  },
+  // ...
+};
+
 export default defineConfig([
   globalIgnores(['dist']),
   {

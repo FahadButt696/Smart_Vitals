@@ -10,7 +10,7 @@ import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import Footer from "./components/custom/Footer";
 import CustomNavbar from "./components/custom/Navbar";
-// import { ThreeDMarqueeDemoSecond } from "./components/custom/ThreeDMarquee";
+import Feature from "./pages/Features";
 
 function App(){
   return (
@@ -20,7 +20,7 @@ function App(){
       
       <Routes>
         <Route path="/" element={<Home/>}/>
-        <Route path="/Features" element={<Features/>}/>
+        <Route path="/Features" element={<Feature/>}/>
         <Route path="/About" element={<About/>}/>
         <Route path="/Contact" element={<Contact/>}/>
         <Route path="/Login" element={<Login/>}/>

@@ -2,7 +2,6 @@
 "use client";
 
 import BubbleText from "@/reactBit_Components/TextAnimations/BubbleText/BubbleText";
-import ShinyText from "@/reactBit_Components/TextAnimations/ShinyText/ShinyText";
 import { IconArrowNarrowRight } from "@tabler/icons-react";
 import { useState, useRef, useId, useEffect } from "react";
 import { ShimmerButton } from "../magicui/shimmer-button";
@@ -67,13 +66,13 @@ const Slide = ({ slide, index, current, handleSlideClick }) => {
         </div>
 
         <article className={`relative p-[4vmin] ${current === index ? "opacity-100 visible" : "opacity-0 invisible"}`}>
-          <h2 className="text-lg md:text-2xl lg:text-4xl font-semibold">
+          <h2 className="text-3xl md:text-2xl sm:text-lg xs:text-md lg:text-4xl font-semibold">
             <BubbleText title={title} />
           </h2>
           <div className="flex justify-center">
             <NavLink to="/Signup">
-              <ShimmerButton className="shadow-2xl mt-6 px-4 py-2">
-                <span className="text-sm font-medium leading-none tracking-tight text-white lg:text-lg">
+              <ShimmerButton className="shadow-2xl  mt-6 px-4 py-2 md:py-4">
+                <span className="text-sm font-medium leading-none tracking-tight  text-white lg:text-lg">
                   {button}
                 </span>
               </ShimmerButton>

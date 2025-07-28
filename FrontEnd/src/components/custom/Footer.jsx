@@ -2,19 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { FaGithub, FaLinkedin, FaTwitter, FaArrowUp } from "react-icons/fa";
+import { FaGithub, FaLinkedin, FaTwitter } from "react-icons/fa";
 
 const Footer = () => {
-  const [showScrollTop, setShowScrollTop] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setShowScrollTop(window.scrollY > 300);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
-
   return (
     <motion.footer
       initial={{ opacity: 0, y: 40 }}
@@ -31,13 +21,28 @@ const Footer = () => {
         </div>
 
         <div className="flex gap-4 text-xl text-neutral-300">
-          <a href="https://github.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">
+          <a
+            href="https://github.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-white transition"
+          >
             <FaGithub />
           </a>
-          <a href="https://linkedin.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">
+          <a
+            href="https://linkedin.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-white transition"
+          >
             <FaLinkedin />
           </a>
-          <a href="https://twitter.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">
+          <a
+            href="https://twitter.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-white transition"
+          >
             <FaTwitter />
           </a>
         </div>
@@ -46,15 +51,6 @@ const Footer = () => {
       <div className="text-center text-neutral-500 text-xs mt-8 border-t border-white/10 pt-4">
         © {new Date().getFullYear()} Smart Vitals — All rights reserved.
       </div>
-
-      {showScrollTop && (
-        <button
-          onClick={scrollToTop}
-          className="fixed bottom-6 right-6 z-50 p-3 bg-cyan-600 hover:bg-cyan-500 text-white rounded-full shadow-lg transition-all duration-300"
-        >
-          <FaArrowUp />
-        </button>
-      )}
     </motion.footer>
   );
 };

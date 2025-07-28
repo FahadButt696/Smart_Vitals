@@ -58,7 +58,7 @@ export const DirectionAwareHover = ({
       onMouseEnter={handleMouseEnter}
       ref={ref}
       className={cn(
-        "w-[20rem] h-[13rem] sm:w-[29rem] sm:h-[22rem] md:w-[29rem] md:h-[22rem] bg-transparent overflow-hidden group/card relative",
+        "w-[31.25rem] h-[31.25rem] sm:w-[29rem] sm:h-[22rem] md:w-[31.25rem] md:h-[31.25rem] bg-transparent overflow-hidden group/card relative",
         className
       )}>
       <AnimatePresence mode="wait">

@@ -1,6 +1,6 @@
 // src/components/customs/Navbar.jsx
 "use client";
-import {logo3} from "../../assets/Assets";
+import { logoChat} from "../../assets/Assets";
 
 import React, { useState, useRef, useEffect } from "react";
 import {
@@ -16,7 +16,7 @@ function cn(...classes) {
 }
 
 export const Navbar = ({ children, className }) => {
-  const { scrollY } = useScroll(); // ✅ window scroll
+  const { scrollY } = useScroll(); 
   const [visible, setVisible] = useState(false);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
@@ -25,7 +25,7 @@ export const Navbar = ({ children, className }) => {
 
   return (
     <motion.div
-      className={cn("fixed inset-x-0 top-0 z-50 w-full", className)}
+      className={cn("fixed inset-x-0 top-3 z-50 w-full", className)}
     >
       {React.Children.map(children, (child) =>
         React.isValidElement(child)
@@ -120,7 +120,7 @@ export const MobileNav = ({ children, className, visible }) => {
         damping: 50,
       }}
       className={cn(
-        "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between bg-transparent px-0 py-2 lg:hidden",
+        "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between bg-transparent px-0 m-0 lg:hidden",
         visible && "bg-white/10 dark:bg-black/90",
         className
       )}
@@ -133,7 +133,7 @@ export const MobileNav = ({ children, className, visible }) => {
 export const MobileNavHeader = ({ children, className }) => {
   return (
     <div
-      className={cn("flex w-full flex-row items-center justify-between px-4 py-3", className)}
+      className={cn("flex w-full flex-row items-center justify-between ", className)}
     >
       {children}
     </div>
@@ -182,18 +182,18 @@ export const NavbarLogo = () => {
   return (
     <a
       href="#"
-      className="relative z-20 mr-4 flex items-center space-x-2 px-2 py-1 text-sm font-normal text-white"
+      className="relative z-20 mr-4 flex items-center space-x-2  py-1 text-sm font-normal text-white"
     >
    
   <img
-    src={logo3}
+    src={logoChat}
     alt="logo3"
-    width={30}
-    height={30}
-    className="rounded-full filter invert"
+    width={70}
+    height={70}
+    className="m-0"
   />
 
-      <span className="font-medium italic FONT text-white dark:text-white">SMART VITALS</span>
+      <span className="relative right-3 font-medium italic FONT text-white dark:text-white">SMART VITALS</span>
     </a>
   );
 };
@@ -246,7 +246,7 @@ export default function CustomNavbar() {
   return (
     <Navbar className="top-0 fixed z-50">
       {/* Desktop Navigation */}
-      <NavBody className="max-w-screen px-8">
+      <NavBody className="max-w-screen ">
         <NavbarLogo />
         <NavItems items={navItems} onItemClick={() => setIsMobileMenuOpen(false)} />
         <div className="flex items-center space-x-4">
@@ -261,7 +261,7 @@ export default function CustomNavbar() {
 
       {/* Mobile Navigation */}
       <MobileNav className="top-0 z-50">
-        <MobileNavHeader className="px-4">
+        <MobileNavHeader className="relative right-2">
           <NavbarLogo />
           <MobileNavToggle isOpen={isMobileMenuOpen} onClick={toggleMobileMenu} />
         </MobileNavHeader>

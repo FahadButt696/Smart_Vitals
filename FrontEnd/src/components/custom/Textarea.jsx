@@ -27,10 +27,10 @@ export const TextAreaWithLabel = ({
       />
       <label
         htmlFor={name}
-        className={`absolute bottom-5 left-12 transition-all duration-200 pointer-events-none px-1 text-cyan-400 ${
+        className={`absolute  bottom-5 left-12 transition-all duration-200 pointer-events-none px-1 text-cyan-400 ${
           shouldFloat
             ? "top-1 text-xs"
-            : "top-5 text-base"
+            : "top-3 text-base"
         }`}
       >
         {label}
