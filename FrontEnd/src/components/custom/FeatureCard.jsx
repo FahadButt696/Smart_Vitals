@@ -1,27 +1,34 @@
-"use client";
-import { motion, useAnimation, useInView } from "framer-motion";
-import { useEffect, useRef } from "react";
-import { NavLink } from "react-router-dom";
+'use client';
+import { motion, useAnimation, useInView } from 'framer-motion';
+import { useEffect, useRef } from 'react';
+import { NavLink } from 'react-router-dom';
 
 const cardVariants = {
   hidden: { opacity: 0, y: 40 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: "easeOut" },
+    transition: { duration: 0.6, ease: 'easeOut' },
   },
 };
 
-const FeatureCard = ({ title, description, image, steps, isReversed, index }) => {
+const FeatureCard = ({
+  title,
+  description,
+  image,
+  steps,
+  isReversed,
+  index,
+}) => {
   const ref = useRef(null);
   const inView = useInView(ref, { amount: 0.3 });
   const controls = useAnimation();
 
   useEffect(() => {
     if (inView) {
-      controls.start("visible");
+      controls.start('visible');
     } else {
-      controls.start("hidden");
+      controls.start('hidden');
     }
   }, [inView, controls]);
 
@@ -32,13 +39,13 @@ const FeatureCard = ({ title, description, image, steps, isReversed, index }) =>
       animate={controls}
       variants={cardVariants}
       className={`flex flex-col md:flex-row ${
-        isReversed ? "md:flex-row-reverse" : ""
+        isReversed ? 'md:flex-row-reverse' : ''
       } items-start gap-10 md:gap-12 lg:gap-16`}
     >
       {/* Image Section with existing hover effect */}
       <motion.div
         whileHover={{ scale: 1.05, rotate: 1 }}
-        transition={{ type: "spring", stiffness: 200, damping: 20 }}
+        transition={{ type: 'spring', stiffness: 200, damping: 20 }}
         className="flex-shrink-0 w-full md:w-[500px] h-[500px] rounded-lg overflow-hidden group"
       >
         <div className="hover:cursor-pointer relative w-full h-full rounded-lg transition-all duration-300 group-hover:shadow-[0_8px_30px_rgba(0,255,255,0.3),0_0_60px_rgba(0,255,255,0.2)]">
@@ -58,7 +65,9 @@ const FeatureCard = ({ title, description, image, steps, isReversed, index }) =>
         animate={controls}
         variants={cardVariants}
       >
-        <h3 className="text-2xl md:text-3xl font-bold text-cyan-400">{title}</h3>
+        <h3 className="text-2xl md:text-3xl font-bold text-cyan-400">
+          {title}
+        </h3>
         <p className="text-neutral-300">{description}</p>
         <ul className="list-disc pl-5 text-sm space-y-1 text-white">
           {steps.map((step, idx) => (

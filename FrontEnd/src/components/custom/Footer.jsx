@@ -1,20 +1,22 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { FaGithub, FaLinkedin, FaTwitter } from "react-icons/fa";
+import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import { FaGithub, FaLinkedin, FaTwitter } from 'react-icons/fa';
 
 const Footer = () => {
   return (
     <motion.footer
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
+      transition={{ duration: 0.6, ease: 'easeOut' }}
       className="relative w-full bg-gradient-to-r from-gray-900 via-cyan-900 to-neutral-900 text-white px-6 py-10"
     >
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 text-sm">
         <div className="text-center md:text-left">
-          <h1 className="text-lg font-bold text-cyan-400 tracking-wider">Smart Vitals</h1>
+          <h1 className="text-lg font-bold text-cyan-400 tracking-wider">
+            Smart Vitals
+          </h1>
           <p className="text-neutral-300 mt-1">
             Empowering your health journey with smart AI tools.
           </p>

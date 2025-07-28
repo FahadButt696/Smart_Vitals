@@ -2,8 +2,8 @@
 	Installed from https://reactbits.dev/tailwind/
 */
 
-import { useRef, useEffect } from "react";
-import { Renderer, Program, Mesh, Triangle, Vec2 } from "ogl";
+import { useRef, useEffect } from 'react';
+import { Renderer, Program, Mesh, Triangle, Vec2 } from 'ogl';
 
 const vertex = `
 attribute vec2 position;
@@ -122,7 +122,7 @@ export default function DarkVeil({
       program.uniforms.uResolution.value.set(w, h);
     };
 
-    window.addEventListener("resize", resize);
+    window.addEventListener('resize', resize);
     resize();
 
     const start = performance.now();
@@ -144,7 +144,7 @@ export default function DarkVeil({
 
     return () => {
       cancelAnimationFrame(frame);
-      window.removeEventListener("resize", resize);
+      window.removeEventListener('resize', resize);
     };
   }, [
     hueShift,

@@ -1,11 +1,11 @@
 // Carousel.jsx
-"use client";
+'use client';
 
-import BubbleText from "@/reactBit_Components/TextAnimations/BubbleText/BubbleText";
-import { IconArrowNarrowRight } from "@tabler/icons-react";
-import { useState, useRef, useId, useEffect } from "react";
-import { ShimmerButton } from "../magicui/shimmer-button";
-import { NavLink } from "react-router-dom";
+import BubbleText from '@/reactBit_Components/TextAnimations/BubbleText/BubbleText';
+import { IconArrowNarrowRight } from '@tabler/icons-react';
+import { useState, useRef, useId, useEffect } from 'react';
+import { ShimmerButton } from '../magicui/shimmer-button';
+import { NavLink } from 'react-router-dom';
 
 const Slide = ({ slide, index, current, handleSlideClick }) => {
   const slideRef = useRef(null);
@@ -16,8 +16,8 @@ const Slide = ({ slide, index, current, handleSlideClick }) => {
   useEffect(() => {
     const animate = () => {
       if (!slideRef.current) return;
-      slideRef.current.style.setProperty("--x", `${xRef.current}px`);
-      slideRef.current.style.setProperty("--y", `${yRef.current}px`);
+      slideRef.current.style.setProperty('--x', `${xRef.current}px`);
+      slideRef.current.style.setProperty('--y', `${yRef.current}px`);
       frameRef.current = requestAnimationFrame(animate);
     };
     frameRef.current = requestAnimationFrame(animate);
@@ -46,14 +46,22 @@ const Slide = ({ slide, index, current, handleSlideClick }) => {
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         style={{
-          transform: current !== index ? "scale(0.98) rotateX(8deg)" : "scale(1) rotateX(0deg)",
-          transformOrigin: "bottom",
-        }}>
+          transform:
+            current !== index
+              ? 'scale(0.98) rotateX(8deg)'
+              : 'scale(1) rotateX(0deg)',
+          transformOrigin: 'bottom',
+        }}
+      >
         <div
           className="absolute top-0 left-0 w-full h-full bg-[#1D1F2F] rounded-[1%] overflow-hidden shadow-lg"
           style={{
-            transform: current === index ? "translate3d(calc(var(--x)/30),calc(var(--y)/30),0)" : "none",
-          }}>
+            transform:
+              current === index
+                ? 'translate3d(calc(var(--x)/30),calc(var(--y)/30),0)'
+                : 'none',
+          }}
+        >
           <img
             className="absolute inset-0 w-[120%] h-[120%] object-cover opacity-100"
             style={{ opacity: current === index ? 1 : 0.5 }}
@@ -62,10 +70,14 @@ const Slide = ({ slide, index, current, handleSlideClick }) => {
             loading="eager"
             decoding="sync"
           />
-          {current === index && <div className="absolute inset-0 bg-black/30 transition-all duration-1000" />}
+          {current === index && (
+            <div className="absolute inset-0 bg-black/30 transition-all duration-1000" />
+          )}
         </div>
 
-        <article className={`relative p-[4vmin] ${current === index ? "opacity-100 visible" : "opacity-0 invisible"}`}>
+        <article
+          className={`relative p-[4vmin] ${current === index ? 'opacity-100 visible' : 'opacity-0 invisible'}`}
+        >
           <h2 className="text-3xl md:text-2xl sm:text-lg xs:text-md lg:text-4xl font-semibold">
             <BubbleText title={title} />
           </h2>
@@ -88,7 +100,7 @@ const CarouselControl = ({ type, title, handleClick }) => {
   return (
     <button
       className={`group w-10 h-10 flex mr-[.1rem] items-center justify-center rounded-full bg-black shadow-xl transform transition-all duration-300 ease-in-out hover:scale-110 hover:shadow-2xl border border-white/10 ${
-        type === "previous" ? "rotate-180" : ""
+        type === 'previous' ? 'rotate-180' : ''
       }`}
       title={title}
       onClick={handleClick}
@@ -101,25 +113,48 @@ const CarouselControl = ({ type, title, handleClick }) => {
   );
 };
 
-
 export function Carousel({ slides }) {
   const [current, setCurrent] = useState(0);
   const id = useId();
 
-  const handlePreviousClick = () => setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
-  const handleNextClick = () => setCurrent((prev) => (prev + 1) % slides.length);
+  const handlePreviousClick = () =>
+    setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
+  const handleNextClick = () =>
+    setCurrent((prev) => (prev + 1) % slides.length);
   const handleSlideClick = (index) => setCurrent(index);
 
   return (
-    <div className="relative w-[70vmin] h-[70vmin] mx-auto" aria-labelledby={`carousel-heading-${id}`}>
-      <ul className="absolute flex mx-[-4vmin] transition-transform duration-1000 ease-in-out" style={{ transform: `translateX(-${current * (100 / slides.length)}%)` }}>
+    <div
+      className="relative w-[70vmin] h-[70vmin] mx-auto"
+      aria-labelledby={`carousel-heading-${id}`}
+    >
+      <ul
+        className="absolute flex mx-[-4vmin] transition-transform duration-1000 ease-in-out"
+        style={{
+          transform: `translateX(-${current * (100 / slides.length)}%)`,
+        }}
+      >
         {slides.map((slide, index) => (
-          <Slide key={index} slide={slide} index={index} current={current} handleSlideClick={handleSlideClick} />
+          <Slide
+            key={index}
+            slide={slide}
+            index={index}
+            current={current}
+            handleSlideClick={handleSlideClick}
+          />
         ))}
       </ul>
       <div className="absolute flex justify-center w-full top-[calc(100%+1rem)]">
-        <CarouselControl type="previous" title="Go to previous slide" handleClick={handlePreviousClick} />
-        <CarouselControl type="next" title="Go to next slide" handleClick={handleNextClick} />
+        <CarouselControl
+          type="previous"
+          title="Go to previous slide"
+          handleClick={handlePreviousClick}
+        />
+        <CarouselControl
+          type="next"
+          title="Go to next slide"
+          handleClick={handleNextClick}
+        />
       </div>
     </div>
   );

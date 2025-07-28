@@ -1,11 +1,11 @@
-"use client";
-import React, { useState } from "react";
+'use client';
+import React, { useState } from 'react';
 
 export const InputWithLabel = ({
   label,
   icon,
   name,
-  type = "text",
+  type = 'text',
   value,
   onChange,
 }) => {
@@ -32,8 +32,8 @@ export const InputWithLabel = ({
         htmlFor={name}
         className={`absolute left-12 transition-all duration-200 pointer-events-none px-1  text-cyan-400 ${
           shouldFloat
-            ? "top-1 text-xs"
-            : "top-1/2 transform -translate-y-1/2 text-base"
+            ? 'top-1 text-xs'
+            : 'top-1/2 transform -translate-y-1/2 text-base'
         }`}
       >
         {label}

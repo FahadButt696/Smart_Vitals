@@ -1,15 +1,19 @@
-"use client";
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { InputWithLabel } from "./Input";
-import { TextAreaWithLabel } from "./Textarea";
-import { FaUser, FaEnvelope, FaCommentDots } from "react-icons/fa";
-import { Contact } from "@/assets/Assets";
+'use client';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { InputWithLabel } from './Input';
+import { TextAreaWithLabel } from './Textarea';
+import { FaUser, FaEnvelope, FaCommentDots } from 'react-icons/fa';
+import { Contact } from '@/assets/Assets';
 
 export default function ContactPage() {
-  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    message: '',
+  });
   const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -20,14 +24,14 @@ export default function ContactPage() {
     const { name, email, message } = formData;
 
     if (!name || !email || !message) {
-      setError("All fields are required.");
+      setError('All fields are required.');
       return;
     }
 
     setTimeout(() => {
       setSubmitted(true);
-      setFormData({ name: "", email: "", message: "" });
-      setError("");
+      setFormData({ name: '', email: '', message: '' });
+      setError('');
     }, 500);
   };
 
@@ -50,8 +54,8 @@ export default function ContactPage() {
           Contact <span className="text-cyan-400">Smart Vitals</span>
         </h2>
         <p className="text-lg text-neutral-300">
-          Got questions, ideas, or just want to chat? We’d love to hear from you.
-          Fill the form below and we’ll get back to you in no time.
+          Got questions, ideas, or just want to chat? We’d love to hear from
+          you. Fill the form below and we’ll get back to you in no time.
         </p>
       </motion.div>
 
@@ -60,7 +64,7 @@ export default function ContactPage() {
         {/* Animated Image */}
         <motion.div
           whileHover={{ scale: 1.05 }}
-          transition={{ type: "spring", stiffness: 150 }}
+          transition={{ type: 'spring', stiffness: 150 }}
           className="w-full flex justify-center"
         >
           <motion.img
@@ -142,7 +146,7 @@ export default function ContactPage() {
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.8 }}
-              transition={{ type: "spring", stiffness: 200, damping: 20 }}
+              transition={{ type: 'spring', stiffness: 200, damping: 20 }}
               className="bg-gradient-to-br from-cyan-900 to-neutral-900 text-white rounded-lg shadow-xl p-8 w-[90%] max-w-lg text-center"
             >
               <h2 className="text-2xl font-bold mb-4">Message Sent!</h2>

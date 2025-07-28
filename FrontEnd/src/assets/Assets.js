@@ -34,29 +34,29 @@ import dark28 from './dark28.png';
 import dark29 from './dark29.jpeg';
 import dark30 from './dark30.png';
 import dark31 from './dark31.jpeg';
-import feature1 from './feature1.jpeg'
-import feature2 from './feature2.jpeg'
-import calorieImage from './calorieImage.webp'
-import DietPlanAi from './DietPlanAi.jpeg'
-import AiMeal from './AiMeal.png'
-import AiSymptom from './AiSymptomChecker.webp'
-import AiMental from './AIMentalHealth.png'
-import Chart from './Chart.webp'
-import track from './track.jpg'
-import mealLog from './mealLog.jpg'
-import workout from './workout.jpg'
-import water from './waterIntake.jpg'
-import AiCalorieCounter from './AiCalorieCounter.jpg'
-import CalorieTracker from './CalorieTracker.jpg'
-import CalorieTracker2 from './CalorieTracker2.webp'
+import feature1 from './feature1.jpeg';
+import feature2 from './feature2.jpeg';
+import calorieImage from './calorieImage.webp';
+import DietPlanAi from './DietPlanAi.jpeg';
+import AiMeal from './AiMeal.png';
+import AiSymptom from './AiSymptomChecker.webp';
+import AiMental from './AIMentalHealth.png';
+import Chart from './Chart.webp';
+import track from './track.jpg';
+import mealLog from './mealLog.jpg';
+import workout from './workout.jpg';
+import water from './waterIntake.jpg';
+import AiCalorieCounter from './AiCalorieCounter.jpg';
+import CalorieTracker from './CalorieTracker.jpg';
+import CalorieTracker2 from './CalorieTracker2.webp';
 import SleepTracker from './SleepTracker.jpg';
-import WeightProgress from './WeightProgress.avif'; 
-import healthReport from './healthReport.avif'; 
-import MealLogger from './MealLogger2.jpg'; 
-import weightTracker from './weightTracker.jpg'; 
-import weightTracker2 from './weightTracker.avif'; 
-import About from './AboutUs.jpg'; 
-import Contact from './ContactUs.png'; 
+import WeightProgress from './WeightProgress.avif';
+import healthReport from './healthReport.avif';
+import MealLogger from './MealLogger2.jpg';
+import weightTracker from './weightTracker.jpg';
+import weightTracker2 from './weightTracker.avif';
+import About from './AboutUs.jpg';
+import Contact from './ContactUs.png';
 import Contact2 from './ContactUs.webp';
 import logoChat from './logoChat.png';
 export {
@@ -85,7 +85,7 @@ export {
   calorieImage,
   feature1,
   feature2,
-  logo3,  
+  logo3,
   logo,
   hero,
   logo2,

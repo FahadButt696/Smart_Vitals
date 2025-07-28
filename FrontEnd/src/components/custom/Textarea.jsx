@@ -1,13 +1,7 @@
-"use client";
-import React, { useState } from "react";
+'use client';
+import React, { useState } from 'react';
 
-export const TextAreaWithLabel = ({
-  label,
-  icon,
-  name,
-  value,
-  onChange,
-}) => {
+export const TextAreaWithLabel = ({ label, icon, name, value, onChange }) => {
   const [isFocused, setIsFocused] = useState(false);
   const shouldFloat = isFocused || value;
 
@@ -28,9 +22,7 @@ export const TextAreaWithLabel = ({
       <label
         htmlFor={name}
         className={`absolute  bottom-5 left-12 transition-all duration-200 pointer-events-none px-1 text-cyan-400 ${
-          shouldFloat
-            ? "top-1 text-xs"
-            : "top-3 text-base"
+          shouldFloat ? 'top-1 text-xs' : 'top-3 text-base'
         }`}
       >
         {label}

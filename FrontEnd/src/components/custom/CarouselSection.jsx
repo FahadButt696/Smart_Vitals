@@ -1,5 +1,5 @@
 // CarouselDemo.jsx
-"use client";
+'use client';
 
 import {
   Chart,
@@ -14,49 +14,49 @@ import {
   MealLogger,
   weightTracker,
   weightTracker2,
-} from "@/assets/Assets";
-import { Carousel } from "../ui/Carousel";
+} from '@/assets/Assets';
+import { Carousel } from '../ui/Carousel';
 
 export function CarouselDemo() {
   const slideData = [
     {
-      title: "WORKOUT LOGGER",
-      button: "ADD WORKOUT",
+      title: 'WORKOUT LOGGER',
+      button: 'ADD WORKOUT',
       src: track,
     },
     {
-      title: "CALORIE COUNT",
-      button: "TRACK CALORIES",
+      title: 'CALORIE COUNT',
+      button: 'TRACK CALORIES',
       src: CalorieTracker2,
     },
     {
-      title: "MEAL LOGGER",
-      button: "LOG A MEAL",
+      title: 'MEAL LOGGER',
+      button: 'LOG A MEAL',
       src: MealLogger,
     },
     {
-      title: "WATER INTAKE",
-      button: "LOG WATER",
+      title: 'WATER INTAKE',
+      button: 'LOG WATER',
       src: water,
     },
     {
-      title: "SLEEP TRACKER",
-      button: "TRACK SLEEP",
+      title: 'SLEEP TRACKER',
+      button: 'TRACK SLEEP',
       src: SleepTracker,
     },
     {
-      title: "WEIGHT PROGRESS",
-      button: "VIEW PROGRESS",
+      title: 'WEIGHT PROGRESS',
+      button: 'VIEW PROGRESS',
       src: weightTracker,
     },
     {
-      title: "CHARTS",
-      button: "VIEW STATS",
+      title: 'CHARTS',
+      button: 'VIEW STATS',
       src: Chart,
     },
     {
-      title: "HEALTH REPORT PDF",
-      button: "GENERATE REPORT",
+      title: 'HEALTH REPORT PDF',
+      button: 'GENERATE REPORT',
       src: healthReport,
     },
   ];

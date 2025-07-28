@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import { motion, useMotionValue, useSpring } from "framer-motion";
+import { useRef, useState } from 'react';
+import { motion, useMotionValue, useSpring } from 'framer-motion';
 
 const springValues = {
   damping: 30,
@@ -9,12 +9,12 @@ const springValues = {
 
 export default function TiltedCard({
   imageSrc,
-  altText = "Tilted card image",
-  captionText = "",
-  containerHeight = "300px",
-  containerWidth = "100%",
-  imageHeight = "300px",
-  imageWidth = "300px",
+  altText = 'Tilted card image',
+  captionText = '',
+  containerHeight = '300px',
+  containerWidth = '100%',
+  imageHeight = '300px',
+  imageWidth = '300px',
   scaleOnHover = 1.1,
   rotateAmplitude = 14,
   showMobileWarning = true,
@@ -101,13 +101,10 @@ export default function TiltedCard({
           src={imageSrc}
           alt={altText}
           className="absolute brightness-70  lg:w-[35rem] lg:h-[30rem] md:w-[25rem] md:h-[25rem] mm:w-[15rem] sm:w-[15rem]  cursor-pointer top-0 left-0 object-cover rounded-[15px] will-change-transform [transform:translateZ(0)]"
-
         />
 
         {displayOverlayContent && overlayContent && (
-          <motion.div
-            className="absolute top-0 left-0 z-[2] will-change-transform [transform:translateZ(30px)]"
-          >
+          <motion.div className="absolute top-0 left-0 z-[2] will-change-transform [transform:translateZ(30px)]">
             {overlayContent}
           </motion.div>
         )}

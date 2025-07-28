@@ -1,18 +1,5 @@
-// import AuthLayout from '@/components/custom/AuthLayout'
-import AuthPanel from '@/components/custom/AuthPanel'
-import { SignUp } from '@clerk/clerk-react'
-// import AuthSwitcher from '@/components/custom/AuthSwitcher'
-import React from 'react'
+import AuthForm from "../components/custom/AuthForm";
 
-const Signup = () => {
-  return (
-    <div>
-
-    {/* <SignUp/> */}
-    <AuthPanel/>
-      
-    </div>
-  )
+export default function Signup() {
+  return <AuthForm type="sign-up" />;
 }
-
-export default Signup

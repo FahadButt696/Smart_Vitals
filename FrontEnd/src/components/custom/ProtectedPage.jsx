@@ -1,4 +1,4 @@
-import { SignedIn, SignedOut, RedirectToSignIn } from "@clerk/clerk-react";
+import { SignedIn, SignedOut, RedirectToSignIn } from '@clerk/clerk-react';
 
 export default function ProtectedPage({ children }) {
   return (

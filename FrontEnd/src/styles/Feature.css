@@ -40,10 +40,9 @@
   border-radius: 12px;
   box-shadow: 0 10px 40px rgba(0, 255, 255, 0.08);
   transition: all ease-in-out;
-  
 }
-.feature-image:hover{
-    cursor: pointer;
+.feature-image:hover {
+  cursor: pointer;
 }
 
 .feature-text {

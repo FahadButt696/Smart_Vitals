@@ -1,8 +1,8 @@
 // src/components/sections/WhyChoose.jsx
-"use client";
+'use client';
 
-import React from "react";
-import { motion } from "framer-motion";
+import React from 'react';
+import { motion } from 'framer-motion';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -12,35 +12,35 @@ const fadeUp = {
     transition: {
       delay: i * 0.2,
       duration: 0.6,
-      ease: "easeOut",
+      ease: 'easeOut',
     },
   }),
 };
 
 const features = [
   {
-    emoji: "🤖",
-    title: "AI-Powered Recommendations",
+    emoji: '🤖',
+    title: 'AI-Powered Recommendations',
     description:
-      "Smart Vitals uses intelligent algorithms to deliver personalized meal plans, workouts, and health suggestions — just for you.",
+      'Smart Vitals uses intelligent algorithms to deliver personalized meal plans, workouts, and health suggestions — just for you.',
   },
   {
-    emoji: "📲",
-    title: "Effortless Logging",
+    emoji: '📲',
+    title: 'Effortless Logging',
     description:
-      "Track meals, workouts, water, and more with a simple tap. No complexity, just a clean and fast experience.",
+      'Track meals, workouts, water, and more with a simple tap. No complexity, just a clean and fast experience.',
   },
   {
-    emoji: "🧠",
-    title: "Student-Friendly Interface",
+    emoji: '🧠',
+    title: 'Student-Friendly Interface',
     description:
-      "Smart Vitals is designed to be minimal, fast, and intuitive — perfect for students and busy users.",
+      'Smart Vitals is designed to be minimal, fast, and intuitive — perfect for students and busy users.',
   },
   {
-    emoji: "🩺",
-    title: "All-in-One Wellness",
+    emoji: '🩺',
+    title: 'All-in-One Wellness',
     description:
-      "Get your health, fitness, sleep, and mental well-being all under one roof. No need for 5 different apps.",
+      'Get your health, fitness, sleep, and mental well-being all under one roof. No need for 5 different apps.',
   },
 ];
 
@@ -62,7 +62,8 @@ const WhyChoose = () => {
           transition={{ delay: 0.2, duration: 0.6 }}
           className="text-neutral-300 mb-12 max-w-2xl mx-auto"
         >
-          Your AI-powered companion for total health and wellness — built for simplicity and precision.
+          Your AI-powered companion for total health and wellness — built for
+          simplicity and precision.
         </motion.p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">

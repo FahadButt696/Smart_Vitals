@@ -1,20 +1,20 @@
 // src/reactBit_Components/Components/Stepper/Stepper.jsx
-import React, { useState, Children, useRef, useLayoutEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState, Children, useRef, useLayoutEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Stepper({
   children,
   initialStep = 1,
   onStepChange = () => {},
   onFinalStepCompleted = () => {},
-  stepCircleContainerClassName = "",
-  stepContainerClassName = "",
-  contentClassName = "",
-  footerClassName = "",
+  stepCircleContainerClassName = '',
+  stepContainerClassName = '',
+  contentClassName = '',
+  footerClassName = '',
   backButtonProps = {},
   nextButtonProps = {},
-  backButtonText = "Back",
-  nextButtonText = "Continue",
+  backButtonText = 'Back',
+  nextButtonText = 'Continue',
   disableStepIndicators = false,
   renderStepIndicator,
   ...rest
@@ -59,7 +59,9 @@ export default function Stepper({
       <div
         className={`mx-auto w-full bg-white/5 backdrop-blur-xl shadow-lg rounded-xl ${stepCircleContainerClassName}`}
       >
-        <div className={`${stepContainerClassName} flex w-full items-center px-4 py-6`}>
+        <div
+          className={`${stepContainerClassName} flex w-full items-center px-4 py-6`}
+        >
           {stepsArray.map((_, index) => {
             const stepNumber = index + 1;
             const isNotLastStep = index < totalSteps - 1;
@@ -102,7 +104,9 @@ export default function Stepper({
         </StepContentWrapper>
         {!isCompleted && (
           <div className={`px-4 pb-6 ${footerClassName}`}>
-            <div className={`mt-6 flex ${currentStep !== 1 ? "justify-between" : "justify-end"}`}>
+            <div
+              className={`mt-6 flex ${currentStep !== 1 ? 'justify-between' : 'justify-end'}`}
+            >
               {currentStep !== 1 && (
                 <button
                   onClick={handleBack}
@@ -117,7 +121,7 @@ export default function Stepper({
                 className="rounded-full bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 font-semibold shadow-md transition"
                 {...nextButtonProps}
               >
-                {isLastStep ? "Complete" : nextButtonText}
+                {isLastStep ? 'Complete' : nextButtonText}
               </button>
             </div>
           </div>
@@ -127,19 +131,29 @@ export default function Stepper({
   );
 }
 
-function StepContentWrapper({ isCompleted, currentStep, direction, children, className }) {
+function StepContentWrapper({
+  isCompleted,
+  currentStep,
+  direction,
+  children,
+  className,
+}) {
   const [parentHeight, setParentHeight] = useState(0);
 
   return (
     <motion.div
-      style={{ position: "relative", overflow: "hidden" }}
+      style={{ position: 'relative', overflow: 'hidden' }}
       animate={{ height: isCompleted ? 0 : parentHeight }}
-      transition={{ type: "spring", duration: 0.4 }}
+      transition={{ type: 'spring', duration: 0.4 }}
       className={className}
     >
       <AnimatePresence initial={false} mode="sync" custom={direction}>
         {!isCompleted && (
-          <SlideTransition key={currentStep} direction={direction} onHeightReady={(h) => setParentHeight(h)}>
+          <SlideTransition
+            key={currentStep}
+            direction={direction}
+            onHeightReady={(h) => setParentHeight(h)}
+          >
             {children}
           </SlideTransition>
         )}
@@ -164,7 +178,7 @@ function SlideTransition({ children, direction, onHeightReady }) {
       animate="center"
       exit="exit"
       transition={{ duration: 0.4 }}
-      style={{ position: "absolute", left: 0, right: 0, top: 0 }}
+      style={{ position: 'absolute', left: 0, right: 0, top: 0 }}
     >
       {children}
     </motion.div>
@@ -173,15 +187,15 @@ function SlideTransition({ children, direction, onHeightReady }) {
 
 const stepVariants = {
   enter: (dir) => ({
-    x: dir >= 0 ? "100%" : "-100%",
+    x: dir >= 0 ? '100%' : '-100%',
     opacity: 0,
   }),
   center: {
-    x: "0%",
+    x: '0%',
     opacity: 1,
   },
   exit: (dir) => ({
-    x: dir >= 0 ? "-50%" : "50%",
+    x: dir >= 0 ? '-50%' : '50%',
     opacity: 0,
   }),
 };
@@ -190,8 +204,18 @@ export function Step({ children }) {
   return <div className="px-4">{children}</div>;
 }
 
-function StepIndicator({ step, currentStep, onClickStep, disableStepIndicators }) {
-  const status = currentStep === step ? "active" : currentStep < step ? "inactive" : "complete";
+function StepIndicator({
+  step,
+  currentStep,
+  onClickStep,
+  disableStepIndicators,
+}) {
+  const status =
+    currentStep === step
+      ? 'active'
+      : currentStep < step
+        ? 'inactive'
+        : 'complete';
 
   const handleClick = () => {
     if (step !== currentStep && !disableStepIndicators) onClickStep(step);
@@ -206,14 +230,14 @@ function StepIndicator({ step, currentStep, onClickStep, disableStepIndicators }
     >
       <motion.div
         variants={{
-          inactive: { scale: 1, backgroundColor: "#222", color: "#a3a3a3" },
-          active: { scale: 1.2, backgroundColor: "#06b6d4", color: "#06b6d4" },
-          complete: { scale: 1, backgroundColor: "#06b6d4", color: "#fff" },
+          inactive: { scale: 1, backgroundColor: '#222', color: '#a3a3a3' },
+          active: { scale: 1.2, backgroundColor: '#06b6d4', color: '#06b6d4' },
+          complete: { scale: 1, backgroundColor: '#06b6d4', color: '#fff' },
         }}
         transition={{ duration: 0.3 }}
         className="flex h-8 w-8 items-center justify-center rounded-full font-semibold text-sm"
       >
-        {status === "complete" ? (
+        {status === 'complete' ? (
           <CheckIcon className="h-4 w-4 text-white" />
         ) : (
           <span>{step}</span>
@@ -229,11 +253,11 @@ function StepConnector({ isComplete }) {
       <motion.div
         className="absolute left-0 top-0 h-full"
         variants={{
-          incomplete: { width: 0, backgroundColor: "transparent" },
-          complete: { width: "100%", backgroundColor: "#06b6d4" },
+          incomplete: { width: 0, backgroundColor: 'transparent' },
+          complete: { width: '100%', backgroundColor: '#06b6d4' },
         }}
         initial={false}
-        animate={isComplete ? "complete" : "incomplete"}
+        animate={isComplete ? 'complete' : 'incomplete'}
         transition={{ duration: 0.4 }}
       />
     </div>
@@ -242,11 +266,22 @@ function StepConnector({ isComplete }) {
 
 function CheckIcon(props) {
   return (
-    <svg {...props} fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+    <svg
+      {...props}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      viewBox="0 0 24 24"
+    >
       <motion.path
         initial={{ pathLength: 0 }}
         animate={{ pathLength: 1 }}
-        transition={{ delay: 0.1, type: "tween", ease: "easeOut", duration: 0.3 }}
+        transition={{
+          delay: 0.1,
+          type: 'tween',
+          ease: 'easeOut',
+          duration: 0.3,
+        }}
         strokeLinecap="round"
         strokeLinejoin="round"
         d="M5 13l4 4L19 7"

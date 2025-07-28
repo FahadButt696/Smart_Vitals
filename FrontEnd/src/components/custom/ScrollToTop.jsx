@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import { FaArrowUp } from "react-icons/fa";
+import React, { useEffect, useState } from 'react';
+import { FaArrowUp } from 'react-icons/fa';
 
 const ScrollToTop = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setShowScrollTop(window.scrollY > 300);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return showScrollTop ? (

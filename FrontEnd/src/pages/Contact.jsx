@@ -1,14 +1,13 @@
-import ContactPage  from '../components/custom/ContactUsSection'
+import ContactPage from '../components/custom/ContactUsSection';
 // import ContactUs from '@/components/custom/ContactUsSection'
-import React from 'react'
+import React from 'react';
 
 const Contact = () => {
   return (
     <div>
-      <ContactPage/>
-      
+      <ContactPage />
     </div>
-  )
-}
+  );
+};
 
-export default Contact
+export default Contact;

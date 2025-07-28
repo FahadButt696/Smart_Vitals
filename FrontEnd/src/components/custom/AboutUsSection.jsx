@@ -1,7 +1,7 @@
-"use client";
-import { motion } from "framer-motion";
-import { About } from "@/assets/Assets";
-import { DirectionAwareHover } from "@/components/ui/Direction_Aware_Hover";
+'use client';
+import { motion } from 'framer-motion';
+import { About } from '@/assets/Assets';
+import { DirectionAwareHover } from '@/components/ui/Direction_Aware_Hover';
 
 const textVariants = {
   hidden: { opacity: 0, y: 30 },
@@ -11,7 +11,7 @@ const textVariants = {
     transition: {
       delay: i * 0.2,
       duration: 0.6,
-      ease: "easeOut",
+      ease: 'easeOut',
     },
   }),
 };
@@ -44,8 +44,9 @@ const AboutUs = () => {
           custom={1}
           variants={textVariants}
         >
-          Discover how technology and AI come together to simplify your fitness goals.
-          Get personalized insights, powerful tools, and effortless tracking — all in one place.
+          Discover how technology and AI come together to simplify your fitness
+          goals. Get personalized insights, powerful tools, and effortless
+          tracking — all in one place.
         </motion.p>
       </motion.div>
 
@@ -84,7 +85,9 @@ const AboutUs = () => {
             custom={1}
             variants={textVariants}
           >
-            Smart Vitals is your AI-powered health and fitness companion — built for modern users seeking simplicity, intelligence, and complete control over their lifestyle.
+            Smart Vitals is your AI-powered health and fitness companion — built
+            for modern users seeking simplicity, intelligence, and complete
+            control over their lifestyle.
           </motion.p>
 
           <motion.p
@@ -92,7 +95,9 @@ const AboutUs = () => {
             custom={2}
             variants={textVariants}
           >
-            Whether it’s tracking your meals, logging workouts, monitoring sleep, or keeping up with hydration, we offer a sleek, intuitive interface that adapts to your personal goals.
+            Whether it’s tracking your meals, logging workouts, monitoring
+            sleep, or keeping up with hydration, we offer a sleek, intuitive
+            interface that adapts to your personal goals.
           </motion.p>
         </motion.div>
       </div>

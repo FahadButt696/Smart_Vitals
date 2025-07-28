@@ -1,14 +1,5 @@
-import { SignIn, SignUp, SignUpButton } from '@clerk/clerk-react'
-import React from 'react'
-// import Signup from './Signup'
+import AuthForm from "../components/custom/AuthForm";
 
-const Login = () => {
-  return (
-    <div>
-      <SignIn/>
-      
-    </div>
-  )
+export default function Login() {
+  return <AuthForm type="sign-in" />;
 }
-
-export default Login
