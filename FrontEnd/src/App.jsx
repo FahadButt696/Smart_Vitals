@@ -10,6 +10,7 @@ import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import Footer from './components/custom/Footer';
 import CustomNavbar from './components/custom/Navbar';
+import { RedirectToSignIn,RedirectToSignUp } from '@clerk/clerk-react';
 
 function App() {
   const location = useLocation();

@@ -2,7 +2,7 @@
 
 A comprehensive health and fitness tracking API built with Node.js, Express, and MongoDB.
 
-## 🚀 Features
+##  Features
 
 - **User Management**: Clerk authentication integration
 - **Workout Tracking**: Log exercises, sets, reps, and progress
@@ -16,7 +16,7 @@ A comprehensive health and fitness tracking API built with Node.js, Express, and
 - **Health Reports**: Generate comprehensive PDF reports
 - **Data Visualization**: Charts and analytics
 
-## 📋 Prerequisites
+##  Prerequisites
 
 - Node.js (v18 or higher)
 - MongoDB (local or Atlas)
@@ -24,7 +24,7 @@ A comprehensive health and fitness tracking API built with Node.js, Express, and
 - OpenAI API key (for AI features)
 - Cloudinary account (for image uploads)
 
-## 🛠️ Installation
+##  Installation
 
 1. **Clone the repository**
    ```bash

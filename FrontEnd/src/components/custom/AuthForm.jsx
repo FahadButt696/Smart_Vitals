@@ -15,7 +15,6 @@ const AuthForm = ({ type = "sign-in" }) => {
 
   const appearance = {
     ...dark,
-    logoImageUrl: logo3,
     elements: {
       ...dark.elements,
       formButtonPrimary:
@@ -54,19 +53,15 @@ const AuthForm = ({ type = "sign-in" }) => {
       >
         {isSignIn ? (
           <SignIn
-            path="/Login"
-            routing="path"
             signUpUrl="/Signup"
-            fallbackRedirectUrl="/Dashboard"
+            forceRedirectUrl="/Dashboard"
             appearance={appearance}
             logo={logo3}
           />
         ) : (
           <SignUp
-            path="/Signup"
-            routing="path"
             signInUrl="/Login"
-            fallbackRedirectUrl="/Dashboard"
+            forceRedirectUrl="/Dashboard"
             appearance={appearance}
             logo={logo3}
           />

@@ -1,7 +1,13 @@
 import React from 'react';
+import { UserButton } from "@clerk/clerk-react";
 
 const Dashboard = () => {
-  return <div></div>;
+  return <div>
+
+
+
+    <UserButton afterSwitchSessionUrl="/Login" />
+  </div>;
 };
 
 export default Dashboard;

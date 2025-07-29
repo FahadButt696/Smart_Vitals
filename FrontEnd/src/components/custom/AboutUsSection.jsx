@@ -61,7 +61,7 @@ const AboutUs = () => {
         >
           <DirectionAwareHover
             imageUrl={About}
-            className="w-[500px] h-[500px] rounded-lg shadow-2xl"
+            className="w-[500px] cursor-pointer h-[500px] rounded-lg shadow-2xl"
           />
         </motion.div>
 
