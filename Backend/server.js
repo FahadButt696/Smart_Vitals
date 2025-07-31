@@ -152,22 +152,26 @@ import cors from 'cors';
 import connectDB from './config/db.js';
 import mealRoutes from './routes/mealRoutes.js'
 import userRoutes from './routes/userRoutes.js'
-import { requireAuth } from '@clerk/express';
+// import { requireAuth } from '@clerk/express';
+import { clerkAuthMiddleware } from './middleware/clerkMiddleWare.js';
 
 dotenv.config();
 connectDB();
 
 const app = express();
 
-app.use(requireAuth())
 app.use(express.json());
 // app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.urlencoded({extended:false} ));
 
-app.use(cors());
-app.use(express.json());
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true
+}));
+// app.use(cors());
+// app.use(express.json());
 app.use("/api/meal", mealRoutes)
-app.use("api/user",requireAuth(), userRoutes)
+app.use("/api/user",clerkAuthMiddleware, userRoutes)
 
 // Routes
 // app.use('/api/protected', protectedRoutes);

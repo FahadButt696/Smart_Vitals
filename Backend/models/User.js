@@ -26,24 +26,24 @@ const userSchema = new mongoose.Schema(
       min: [12, "Minimum age is 12"],
       max: [100, "Maximum age is 100"],
     },
-    gender: {
-      type: String,
-      enum: ["Male", "Female", "Other"],
-      required: true,
-    },
+    // gender: {
+    //   type: String,
+    //   enum: ["Male", "Female", "Other"],
+    //   required: true,
+    // },
 
     // Height (value + unit)
     height: {
       value: {
         type: Number,
-        required: true,
+        // required: true,
         min: [50, "Height too low"],
         max: [250, "Height too high"],
       },
       unit: {
         type: String,
         enum: ["cm", "inches"],
-        required: true,
+        // required: true,
       },
     },
 
@@ -51,14 +51,14 @@ const userSchema = new mongoose.Schema(
     weight: {
       value: {
         type: Number,
-        required: true,
+        // required: true,
         min: [20, "Weight too low"],
         max: [300, "Weight too high"],
       },
       unit: {
         type: String,
         enum: ["kg", "lbs"],
-        required: true,
+        // required: true,
       },
     },
 
