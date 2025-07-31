@@ -1,3 +1,4 @@
+import '../../styles/clerk_custom.css';
 "use client";
 
 import React from "react";
@@ -7,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { logo3 } from "../../assets/Assets"; // Make sure logo is a valid image URL
+import { logo3 } from "../../assets/Assets";
 
 const AuthForm = ({ type = "sign-in" }) => {
   const isSignIn = type === "sign-in";
@@ -15,18 +16,31 @@ const AuthForm = ({ type = "sign-in" }) => {
 
   const appearance = {
     ...dark,
+    variables: {
+      colorBackground: "#0f172a",
+      colorPrimary: "#22d3ee",
+      colorText: "white",
+    },
     elements: {
       ...dark.elements,
+      card:
+        "bg-gradient-to-r from-gray-900 via-cyan-900 to-neutral-900 shadow-lg shadow-cyan-900/40 border border-cyan-700 rounded-xl p-6",
       formButtonPrimary:
         "bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-cyan-400 w-full",
-      logoImage:
-        "w-24 h-24 mx-auto mb-6 rounded-full shadow-lg shadow-cyan-500/40",
+      socialButtonsBlockButton: "clerk-custom-provider-btn",
+      socialButtonsBlockButtonText: "text-inherit",
+
+      // 👇 Logo inside form
+      logoImage: "clerk-custom-logo",
       logoImageContainer: "flex justify-center mb-6",
+
+      // 👇 Hide the footer
+      footer: "hidden",
     },
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-black via-cyan-950 to-neutral-900 px-4 py-20 relative overflow-hidden">
+    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-r from-gray-900 via-cyan-900 to-neutral-900 px-4 py-20 relative overflow-hidden">
       {/* Return to Home Button */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -37,9 +51,9 @@ const AuthForm = ({ type = "sign-in" }) => {
         <Button
           onClick={() => navigate("/")}
           variant="outline"
-          className="border border-cyan-700 bg-transparent text-cyan-300 hover:bg-cyan-800/30 hover:text-white"
+          className="backButton"
         >
-          <ArrowLeft size={18} className="mr-2" />
+          <ArrowLeft size={18} className="relative left-1" />
           Return to Home
         </Button>
       </motion.div>
@@ -54,14 +68,14 @@ const AuthForm = ({ type = "sign-in" }) => {
         {isSignIn ? (
           <SignIn
             signUpUrl="/Signup"
-            forceRedirectUrl="/Dashboard"
+            forceRedirectUrl="/Onboarding"
             appearance={appearance}
             logo={logo3}
           />
         ) : (
           <SignUp
             signInUrl="/Login"
-            forceRedirectUrl="/Dashboard"
+            forceRedirectUrl="/Onboarding"
             appearance={appearance}
             logo={logo3}
           />

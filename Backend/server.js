@@ -148,33 +148,26 @@
 
 import express from 'express';
 import dotenv from 'dotenv';
-
 import cors from 'cors';
 import connectDB from './config/db.js';
-// import { clerkMiddleware } from '@clerk/express';
-// import protectedRoutes from './routes/protected.js';
-// import clerkWebhook from './routes/clerkWebhook.js';
 import mealRoutes from './routes/mealRoutes.js'
+import userRoutes from './routes/userRoutes.js'
 import { requireAuth } from '@clerk/express';
-
 
 dotenv.config();
 connectDB();
 
 const app = express();
-// app.use(express.json());
 
+app.use(requireAuth())
 app.use(express.json());
 // app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.urlencoded({extended:false} ));
 
-// Clerk middleware for authentication
-// app.use('/api/clerk', clerkWebhook);
-
-
 app.use(cors());
 app.use(express.json());
-app.use("/api/meal",requireAuth(), mealRoutes)
+app.use("/api/meal", mealRoutes)
+app.use("api/user",requireAuth(), userRoutes)
 
 // Routes
 // app.use('/api/protected', protectedRoutes);

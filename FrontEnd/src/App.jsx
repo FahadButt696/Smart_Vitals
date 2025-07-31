@@ -11,12 +11,13 @@ import Dashboard from './pages/Dashboard';
 import Footer from './components/custom/Footer';
 import CustomNavbar from './components/custom/Navbar';
 import { RedirectToSignIn,RedirectToSignUp } from '@clerk/clerk-react';
+import Onboarding from './pages/Onboarding';
 
 function App() {
   const location = useLocation();
   
   // Pages where we don't want navbar and footer
-  const authPages = ['/Login', '/Signup'];
+  const authPages = ['/Login', '/Signup','/Dashboard'];
   const isAuthPage = authPages.includes(location.pathname);
 
   return (
@@ -32,6 +33,7 @@ function App() {
         <Route path="/Login" element={<Login />} />
         <Route path="/Signup" element={<Signup />} />
         <Route path="/Dashboard" element={<Dashboard />} />
+        <Route path="/Onboarding"element={<Onboarding/>}/>
       </Routes>
       {!isAuthPage && <Footer />}
     </div>

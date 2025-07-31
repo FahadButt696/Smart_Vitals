@@ -1,0 +1,50 @@
+/* Improved Provider Buttons - Cyan Outline, Glassy Feel */
+.clerk-custom-provider-btn {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+  font-weight: 500 !important;
+  border: 1px solid rgba(94, 234, 212, 0.4) !important; /* cyan-300 */
+  border-radius: 0.5rem !important; /* rounded-lg */
+  padding: 0.6rem 1.2rem !important;
+  box-shadow: 0 0 8px rgba(94, 234, 212, 0.2) !important;
+  backdrop-filter: blur(6px) !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.clerk-custom-provider-btn:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-color: rgba(94, 234, 212, 0.6) !important;
+  color: #e0f2f1 !important; 
+}
+
+.backButton{
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+  font-weight: 500 !important;
+  border: 1px solid rgba(94, 234, 212, 0.4) !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 0 8px rgba(94, 234, 212, 0.2) !important;
+  backdrop-filter: blur(6px) !important;
+  transition: all 0.2s ease-in-out !important;
+
+}
+.backButton:hover{
+    background: rgba(255, 255, 255, 0.15) !important;
+  border-color: rgba(94, 234, 212, 0.6) !important;
+  color: #e0f2f1 !important;
+  cursor: pointer;
+}
+
+.cl-internal-1dauvpw{
+    display: none;
+}
+
+.clerk-custom-logo {
+  width: 120px !important;
+  height: 120px !important;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+.clerk-custom-logo:hover{
+    transform: scale(1.05);
+
+}

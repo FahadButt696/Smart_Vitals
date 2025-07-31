@@ -1,133 +1,144 @@
-// import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-// const userSchema = new mongoose.Schema({
-//   clerkUserId: {
-//     type: String,
-//     required: true,
-//     unique: true,
-//     index: true
-//   },
-//   email: {
-//     type: String,
-//     required: true,
-//     unique: true,
-//     lowercase: true,
-//     trim: true
-//   },
-//   firstName: {
-//     type: String,
-//     required: true,
-//     trim: true
-//   },
-//   lastName: {
-//     type: String,
-//     required: true,
-//     trim: true
-//   },
-//   profilePicture: {
-//     type: String,
-//     default: null
-//   },
-//   dateOfBirth: {
-//     type: Date,
-//     default: null
-//   },
-//   gender: {
-//     type: String,
-//     enum: ['male', 'female', 'other', 'prefer_not_to_say'],
-//     default: 'prefer_not_to_say'
-//   },
-//   height: {
-//     type: Number, // in cm
-//     min: 50,
-//     max: 300,
-//     default: null
-//   },
-//   weight: {
-//     type: Number, // in kg
-//     min: 20,
-//     max: 500,
-//     default: null
-//   },
-//   activityLevel: {
-//     type: String,
-//     enum: ['sedentary', 'lightly_active', 'moderately_active', 'very_active', 'extremely_active'],
-//     default: 'sedentary'
-//   },
-//   fitnessGoals: [{
-//     type: String,
-//     enum: ['weight_loss', 'muscle_gain', 'maintenance', 'endurance', 'strength', 'flexibility', 'general_health']
-//   }],
-//   medicalConditions: [{
-//     type: String,
-//     trim: true
-//   }],
-//   allergies: [{
-//     type: String,
-//     trim: true
-//   }],
-//   preferences: {
-//     units: {
-//       type: String,
-//       enum: ['metric', 'imperial'],
-//       default: 'metric'
-//     },
-//     notifications: {
-//       email: { type: Boolean, default: true },
-//       push: { type: Boolean, default: true },
-//       reminders: { type: Boolean, default: true }
-//     }
-//   },
-//   isActive: {
-//     type: Boolean,
-//     default: true
-//   }
-// }, {
-//   timestamps: true,
-//   toJSON: { virtuals: true },
-//   toObject: { virtuals: true }
-// });
+const userSchema = new mongoose.Schema(
+  {
+    clerkId: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
+    fullName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      trim: true,
+      lowercase: true,
+      match: [/^\S+@\S+\.\S+$/, "Invalid email address"],
+    },
+    age: {
+      type: Number,
+      required: true,
+      min: [12, "Minimum age is 12"],
+      max: [100, "Maximum age is 100"],
+    },
+    gender: {
+      type: String,
+      enum: ["Male", "Female", "Other"],
+      required: true,
+    },
 
-// // Virtual for full name
-// userSchema.virtual('fullName').get(function() {
-//   return `${this.firstName} ${this.lastName}`;
-// });
+    // Height (value + unit)
+    height: {
+      value: {
+        type: Number,
+        required: true,
+        min: [50, "Height too low"],
+        max: [250, "Height too high"],
+      },
+      unit: {
+        type: String,
+        enum: ["cm", "inches"],
+        required: true,
+      },
+    },
 
-// // Virtual for BMI
-// userSchema.virtual('bmi').get(function() {
-//   if (this.height && this.weight) {
-//     const heightInMeters = this.height / 100;
-//     return (this.weight / (heightInMeters * heightInMeters)).toFixed(1);
-//   }
-//   return null;
-// });
+    // Weight (value + unit)
+    weight: {
+      value: {
+        type: Number,
+        required: true,
+        min: [20, "Weight too low"],
+        max: [300, "Weight too high"],
+      },
+      unit: {
+        type: String,
+        enum: ["kg", "lbs"],
+        required: true,
+      },
+    },
 
-// // Index for better query performance
-// userSchema.index({ email: 1 });
-// userSchema.index({ clerkUserId: 1 });
+    goal: {
+      type: String,
+      enum: ["Lose Weight", "Gain Muscle", "Maintain"],
+      required: true,
+    },
+    targetWeight: {
+      type: Number,
+      required: true,
+    },
+    activityLevel: {
+      type: String,
+      enum: [
+        "Sedentary",
+        "Lightly active",
+        "Moderately active",
+        "Very active",
+      ],
+      required: true,
+    },
+    dietaryPreference: {
+      type: String,
+      enum: ["Vegan", "Vegetarian", "Keto", "Normal", "Custom"],
+      default: "Normal",
+    },
 
-// // Pre-save middleware
-// userSchema.pre('save', function(next) {
-//   // Convert email to lowercase
-//   if (this.email) {
-//     this.email = this.email.toLowerCase();
-//   }
-//   next();
-// });
+    medicalConditions: {
+      type: String,
+      trim: true,
+    },
+    allergies: {
+      type: String,
+      trim: true,
+    },
+    medications: {
+      type: String,
+      trim: true,
+    },
 
-// const User = mongoose.model('User', userSchema);
+    waterGoal: {
+      type: Number,
+      default: 2500, // in ml
+    },
+    sleepGoal: {
+      type: Number,
+      default: 8, // hours
+    },
+    workoutDaysPerWeek: {
+      type: Number,
+      min: 0,
+      max: 7,
+      default: 3,
+    },
+    workoutPreferences: {
+      type: [String],
+      enum: ["Yoga", "Cardio", "Strength", "HIIT", "Walking"],
+      default: [],
+    },
+    mealPlanType: {
+      type: String,
+      enum: ["High protein", "Low carb", "Balanced", "Custom"],
+      default: "Balanced",
+    },
+    wantsMentalSupport: {
+      type: Boolean,
+      default: false,
+    },
 
-// export default User; 
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+  {
+    versionKey: false,
+  }
+);
 
-
-import mongoose from 'mongoose';
-
-const userSchema = new mongoose.Schema({
-  clerkId: { type: String, required: true, unique: true },
-  email: { type: String, required: true },
-  firstName: String,
-  lastName: String,
-  createdAt: { type: Date, default: Date.now },
-});
-
-export default mongoose.model('User', userSchema);
+const User = mongoose.model("User", userSchema);
+export default User;
+ 
