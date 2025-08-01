@@ -187,7 +187,7 @@ const ImageCalorie = () => {
           initial="hidden"
           animate={controls}
           transition={{ delay: 0.4 }}
-          className="w-full bg-black text-white  px-9 py-4 text-xl font-bold text-center transition-all duration-300 ease-in-out hover:bg-white hover:text-black focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-black focus:outline-none cursor-pointer"
+          className="w-full bg-gradient-to-r from-cyan-400 to-purple-400 text-white px-9 py-4 text-xl font-bold text-center transition-all duration-300 ease-in-out hover:from-cyan-500 hover:to-purple-500 focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-black focus:outline-none cursor-pointer"
         >
           LEARN MORE <FiArrowUpRight className="inline" />
         </MotionNavLink>
@@ -254,7 +254,7 @@ const AIMeal = () => {
           initial="hidden"
           animate={controls}
           transition={{ delay: 0.3 }}
-          className="w-full  bg-black text-white  px-9 py-4 text-xl font-bold text-center hover:bg-white hover:text-black transition all duration-300 ease-in-out focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-black focus:outline-none cursor-pointer"
+          className="w-full bg-gradient-to-r from-cyan-400 to-purple-400 text-white px-9 py-4 text-xl font-bold text-center hover:from-cyan-500 hover:to-purple-500 transition-all duration-300 ease-in-out focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-black focus:outline-none cursor-pointer"
         >
           LEARN MORE <FiArrowUpRight className="inline" />
         </MotionNavLink>
@@ -311,7 +311,7 @@ const AISymptom = () => {
           initial="hidden"
           animate={controls}
           transition={{ delay: 0.4 }}
-          className="w-full bg-black text-white  px-9 py-4 text-xl font-bold text-center transition-all duration-300 ease-in-out hover:bg-white hover:text-black focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-black focus:outline-none cursor-pointer"
+          className="w-full bg-gradient-to-r from-cyan-400 to-purple-400 text-white px-9 py-4 text-xl font-bold text-center hover:from-cyan-500 hover:to-purple-500 transition-all duration-300 ease-in-out focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-black focus:outline-none cursor-pointer"
         >
           LEARN MORE <FiArrowUpRight className="inline" />
         </MotionNavLink>
@@ -368,7 +368,7 @@ const AIMental = () => {
           initial="hidden"
           animate={controls}
           transition={{ delay: 0.4 }}
-          className="w-full bg-black text-white  px-9 py-4 text-xl font-bold text-center transition-all duration-300 ease-in-out hover:bg-white hover:text-black focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-black focus:outline-none cursor-pointer"
+          className="w-full bg-gradient-to-r from-cyan-400 to-purple-400 text-white px-9 py-4 text-xl font-bold text-center hover:from-cyan-500 hover:to-purple-500 transition-all duration-300 ease-in-out focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-black focus:outline-none cursor-pointer"
         >
           LEARN MORE <FiArrowUpRight className="inline" />
         </MotionNavLink>

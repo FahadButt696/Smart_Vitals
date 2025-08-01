@@ -65,7 +65,7 @@ export const NavBody = ({ children, className, visible }) => {
   );
 };
 
-export const NavItems = ({ items, className, onItemClick }) => {
+export const NavItems = ({ items, className, onItemClick, activePage }) => {
   const [hovered, setHovered] = useState(null);
 
   return (
@@ -76,23 +76,45 @@ export const NavItems = ({ items, className, onItemClick }) => {
         className
       )}
     >
-      {items.map((item, idx) => (
-        <a
-          onMouseEnter={() => setHovered(idx)}
-          onClick={onItemClick}
-          className="relative px-4 py-2 text-white dark:text-white"
-          key={`link-${idx}`}
-          href={item.link}
-        >
-          {hovered === idx && (
-            <motion.div
-              layoutId="hovered"
-              className="absolute inset-0 h-full w-full rounded-full bg-white/10 dark:bg-white/10"
-            />
-          )}
-          <span className="relative z-20">{item.name}</span>
-        </a>
-      ))}
+      {items.map((item, idx) => {
+        const isActive = activePage === item.link;
+        const isHovered = hovered === idx;
+        const shouldShowEffect = isHovered || isActive;
+        
+        return (
+          <a
+            onMouseEnter={() => setHovered(idx)}
+            onMouseLeave={() => setHovered(null)}
+            onClick={onItemClick}
+            className="relative px-4 py-2 text-white dark:text-white transition-all duration-300"
+            key={`link-${idx}`}
+            href={item.link}
+          >
+            {shouldShowEffect && (
+              <motion.div
+                layoutId="hovered"
+                className={cn(
+                  "absolute inset-0 h-full w-full rounded-full backdrop-blur-sm",
+                  isActive 
+                    ? "bg-gradient-to-r from-cyan-400/50 to-purple-400/50 border border-cyan-400/60" 
+                    : "bg-gradient-to-r from-cyan-400/30 to-purple-400/30"
+                )}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.2 }}
+              />
+            )}
+            <span className={cn(
+              "relative z-20 transition-all duration-300",
+              isActive 
+                ? "bg-gradient-to-r from-cyan-300 to-purple-300 bg-clip-text text-transparent" 
+                : "bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent hover:from-cyan-300 hover:to-purple-300"
+            )}>
+              {item.name}
+            </span>
+          </a>
+        );
+      })}
     </motion.div>
   );
 };
@@ -190,7 +212,7 @@ export const NavbarLogo = () => {
     >
       <img src={logoChat} alt="logo3" width={70} height={70} className="m-0" />
 
-      <span className="relative right-3 font-medium italic FONT text-white dark:text-white">
+      <span className="relative right-3 font-medium italic FONT bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent">
         SMART VITALS
       </span>
     </a>
@@ -210,9 +232,9 @@ export const NavbarButton = ({
 
   const variantStyles = {
     primary:
-      'bg-white text-black shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset]',
+      'bg-gradient-to-r from-cyan-400 to-purple-400 text-white shadow-lg hover:from-cyan-500 hover:to-purple-500 transition-all duration-200',
     secondary:
-      'bg-transparent border border-white text-white dark:text-white hover:bg-white/10',
+      'bg-white/10 text-white border border-white/20 hover:bg-white/20 backdrop-blur-sm transition-all duration-200',
     dark: 'bg-black text-white shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset]',
     gradient:
       'bg-gradient-to-b from-blue-500 to-blue-700 text-white shadow-[0px_2px_0px_0px_rgba(255,255,255,0.3)_inset]',
@@ -231,6 +253,12 @@ export const NavbarButton = ({
 
 export default function CustomNavbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activePage, setActivePage] = useState('/');
+
+  // Get current pathname
+  useEffect(() => {
+    setActivePage(window.location.pathname);
+  }, []);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -241,7 +269,7 @@ export default function CustomNavbar() {
     { name: 'Features', link: '/Features' },
     { name: 'About', link: '/About' },
     { name: 'Contact', link: '/Contact' },
-    { name: 'Dashboad', link: '/Dashboard'}
+    { name: 'Dashboard', link: '/Dashboard'}
   ];
 
   return (
@@ -251,6 +279,7 @@ export default function CustomNavbar() {
         <NavbarLogo />
         <NavItems
           items={navItems}
+          activePage={activePage}
           onItemClick={() => setIsMobileMenuOpen(false)}
         />
         <div className="flex items-center space-x-4">
@@ -273,16 +302,29 @@ export default function CustomNavbar() {
           />
         </MobileNavHeader>
         <MobileNavMenu isOpen={isMobileMenuOpen}>
-          {navItems.map((item, idx) => (
-            <a
-              key={`mobile-link-${idx}`}
-              href={item.link}
-              className="block w-full px-4 py-3 text-lg text-white hover:bg-gray-700/50 rounded-md transition-colors"
-              onClick={toggleMobileMenu}
-            >
-              {item.name}
-            </a>
-          ))}
+          {navItems.map((item, idx) => {
+            const isActive = activePage === item.link;
+            return (
+              <a
+                key={`mobile-link-${idx}`}
+                href={item.link}
+                className={cn(
+                  "block w-full px-4 py-3 text-lg text-white rounded-md transition-all duration-300 relative overflow-hidden",
+                  isActive && "bg-gradient-to-r from-cyan-400/30 to-purple-400/30 border border-cyan-400/50"
+                )}
+                onClick={toggleMobileMenu}
+              >
+                <span className={cn(
+                  "transition-all duration-300 relative z-10",
+                  isActive 
+                    ? "bg-gradient-to-r from-cyan-300 to-purple-300 bg-clip-text text-transparent" 
+                    : "bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent hover:from-cyan-300 hover:to-purple-300"
+                )}>
+                  {item.name}
+                </span>
+              </a>
+            );
+          })}
           <div className="flex flex-col space-y-4 w-full mt-4 border-t border-neutral-700 pt-4">
             <NavbarButton href="Login" variant="secondary" className="w-full ">
               Sign In

@@ -17,11 +17,11 @@ function App() {
   const location = useLocation();
   
   // Pages where we don't want navbar and footer
-  const authPages = ['/Login', '/Signup','/Dashboard'];
+  const authPages = ['/Login', '/Signup','/Dashboard','/Onboarding'];
   const isAuthPage = authPages.includes(location.pathname);
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
+    <div className="relative min-h-screen overflow-hidden font-['Inter',sans-serif] onboarding-bg-effect">
       <Background />
       {!isAuthPage && <CustomNavbar />}
 

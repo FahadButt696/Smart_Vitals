@@ -80,11 +80,15 @@ export function ThreeDMarqueeDemoSecond() {
         viewport={{ once: false }}
         className="relative z-20 mx-auto max-w-4xl text-center text-2xl font-bold text-balance text-white md:text-4xl lg:text-6xl"
       >
-        Your Personalized Path to Optimal Health.{' '}
-        <span className="relative z-20 inline-block rounded-xl bg-gradient-to-r from-gray-900 via-cyan-900 to-neutral-900 px-4 py-1 mt-5 text-white decoration-[6px] underline-offset-[16px] backdrop-blur-sm">
+        Your Personalized Path to{' '}
+        <span className="relative z-20 inline-block bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent">
+          Optimal Health
+        </span>
+        <br />
+        <span className="relative z-20 inline-block rounded-xl bg-gradient-to-r from-cyan-400/20 via-blue-500/20 to-purple-500/20 px-4 py-1 mt-3 text-white backdrop-blur-sm border border-cyan-400/30">
           Smart Vitals
         </span>{' '}
-        Leads The Way.
+        Leads The Way
       </motion.h2>
 
       {/* Animated Description */}
@@ -110,8 +114,10 @@ export function ThreeDMarqueeDemoSecond() {
       >
         <NavLink to="/Signup">
           <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 250, damping: 15 }}
-            className="rounded-md border border-white/20 bg-gradient-to-r from-gray-900 via-cyan-900 to-neutral-900 px-6 py-2.5 text-sm font-medium text-white transition-colors duration-300 hover:from-cyan-800 hover:via-cyan-600 hover:to-cyan-800 focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-black focus:outline-none cursor-pointer"
+            className="rounded-md border border-cyan-400/30 bg-gradient-to-r from-cyan-400 to-purple-400 px-6 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:from-cyan-500 hover:to-purple-500 hover:shadow-lg hover:shadow-cyan-500/25 focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-black focus:outline-none cursor-pointer backdrop-blur-sm"
           >
             Join Smart Vitals
           </motion.button>
@@ -119,8 +125,10 @@ export function ThreeDMarqueeDemoSecond() {
 
         <NavLink to="/Features">
           <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 250, damping: 15 }}
-            className="rounded-md border border-white/20 bg-white/10 px-6 py-2.5 text-sm font-medium text-white backdrop-blur-sm transition-colors duration-300 hover:bg-white/20 focus:ring-2 focus:ring-white/20 focus:ring-offset-2 focus:ring-offset-black focus:outline-none cursor-pointer"
+            className="rounded-md border border-white/30 bg-white/10 px-6 py-2.5 text-sm font-medium text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 hover:border-white/50 hover:shadow-lg hover:shadow-white/25 focus:ring-2 focus:ring-white/20 focus:ring-offset-2 focus:ring-offset-black focus:outline-none cursor-pointer"
           >
             Explore Benefits
           </motion.button>

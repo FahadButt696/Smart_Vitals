@@ -26,7 +26,7 @@ const AuthForm = ({ type = "sign-in" }) => {
       card:
         "bg-gradient-to-r from-gray-900 via-cyan-900 to-neutral-900 shadow-lg shadow-cyan-900/40 border border-cyan-700 rounded-xl p-6",
       formButtonPrimary:
-        "bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-cyan-400 w-full",
+        "bg-gradient-to-r from-cyan-400 to-purple-400 hover:from-cyan-500 hover:to-purple-500 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-cyan-400 w-full",
       socialButtonsBlockButton: "clerk-custom-provider-btn",
       socialButtonsBlockButtonText: "text-inherit",
 

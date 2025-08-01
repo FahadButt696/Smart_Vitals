@@ -50,10 +50,10 @@ export default function ContactPage() {
         viewport={{ once: true }}
         transition={{ duration: 0.6 }}
       >
-        <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-          Contact <span className="text-cyan-400">Smart Vitals</span>
-        </h2>
-        <p className="text-lg text-neutral-300">
+                 <h2 className="text-4xl md:text-5xl font-bold mb-4">
+           Contact <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent">Smart Vitals</span>
+         </h2>
+        <p className="text-lg text-white/70">
           Got questions, ideas, or just want to chat? We’d love to hear from
           you. Fill the form below and we’ll get back to you in no time.
         </p>
@@ -109,13 +109,13 @@ export default function ContactPage() {
             icon={<FaCommentDots />}
           />
 
-          <motion.button
-            whileTap={{ scale: 0.97 }}
-            whileHover={{ scale: 1.02 }}
-            className="bg-cyan-600 hover:bg-cyan-700 active:bg-cyan-800 transition-colors text-white font-semibold py-3 rounded-md shadow-md w-full"
-          >
-            Send Message
-          </motion.button>
+                     <motion.button
+             whileTap={{ scale: 0.97 }}
+             whileHover={{ scale: 1.02 }}
+             className="bg-gradient-to-r from-cyan-400 to-purple-400 hover:from-cyan-500 hover:to-purple-500 transition-all duration-200 text-white font-semibold py-3 rounded-md shadow-lg w-full"
+           >
+             Send Message
+           </motion.button>
 
           {/* Error Display */}
           <AnimatePresence>

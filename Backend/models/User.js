@@ -18,50 +18,44 @@ const userSchema = new mongoose.Schema(
       required: true,
       trim: true,
       lowercase: true,
-      match: [/^\S+@\S+\.\S+$/, "Invalid email address"],
+    },
+    gender: {
+      type: String,
+      enum: ["Male", "Female", "Other"],
+      required: true,
+    },
+    imageUrl: {
+      type: String,
+      trim: true,
     },
     age: {
       type: Number,
       required: true,
-      min: [12, "Minimum age is 12"],
-      max: [100, "Maximum age is 100"],
+      min: 13,
+      max: 120,
     },
-    // gender: {
-    //   type: String,
-    //   enum: ["Male", "Female", "Other"],
-    //   required: true,
-    // },
-
-    // Height (value + unit)
     height: {
       value: {
         type: Number,
-        // required: true,
-        min: [50, "Height too low"],
-        max: [250, "Height too high"],
+        required: true,
       },
       unit: {
         type: String,
-        enum: ["cm", "inches"],
-        // required: true,
+        enum: ["cm", "feet"],
+        required: true,
       },
     },
-
-    // Weight (value + unit)
     weight: {
       value: {
         type: Number,
-        // required: true,
-        min: [20, "Weight too low"],
-        max: [300, "Weight too high"],
+        required: true,
       },
       unit: {
         type: String,
         enum: ["kg", "lbs"],
-        // required: true,
+        required: true,
       },
     },
-
     goal: {
       type: String,
       enum: ["Lose Weight", "Gain Muscle", "Maintain"],
@@ -73,20 +67,14 @@ const userSchema = new mongoose.Schema(
     },
     activityLevel: {
       type: String,
-      enum: [
-        "Sedentary",
-        "Lightly active",
-        "Moderately active",
-        "Very active",
-      ],
+      enum: ["Sedentary", "Lightly active", "Moderately active", "Very active"],
       required: true,
     },
     dietaryPreference: {
       type: String,
-      enum: ["Vegan", "Vegetarian", "Keto", "Normal", "Custom"],
+      enum: ["Normal", "Vegan", "Vegetarian", "Keto", "Custom"],
       default: "Normal",
     },
-
     medicalConditions: {
       type: String,
       trim: true,
@@ -99,36 +87,26 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-
-    waterGoal: {
-      type: Number,
-      default: 2500, // in ml
-    },
-    sleepGoal: {
-      type: Number,
-      default: 8, // hours
-    },
     workoutDaysPerWeek: {
       type: Number,
-      min: 0,
+      min: 1,
       max: 7,
       default: 3,
     },
     workoutPreferences: {
       type: [String],
-      enum: ["Yoga", "Cardio", "Strength", "HIIT", "Walking"],
+      enum: ["Cardio", "Strength", "Yoga", "HIIT", "Walking"],
       default: [],
     },
     mealPlanType: {
       type: String,
-      enum: ["High protein", "Low carb", "Balanced", "Custom"],
+      enum: ["Balanced", "High protein", "Low carb", "Custom"],
       default: "Balanced",
     },
     wantsMentalSupport: {
       type: Boolean,
       default: false,
     },
-
     createdAt: {
       type: Date,
       default: Date.now,

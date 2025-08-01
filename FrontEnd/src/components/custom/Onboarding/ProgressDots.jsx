@@ -1,19 +1,20 @@
 import { motion } from "framer-motion";
 
-const ProgressDots = ({ currentStep, totalSteps }) => {
+const ProgressDots = ({ total, current }) => {
   return (
-    <div className="flex justify-center items-center mt-6 gap-3">
-      {Array.from({ length: totalSteps }, (_, index) => (
+    <div className="flex items-center justify-center gap-3">
+      {Array.from({ length: total }, (_, index) => (
         <motion.div
           key={index}
-          initial={{ opacity: 0 }}
-          animate={{
-            opacity: 1,
-            scale: currentStep === index ? 1.2 : 1
-          }}
-          transition={{ duration: 0.3 }}
-          className={`w-3 h-3 rounded-full ${
-            currentStep === index ? "bg-cyan-400" : "bg-white/30"
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: index * 0.1 }}
+          className={`w-3 h-3 rounded-full transition-all duration-300 ${
+            index === current
+              ? "bg-gradient-to-r from-cyan-400 to-purple-400 scale-125"
+              : index < current
+              ? "bg-cyan-400/60"
+              : "bg-white/20"
           }`}
         />
       ))}

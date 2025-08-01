@@ -31,16 +31,16 @@ const AboutUs = () => {
         whileInView="visible"
         viewport={{ once: true }}
       >
-        <motion.h2
-          className="text-4xl md:text-5xl font-bold text-white mb-4"
-          custom={0}
-          variants={textVariants}
-        >
-          Welcome to <span className="text-cyan-400">Smart Vitals</span>
-        </motion.h2>
+                 <motion.h2
+           className="text-4xl md:text-5xl font-bold mb-4"
+           custom={0}
+           variants={textVariants}
+         >
+           Welcome to <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent">Smart Vitals</span>
+         </motion.h2>
 
         <motion.p
-          className="text-lg text-neutral-300"
+          className="text-lg text-white/70"
           custom={1}
           variants={textVariants}
         >
@@ -72,16 +72,16 @@ const AboutUs = () => {
           whileInView="visible"
           viewport={{ once: true, amount: 0.4 }}
         >
-          <motion.h2
-            className="text-3xl md:text-4xl font-bold leading-tight"
-            custom={0}
-            variants={textVariants}
-          >
-            About <span className="text-cyan-400">Smart Vitals</span>
-          </motion.h2>
+                     <motion.h2
+             className="text-3xl md:text-4xl font-bold leading-tight"
+             custom={0}
+             variants={textVariants}
+           >
+             About <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent">Smart Vitals</span>
+           </motion.h2>
 
           <motion.p
-            className="text-lg text-neutral-300"
+            className="text-lg text-white/70"
             custom={1}
             variants={textVariants}
           >
@@ -91,7 +91,7 @@ const AboutUs = () => {
           </motion.p>
 
           <motion.p
-            className="text-neutral-400"
+            className="text-white/50"
             custom={2}
             variants={textVariants}
           >

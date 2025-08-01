@@ -169,16 +169,16 @@ export default function Feature() {
           whileInView="visible"
           viewport={{ once: true }}
         >
-          <motion.h2
-            className="text-4xl md:text-5xl font-bold text-white mb-4"
-            custom={0}
-            variants={textVariants}
-          >
-            Explore <span className="text-cyan-400">Smart Vitals</span> Features
-          </motion.h2>
+                     <motion.h2
+             className="text-4xl md:text-5xl font-bold mb-4"
+             custom={0}
+             variants={textVariants}
+           >
+             Explore <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent">Smart Vitals</span> Features
+           </motion.h2>
 
           <motion.p
-            className="text-lg text-neutral-300"
+            className="text-lg text-white/70"
             custom={1}
             variants={textVariants}
           >

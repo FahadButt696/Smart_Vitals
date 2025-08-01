@@ -6,8 +6,8 @@ const connectDB = async () => {
   try {
     await connect(process.env.CONN_STRING, {
       dbName: process.env.DB_NAME,
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
+      pass:process.env.PASSWORD,
+      user:process.env.USER_NAME
     });
     console.log("MongoDB connected");
   } catch (err) {

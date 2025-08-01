@@ -9,7 +9,7 @@ export const ShimmerButton = React.forwardRef(
       shimmerSize = '0.05em',
       shimmerDuration = '3s',
       borderRadius = '100px',
-      background = 'rgba(0, 0, 0, 1)',
+      background = 'rgba(0, 0, 0, 0.8)',
       className,
       children,
       ...props

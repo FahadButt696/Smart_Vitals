@@ -62,7 +62,7 @@ export function CarouselDemo() {
   ];
 
   return (
-    <div className="relative overflow-hidden w-full h-full py-20 bg-gradient-to-r from-gray-900 via-cyan-900 to-neutral-900">
+    <div className="relative overflow-hidden w-full h-full py-20 bg-gradient-to-r from-gray-900 via-cyan-900 to-purple-900">
       <Carousel slides={slideData} />
     </div>
   );

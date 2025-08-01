@@ -14,15 +14,15 @@ const Footer = () => {
     >
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 text-sm">
         <div className="text-center md:text-left">
-          <h1 className="text-lg font-bold text-cyan-400 tracking-wider">
+          <h1 className="text-lg font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent tracking-wider">
             Smart Vitals
           </h1>
-          <p className="text-neutral-300 mt-1">
+          <p className="text-white/70 mt-1">
             Empowering your health journey with smart AI tools.
           </p>
         </div>
 
-        <div className="flex gap-4 text-xl text-neutral-300">
+        <div className="flex gap-4 text-xl text-white/70">
           <a
             href="https://github.com/"
             target="_blank"
@@ -50,7 +50,7 @@ const Footer = () => {
         </div>
       </div>
 
-      <div className="text-center text-neutral-500 text-xs mt-8 border-t border-white/10 pt-4">
+      <div className="text-center text-white/50 text-xs mt-8 border-t border-white/10 pt-4">
         © {new Date().getFullYear()} Smart Vitals — All rights reserved.
       </div>
     </motion.footer>

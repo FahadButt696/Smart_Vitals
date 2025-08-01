@@ -65,10 +65,10 @@ const FeatureCard = ({
         animate={controls}
         variants={cardVariants}
       >
-        <h3 className="text-2xl md:text-3xl font-bold text-cyan-400">
-          {title}
-        </h3>
-        <p className="text-neutral-300">{description}</p>
+                 <h3 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent">
+           {title}
+         </h3>
+        <p className="text-white/70">{description}</p>
         <ul className="list-disc pl-5 text-sm space-y-1 text-white">
           {steps.map((step, idx) => (
             <li key={idx}>{step}</li>
@@ -77,7 +77,7 @@ const FeatureCard = ({
         <div className="pt-4">
           <NavLink
             to="/Signup"
-            className="inline-block mt-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white font-semibold rounded-md transition"
+            className="inline-block mt-2 px-4 py-2 bg-gradient-to-r from-cyan-400 to-purple-400 text-white font-semibold rounded-md hover:from-cyan-500 hover:to-purple-500 transition-all duration-200"
           >
             Try it Now →
           </NavLink>

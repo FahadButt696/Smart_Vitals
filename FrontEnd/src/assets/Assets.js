@@ -3,6 +3,12 @@ import hero from './Hero.jpg';
 import logo2 from './Logo2.png';
 import logo3 from './logo3.png';
 
+// Step-specific images
+import basicInfo from './basicInfo.jpg';
+import bodyMetrics from './bodyMetrics.jpg';
+import healthGoals from './healthGoals.avif';
+import fitnessPreference from './fitnessPreference.jpg';
+
 import dark1 from './dark1.jpeg';
 import dark2 from './dark2.jpeg';
 import dark3 from './dark3.jpeg';
@@ -59,7 +65,14 @@ import About from './AboutUs.jpg';
 import Contact from './ContactUs.png';
 import Contact2 from './ContactUs.webp';
 import logoChat from './logoChat.png';
+
 export {
+  // Step-specific images
+  basicInfo,
+  bodyMetrics,
+  healthGoals,
+  fitnessPreference,
+  
   logoChat,
   Contact2,
   Contact,
