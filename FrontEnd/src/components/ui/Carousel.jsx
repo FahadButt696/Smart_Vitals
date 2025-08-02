@@ -84,7 +84,7 @@ const Slide = ({ slide, index, current, handleSlideClick }) => {
           <div className="flex justify-center">
             <NavLink to="/Signup">
               <ShimmerButton className="shadow-2xl  mt-6 px-4 py-2 md:py-4">
-                <span className="text-sm font-medium leading-none tracking-tight  text-white lg:text-lg">
+                <span className="text-sm font-medium leading-none tracking-tight bg-gradient-to-br from bg-cyan-400 via-blue-500 to-purple-500 text-transparent bg-clip-text lg:text-lg">
                   {button}
                 </span>
               </ShimmerButton>
@@ -106,7 +106,7 @@ const CarouselControl = ({ type, title, handleClick }) => {
       onClick={handleClick}
     >
       <IconArrowNarrowRight
-        className="text-white group-hover:text-cyan-400 transition duration-300 ease-in-out"
+        className="  bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500 hover:from-blue-500 hover:to-green-500 transition duration-300 ease-in-out"
         size={26}
       />
     </button>

@@ -72,7 +72,7 @@ export const NavItems = ({ items, className, onItemClick, activePage }) => {
     <motion.div
       onMouseLeave={() => setHovered(null)}
       className={cn(
-        'absolute inset-0 hidden flex-1 flex-row items-center justify-center space-x-2 text-sm font-medium text-white transition duration-200 lg:flex lg:space-x-2',
+        'absolute inset-0 hidden flex-1 flex-row items-center justify-center space-x-2 text-sm font-bold text-white transition duration-200 lg:flex lg:space-x-2',
         className
       )}
     >
@@ -96,7 +96,7 @@ export const NavItems = ({ items, className, onItemClick, activePage }) => {
                 className={cn(
                   "absolute inset-0 h-full w-full rounded-full backdrop-blur-sm",
                   isActive 
-                    ? "bg-gradient-to-r from-cyan-400/50 to-purple-400/50 border border-cyan-400/60" 
+                    ? "bg-gradient-to-r from-cyan-400/50 to-purple-400/50 " 
                     : "bg-gradient-to-r from-cyan-400/30 to-purple-400/30"
                 )}
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -106,9 +106,9 @@ export const NavItems = ({ items, className, onItemClick, activePage }) => {
             )}
             <span className={cn(
               "relative z-20 transition-all duration-300",
-              isActive 
-                ? "bg-gradient-to-r from-cyan-300 to-purple-300 bg-clip-text text-transparent" 
-                : "bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent hover:from-cyan-300 hover:to-purple-300"
+              // isActive 
+              //   ? "bg-gradient-to-r from-cyan-300 to-purple-300 bg-clip-text text-transparent" 
+              //   : "bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent hover:from-cyan-300 hover:to-purple-300"
             )}>
               {item.name}
             </span>
@@ -212,7 +212,7 @@ export const NavbarLogo = () => {
     >
       <img src={logoChat} alt="logo3" width={70} height={70} className="m-0" />
 
-      <span className="relative right-3 font-medium italic FONT bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent">
+      <span className="relative right-3 font-bold italic  bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent">
         SMART VITALS
       </span>
     </a>

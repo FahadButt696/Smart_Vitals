@@ -71,7 +71,7 @@ const WhyChoose = () => {
           transition={{ duration: 0.6 }}
           className="text-3xl sm:text-4xl font-bold mb-4"
         >
-          Why Choose <span className="text-sky-400">Smart Vitals</span>?
+          Why Choose <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent font-bold">Smart Vitals</span>?
         </motion.h2>
         <motion.p
           initial={{ opacity: 0, y: -10 }}

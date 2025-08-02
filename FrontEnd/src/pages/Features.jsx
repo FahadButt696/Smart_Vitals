@@ -161,7 +161,7 @@ const featureData = [
 
 export default function Feature() {
   return (
-    <section className="my-10 bg-gradient-to-r from-gray-900 via-cyan-900 to-neutral-900 text-white py-16 px-6 md:px-12">
+    <section className="my-10  text-white py-16 px-6 md:px-12">
       <div className="max-w-7xl mx-auto">
         <motion.div
           className="max-w-3xl text-center mb-14 mx-auto"

@@ -40,7 +40,7 @@ export default function ContactPage() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="my-10 min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-gradient-to-r from-gray-900 via-cyan-900 to-neutral-900"
+      className="my-10 min-h-screen flex flex-col items-center justify-center px-4 py-12 "
     >
       {/* Header */}
       <motion.div

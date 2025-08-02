@@ -10,11 +10,11 @@ const Footer = () => {
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: 'easeOut' }}
-      className="relative w-full bg-gradient-to-r from-gray-900 via-cyan-900 to-neutral-900 text-white px-6 py-10"
+      className="relative w-full  text-white px-6 py-10"
     >
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 text-sm">
         <div className="text-center md:text-left">
-          <h1 className="text-lg font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent tracking-wider">
+          <h1 className="text-lg font-bold FONT bg-gradient-to-r from-cyan-300 to-purple-300 bg-clip-text text-transparent ">
             Smart Vitals
           </h1>
           <p className="text-white/70 mt-1">

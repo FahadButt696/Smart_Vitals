@@ -39,7 +39,7 @@ const Step2_BodyMetrics = () => {
                     min: { value: 3, message: "Minimum 3 feet" },
                     max: { value: 8, message: "Maximum 8 feet" }
                   })}
-                  placeholder="Feet (e.g., 5.5)"
+                  placeholder="Feet"
                   className="flex-1 p-4 rounded-xl bg-white/10 text-white border border-white/20 focus:border-cyan-400 focus:outline-none transition-all duration-200 placeholder-white/50"
                 />
                 <input
@@ -53,7 +53,7 @@ const Step2_BodyMetrics = () => {
                     min: { value: 0, message: "Minimum 0 inches" },
                     max: { value: 11, message: "Maximum 11 inches" }
                   })}
-                  placeholder="Inches (e.g., 4.5)"
+                  placeholder="Inches "
                   className="flex-1 p-4 rounded-xl bg-white/10 text-white border border-white/20 focus:border-cyan-400 focus:outline-none transition-all duration-200 placeholder-white/50"
                 />
               </>
@@ -69,7 +69,7 @@ const Step2_BodyMetrics = () => {
                   min: { value: 50, message: "Height too low" },
                   max: { value: 250, message: "Height too high" }
                 })}
-                placeholder="Height in cm (e.g., 165.5)"
+                placeholder="Height in cm "
                 className="flex-1 p-4 rounded-xl bg-white/10 text-white border border-white/20 focus:border-cyan-400 focus:outline-none transition-all duration-200 placeholder-white/50"
               />
             )}
@@ -142,7 +142,7 @@ const Step2_BodyMetrics = () => {
                 min: { value: 20, message: "Weight too low" },
                 max: { value: 300, message: "Weight too high" }
               })}
-              placeholder="Weight (e.g., 70.5)"
+              placeholder="Weight"
               className="flex-1 p-4 rounded-xl bg-white/10 text-white border border-white/20 focus:border-cyan-400 focus:outline-none transition-all duration-200 placeholder-white/50"
             />
             <div className="relative w-32">
@@ -191,7 +191,7 @@ const Step2_BodyMetrics = () => {
                 min: { value: 20, message: "Target weight too low" },
                 max: { value: 300, message: "Target weight too high" }
               })}
-              placeholder="Target weight (e.g., 65.5)"
+              placeholder="Target weight "
               className="flex-1 p-4 rounded-xl bg-white/10 text-white border border-white/20 focus:border-cyan-400 focus:outline-none transition-all duration-200 placeholder-white/50"
             />
             <div className="relative w-32">

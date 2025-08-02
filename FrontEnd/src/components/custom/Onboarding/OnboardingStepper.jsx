@@ -134,7 +134,7 @@ const OnboardingStepper = ({ onStepChange }) => {
   };
 
   return (
-    <div className="w-full max-w-[70vw] mx-auto font-['Inter',sans-serif]">
+    <div className="w-screen max-w-[70vw] mx-auto font-['Inter',sans-serif]">
       <FormProvider {...methods}>
         <form onSubmit={methods.handleSubmit(onSubmit)}>
           {/* Step Header */}
@@ -151,7 +151,7 @@ const OnboardingStepper = ({ onStepChange }) => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
             >
-              {currentStep.title}
+              {/* {currentStep.title} */}
             </motion.h2>
             <motion.p 
               className="text-white/70 text-lg"
@@ -159,7 +159,7 @@ const OnboardingStepper = ({ onStepChange }) => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
             >
-              {currentStep.subtitle}
+              {/* {currentStep.subtitle} */}
             </motion.p>
           </motion.div>
 

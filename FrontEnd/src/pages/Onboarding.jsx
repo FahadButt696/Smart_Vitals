@@ -87,7 +87,7 @@ const Onboarding = () => {
           initial={{ opacity: 0, y: -30, scale: 0.8 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.1 }}
-          className="mb-4"
+          className=""
         >
           <img 
             src={logoChat} 
