@@ -10,6 +10,7 @@ import {
   useMotionValueEvent,
 } from 'framer-motion';
 import { IconMenu2, IconX } from '@tabler/icons-react';
+import { useLocation } from 'react-router-dom';
 
 function cn(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -67,6 +68,7 @@ export const NavBody = ({ children, className, visible }) => {
 
 export const NavItems = ({ items, className, onItemClick, activePage }) => {
   const [hovered, setHovered] = useState(null);
+  const location = useLocation();
 
   return (
     <motion.div
@@ -77,7 +79,7 @@ export const NavItems = ({ items, className, onItemClick, activePage }) => {
       )}
     >
       {items.map((item, idx) => {
-        const isActive = activePage === item.link;
+        const isActive = location.pathname === item.link;
         const isHovered = hovered === idx;
         const shouldShowEffect = isHovered || isActive;
         
@@ -96,7 +98,7 @@ export const NavItems = ({ items, className, onItemClick, activePage }) => {
                 className={cn(
                   "absolute inset-0 h-full w-full rounded-full backdrop-blur-sm",
                   isActive 
-                    ? "bg-gradient-to-r from-cyan-400/50 to-purple-400/50 " 
+                    ? "bg-gradient-to-r from-cyan-400/60 to-purple-400/60 border border-cyan-400/30" 
                     : "bg-gradient-to-r from-cyan-400/30 to-purple-400/30"
                 )}
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -106,9 +108,9 @@ export const NavItems = ({ items, className, onItemClick, activePage }) => {
             )}
             <span className={cn(
               "relative z-20 transition-all duration-300",
-              // isActive 
-              //   ? "bg-gradient-to-r from-cyan-300 to-purple-300 bg-clip-text text-transparent" 
-              //   : "bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent hover:from-cyan-300 hover:to-purple-300"
+              isActive 
+                ? "bg-gradient-to-r from-cyan-300 to-purple-300 bg-clip-text text-transparent font-semibold" 
+                : "text-white hover:text-cyan-300"
             )}>
               {item.name}
             </span>
@@ -253,12 +255,7 @@ export const NavbarButton = ({
 
 export default function CustomNavbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [activePage, setActivePage] = useState('/');
-
-  // Get current pathname
-  useEffect(() => {
-    setActivePage(window.location.pathname);
-  }, []);
+  const location = useLocation();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -279,7 +276,6 @@ export default function CustomNavbar() {
         <NavbarLogo />
         <NavItems
           items={navItems}
-          activePage={activePage}
           onItemClick={() => setIsMobileMenuOpen(false)}
         />
         <div className="flex items-center space-x-4">
@@ -303,7 +299,7 @@ export default function CustomNavbar() {
         </MobileNavHeader>
         <MobileNavMenu isOpen={isMobileMenuOpen}>
           {navItems.map((item, idx) => {
-            const isActive = activePage === item.link;
+            const isActive = location.pathname === item.link;
             return (
               <a
                 key={`mobile-link-${idx}`}
@@ -317,8 +313,8 @@ export default function CustomNavbar() {
                 <span className={cn(
                   "transition-all duration-300 relative z-10",
                   isActive 
-                    ? "bg-gradient-to-r from-cyan-300 to-purple-300 bg-clip-text text-transparent" 
-                    : "bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent hover:from-cyan-300 hover:to-purple-300"
+                    ? "bg-gradient-to-r from-cyan-300 to-purple-300 bg-clip-text text-transparent font-semibold" 
+                    : "text-white hover:text-cyan-300"
                 )}>
                   {item.name}
                 </span>

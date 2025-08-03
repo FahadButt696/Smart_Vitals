@@ -7,16 +7,16 @@ const Step2_BodyMetrics = () => {
   const heightUnit = watch("height.unit");
 
   return (
-    <div className="space-y-8">
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-500/20 mb-4">
-          <span className="text-2xl">📏</span>
+    <div className="space-y-6 sm:space-y-8">
+      <div className="text-center mb-6 sm:mb-8">
+        <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-green-500/20 mb-4">
+          <span className="text-xl sm:text-2xl">📏</span>
         </div>
-        <h3 className="text-2xl font-bold text-white mb-2">Body Metrics</h3>
-        <p className="text-white/70">Your physical measurements</p>
+        <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">Body Metrics</h3>
+        <p className="text-white/70 text-sm sm:text-base">Your physical measurements</p>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* Height */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -24,8 +24,8 @@ const Step2_BodyMetrics = () => {
           transition={{ delay: 0.1 }}
           className="space-y-3"
         >
-          <label className="block text-white font-medium">Height</label>
-          <div className="flex gap-3">
+          <label className="block text-white font-medium text-sm sm:text-base">Height</label>
+          <div className="flex flex-col sm:flex-row gap-3">
             {heightUnit === "feet" ? (
               <>
                 <input
@@ -40,7 +40,7 @@ const Step2_BodyMetrics = () => {
                     max: { value: 8, message: "Maximum 8 feet" }
                   })}
                   placeholder="Feet"
-                  className="flex-1 p-4 rounded-xl bg-white/10 text-white border border-white/20 focus:border-cyan-400 focus:outline-none transition-all duration-200 placeholder-white/50"
+                  className="flex-1 p-3 sm:p-4 rounded-xl bg-white/10 text-white border border-white/20 focus:border-cyan-400 focus:outline-none transition-all duration-200 placeholder-white/50 text-sm sm:text-base"
                 />
                 <input
                   type="text"
@@ -54,7 +54,7 @@ const Step2_BodyMetrics = () => {
                     max: { value: 11, message: "Maximum 11 inches" }
                   })}
                   placeholder="Inches "
-                  className="flex-1 p-4 rounded-xl bg-white/10 text-white border border-white/20 focus:border-cyan-400 focus:outline-none transition-all duration-200 placeholder-white/50"
+                  className="flex-1 p-3 sm:p-4 rounded-xl bg-white/10 text-white border border-white/20 focus:border-cyan-400 focus:outline-none transition-all duration-200 placeholder-white/50 text-sm sm:text-base"
                 />
               </>
             ) : (
@@ -70,19 +70,19 @@ const Step2_BodyMetrics = () => {
                   max: { value: 250, message: "Height too high" }
                 })}
                 placeholder="Height in cm "
-                className="flex-1 p-4 rounded-xl bg-white/10 text-white border border-white/20 focus:border-cyan-400 focus:outline-none transition-all duration-200 placeholder-white/50"
+                className="flex-1 p-3 sm:p-4 rounded-xl bg-white/10 text-white border border-white/20 focus:border-cyan-400 focus:outline-none transition-all duration-200 placeholder-white/50 text-sm sm:text-base"
               />
             )}
-            <div className="relative w-32">
+            <div className="relative w-full sm:w-32">
               <select
                 {...register("height.unit", { required: true })}
-                className="w-full p-4 rounded-xl bg-gradient-to-r from-cyan-500/20 to-purple-500/20 text-white border border-white/20 focus:border-cyan-400 focus:outline-none transition-all duration-200 appearance-none pr-10"
+                className="w-full p-3 sm:p-4 rounded-xl bg-gradient-to-r from-cyan-500/20 to-purple-500/20 text-white border border-white/20 focus:border-cyan-400 focus:outline-none transition-all duration-200 appearance-none pr-10 text-sm sm:text-base"
               >
                 <option value="cm" className="bg-gray-800 text-white">cm</option>
                 <option value="feet" className="bg-gray-800 text-white">feet/inches</option>
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </div>
@@ -94,7 +94,7 @@ const Step2_BodyMetrics = () => {
                 <motion.p
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="text-red-400 text-sm"
+                  className="text-red-400 text-xs sm:text-sm"
                 >
                   {errors.height.feet.message}
                 </motion.p>
@@ -103,7 +103,7 @@ const Step2_BodyMetrics = () => {
                 <motion.p
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="text-red-400 text-sm"
+                  className="text-red-400 text-xs sm:text-sm"
                 >
                   {errors.height.inches.message}
                 </motion.p>
@@ -114,7 +114,7 @@ const Step2_BodyMetrics = () => {
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="text-red-400 text-sm"
+                className="text-red-400 text-xs sm:text-sm"
               >
                 {errors.height.value.message}
               </motion.p>
@@ -129,8 +129,8 @@ const Step2_BodyMetrics = () => {
           transition={{ delay: 0.2 }}
           className="space-y-3"
         >
-          <label className="block text-white font-medium">Weight</label>
-          <div className="flex gap-3">
+          <label className="block text-white font-medium text-sm sm:text-base">Weight</label>
+          <div className="flex flex-col sm:flex-row gap-3">
             <input
               type="text"
               {...register("weight.value", {
@@ -143,18 +143,18 @@ const Step2_BodyMetrics = () => {
                 max: { value: 300, message: "Weight too high" }
               })}
               placeholder="Weight"
-              className="flex-1 p-4 rounded-xl bg-white/10 text-white border border-white/20 focus:border-cyan-400 focus:outline-none transition-all duration-200 placeholder-white/50"
+              className="flex-1 p-3 sm:p-4 rounded-xl bg-white/10 text-white border border-white/20 focus:border-cyan-400 focus:outline-none transition-all duration-200 placeholder-white/50 text-sm sm:text-base"
             />
-            <div className="relative w-32">
+            <div className="relative w-full sm:w-32">
               <select
                 {...register("weight.unit", { required: true })}
-                className="w-full p-4 rounded-xl bg-gradient-to-r from-cyan-500/20 to-purple-500/20 text-white border border-white/20 focus:border-cyan-400 focus:outline-none transition-all duration-200 appearance-none pr-10"
+                className="w-full p-3 sm:p-4 rounded-xl bg-gradient-to-r from-cyan-500/20 to-purple-500/20 text-white border border-white/20 focus:border-cyan-400 focus:outline-none transition-all duration-200 appearance-none pr-10 text-sm sm:text-base"
               >
                 <option value="kg" className="bg-gray-800 text-white">kg</option>
                 <option value="lbs" className="bg-gray-800 text-white">lbs</option>
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </div>
@@ -164,7 +164,7 @@ const Step2_BodyMetrics = () => {
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-red-400 text-sm"
+              className="text-red-400 text-xs sm:text-sm"
             >
               {errors.weight.value.message}
             </motion.p>
@@ -178,8 +178,8 @@ const Step2_BodyMetrics = () => {
           transition={{ delay: 0.3 }}
           className="space-y-3"
         >
-          <label className="block text-white font-medium">Target Weight</label>
-          <div className="flex gap-3">
+          <label className="block text-white font-medium text-sm sm:text-base">Target Weight</label>
+          <div className="flex flex-col sm:flex-row gap-3">
             <input
               type="text"
               {...register("targetWeight.value", {
@@ -192,18 +192,18 @@ const Step2_BodyMetrics = () => {
                 max: { value: 300, message: "Target weight too high" }
               })}
               placeholder="Target weight "
-              className="flex-1 p-4 rounded-xl bg-white/10 text-white border border-white/20 focus:border-cyan-400 focus:outline-none transition-all duration-200 placeholder-white/50"
+              className="flex-1 p-3 sm:p-4 rounded-xl bg-white/10 text-white border border-white/20 focus:border-cyan-400 focus:outline-none transition-all duration-200 placeholder-white/50 text-sm sm:text-base"
             />
-            <div className="relative w-32">
+            <div className="relative w-full sm:w-32">
               <select
                 {...register("targetWeight.unit", { required: true })}
-                className="w-full p-4 rounded-xl bg-gradient-to-r from-cyan-500/20 to-purple-500/20 text-white border border-white/20 focus:border-cyan-400 focus:outline-none transition-all duration-200 appearance-none pr-10"
+                className="w-full p-3 sm:p-4 rounded-xl bg-gradient-to-r from-cyan-500/20 to-purple-500/20 text-white border border-white/20 focus:border-cyan-400 focus:outline-none transition-all duration-200 appearance-none pr-10 text-sm sm:text-base"
               >
                 <option value="kg" className="bg-gray-800 text-white">kg</option>
                 <option value="lbs" className="bg-gray-800 text-white">lbs</option>
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </div>
@@ -213,7 +213,7 @@ const Step2_BodyMetrics = () => {
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-red-400 text-sm"
+              className="text-red-400 text-xs sm:text-sm"
             >
               {errors.targetWeight.value.message}
             </motion.p>

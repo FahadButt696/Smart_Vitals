@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { FaGithub, FaLinkedin, FaTwitter } from 'react-icons/fa';
+import { FaInstagram, FaFacebook, FaLinkedin } from 'react-icons/fa';
 
 const Footer = () => {
   return (
@@ -10,11 +10,11 @@ const Footer = () => {
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: 'easeOut' }}
-      className="relative w-full  text-white px-6 py-10"
+      className="relative w-full text-white px-4 sm:px-6 py-10"
     >
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 text-sm">
         <div className="text-center md:text-left">
-          <h1 className="text-lg font-bold FONT bg-gradient-to-r from-cyan-300 to-purple-300 bg-clip-text text-transparent ">
+          <h1 className="text-lg font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent">
             Smart Vitals
           </h1>
           <p className="text-white/70 mt-1">
@@ -22,31 +22,54 @@ const Footer = () => {
           </p>
         </div>
 
-        <div className="flex gap-4 text-xl text-white/70">
-          <a
-            href="https://github.com/"
+        <div className="flex gap-4 text-xl">
+          {/* Instagram */}
+          <motion.a
+            href="https://instagram.com/"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-white transition"
+            className="text-pink-400 hover:text-pink-300 transition-all duration-300 hover:scale-110"
+            whileHover={{ 
+              scale: 1.1,
+              rotate: [0, -10, 10, 0],
+              transition: { duration: 0.3 }
+            }}
+            whileTap={{ scale: 0.95 }}
           >
-            <FaGithub />
-          </a>
-          <a
+            <FaInstagram />
+          </motion.a>
+          
+          {/* Facebook */}
+          <motion.a
+            href="https://facebook.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-400 hover:text-blue-300 transition-all duration-300 hover:scale-110"
+            whileHover={{ 
+              scale: 1.1,
+              rotate: [0, -10, 10, 0],
+              transition: { duration: 0.3 }
+            }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <FaFacebook />
+          </motion.a>
+          
+          {/* LinkedIn */}
+          <motion.a
             href="https://linkedin.com/"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-white transition"
+            className="text-blue-500 hover:text-blue-400 transition-all duration-300 hover:scale-110"
+            whileHover={{ 
+              scale: 1.1,
+              rotate: [0, -10, 10, 0],
+              transition: { duration: 0.3 }
+            }}
+            whileTap={{ scale: 0.95 }}
           >
             <FaLinkedin />
-          </a>
-          <a
-            href="https://twitter.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-white transition"
-          >
-            <FaTwitter />
-          </a>
+          </motion.a>
         </div>
       </div>
 

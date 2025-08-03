@@ -25,16 +25,16 @@ const Step4_Preferences = () => {
   };
 
   return (
-    <div className="space-y-8">
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-orange-500/20 mb-4">
-          <span className="text-2xl">🏃</span>
+    <div className="space-y-6 sm:space-y-8">
+      <div className="text-center mb-6 sm:mb-8">
+        <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-orange-500/20 mb-4">
+          <span className="text-xl sm:text-2xl">🏃</span>
         </div>
-        <h3 className="text-2xl font-bold text-white mb-2">Workout Preferences</h3>
-        <p className="text-white/70">Select your preferred workout types</p>
+        <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">Workout Preferences</h3>
+        <p className="text-white/70 text-sm sm:text-base">Select your preferred workout types</p>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* Workout Days Per Week */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -42,11 +42,11 @@ const Step4_Preferences = () => {
           transition={{ delay: 0.1 }}
           className="space-y-3"
         >
-          <label className="block text-white font-medium">Workout Days Per Week</label>
+          <label className="block text-white font-medium text-sm sm:text-base">Workout Days Per Week</label>
           <div className="relative">
             <select 
               {...register("workoutDaysPerWeek")} 
-              className="w-full p-4 rounded-xl bg-gradient-to-r from-cyan-500/20 to-purple-500/20 text-white border border-white/20 focus:border-cyan-400 focus:outline-none transition-all duration-200 appearance-none pr-10"
+              className="w-full p-3 sm:p-4 rounded-xl bg-gradient-to-r from-cyan-500/20 to-purple-500/20 text-white border border-white/20 focus:border-cyan-400 focus:outline-none transition-all duration-200 appearance-none pr-10 text-sm sm:text-base"
             >
               <option value="1" className="bg-gray-800 text-white">1 day</option>
               <option value="2" className="bg-gray-800 text-white">2 days</option>
@@ -57,7 +57,7 @@ const Step4_Preferences = () => {
               <option value="7" className="bg-gray-800 text-white">7 days</option>
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
             </div>
@@ -71,21 +71,21 @@ const Step4_Preferences = () => {
           transition={{ delay: 0.2 }}
           className="space-y-4"
         >
-          <label className="block text-white font-medium">Select Your Workout Types</label>
-          <div className="grid grid-cols-2 gap-3">
+          <label className="block text-white font-medium text-sm sm:text-base">Select Your Workout Types</label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {workoutOptions.map((option) => (
               <button
                 key={option.value}
                 type="button"
                 onClick={() => togglePreference(option.value)}
-                className={`p-4 rounded-xl border-2 transition-all duration-200 ${
+                className={`p-3 sm:p-4 rounded-xl border-2 transition-all duration-200 ${
                   selectedPreferences.includes(option.value)
                     ? 'border-cyan-400 bg-cyan-400/20 text-cyan-400'
                     : 'border-white/20 bg-white/5 text-white hover:border-white/40 hover:bg-white/10'
                 }`}
               >
-                <div className="text-2xl mb-2">{option.icon}</div>
-                <div className="text-sm font-medium">{option.label}</div>
+                <div className="text-xl sm:text-2xl mb-2">{option.icon}</div>
+                <div className="text-xs sm:text-sm font-medium">{option.label}</div>
               </button>
             ))}
           </div>
@@ -98,11 +98,11 @@ const Step4_Preferences = () => {
           transition={{ delay: 0.3 }}
           className="space-y-3"
         >
-          <label className="block text-white font-medium">Preferred Meal Plan Type</label>
+          <label className="block text-white font-medium text-sm sm:text-base">Preferred Meal Plan Type</label>
           <div className="relative">
             <select 
               {...register("mealPlanType")} 
-              className="w-full p-4 rounded-xl bg-gradient-to-r from-cyan-500/20 to-purple-500/20 text-white border border-white/20 focus:border-cyan-400 focus:outline-none transition-all duration-200 appearance-none pr-10"
+              className="w-full p-3 sm:p-4 rounded-xl bg-gradient-to-r from-cyan-500/20 to-purple-500/20 text-white border border-white/20 focus:border-cyan-400 focus:outline-none transition-all duration-200 appearance-none pr-10 text-sm sm:text-base"
             >
               <option value="Balanced" className="bg-gray-800 text-white">Balanced</option>
               <option value="High protein" className="bg-gray-800 text-white">High Protein</option>
@@ -110,7 +110,7 @@ const Step4_Preferences = () => {
               <option value="Custom" className="bg-gray-800 text-white">Custom</option>
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
             </div>
@@ -124,13 +124,13 @@ const Step4_Preferences = () => {
           transition={{ delay: 0.4 }}
           className="space-y-3"
         >
-          <label className="flex items-center gap-3 text-white cursor-pointer">
+          <label className="flex items-start gap-3 text-white cursor-pointer">
             <input 
               type="checkbox" 
               {...register("wantsMentalSupport")}
-              className="w-5 h-5 rounded border-white/20 bg-white/10 text-cyan-400 focus:ring-cyan-400"
+              className="w-4 h-4 sm:w-5 sm:h-5 mt-1 rounded border-white/20 bg-white/10 text-cyan-400 focus:ring-cyan-400"
             />
-            <span className="font-medium">I would like mental health support and wellness tips</span>
+            <span className="font-medium text-sm sm:text-base leading-relaxed">I would like mental health support and wellness tips</span>
           </label>
         </motion.div>
       </div>
