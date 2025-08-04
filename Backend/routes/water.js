@@ -1,26 +1,31 @@
 import express from 'express';
-import { authenticateUser } from '../middleware/auth.js';
-import WaterIntake from '../models/WaterIntake.js';
+import { clerkAuthMiddleware } from '../middleware/clerkMiddleWare.js';
+import {
+  getWaterLogs,
+  addWaterLog,
+  updateWaterLog,
+  deleteWaterLog,
+  getWaterStats
+} from '../controllers/waterController.js';
 
 const router = express.Router();
 
-router.get('/', authenticateUser, async (req, res) => {
-  try {
-    const intakes = await WaterIntake.find({ userId: req.user.id }).sort({ date: -1 });
-    res.json({ success: true, count: intakes.length, data: intakes });
-  } catch (error) {
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
-});
+// Apply authentication middleware to all routes
+router.use(clerkAuthMiddleware);
 
-router.post('/', authenticateUser, async (req, res) => {
-  try {
-    const intake = new WaterIntake({ ...req.body, userId: req.user.id });
-    await intake.save();
-    res.status(201).json({ success: true, data: intake });
-  } catch (error) {
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
-});
+// Get all water logs for a user
+router.get('/', getWaterLogs);
+
+// Add a new water log
+router.post('/', addWaterLog);
+
+// Update a water log
+router.put('/:id', updateWaterLog);
+
+// Delete a water log
+router.delete('/:id', deleteWaterLog);
+
+// Get water statistics
+router.get('/stats', getWaterStats);
 
 export default router; 

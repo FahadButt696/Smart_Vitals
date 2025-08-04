@@ -393,6 +393,27 @@
 }
 
 .inputStyle {
-  @apply w-full px-4 py-2 rounded-md bg-neutral-800 text-white border border-cyan-600 focus:outline-none focus:ring-2 focus:ring-cyan-400 transition;
+  @apply w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:border-cyan-400 focus:outline-none transition-all duration-200;
+}
+
+/* Sidebar scrollbar hiding */
+.sidebar-scroll {
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.sidebar-scroll::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+/* Prevent horizontal scroll globally */
+body {
+  overflow-x: hidden;
+}
+
+html {
+  overflow-x: hidden;
 }
 

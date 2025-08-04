@@ -1,26 +1,31 @@
 import express from 'express';
-import { authenticateUser } from '../middleware/auth.js';
-import SymptomLog from '../models/SymptomLog.js';
+import { clerkAuthMiddleware } from '../middleware/clerkMiddleWare.js';
+import {
+  getSymptomLogs,
+  addSymptomLog,
+  updateSymptomLog,
+  deleteSymptomLog,
+  getSymptomStats
+} from '../controllers/symptomController.js';
 
 const router = express.Router();
 
-router.get('/', authenticateUser, async (req, res) => {
-  try {
-    const logs = await SymptomLog.find({ userId: req.user.id }).sort({ date: -1 });
-    res.json({ success: true, count: logs.length, data: logs });
-  } catch (error) {
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
-});
+// Apply authentication middleware to all routes
+router.use(clerkAuthMiddleware);
 
-router.post('/', authenticateUser, async (req, res) => {
-  try {
-    const log = new SymptomLog({ ...req.body, userId: req.user.id });
-    await log.save();
-    res.status(201).json({ success: true, data: log });
-  } catch (error) {
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
-});
+// Get all symptom logs for a user
+router.get('/', getSymptomLogs);
+
+// Add a new symptom log
+router.post('/', addSymptomLog);
+
+// Update a symptom log
+router.put('/:id', updateSymptomLog);
+
+// Delete a symptom log
+router.delete('/:id', deleteSymptomLog);
+
+// Get symptom statistics
+router.get('/stats', getSymptomStats);
 
 export default router; 

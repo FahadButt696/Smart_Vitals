@@ -1,26 +1,31 @@
 import express from 'express';
-import { authenticateUser } from '../middleware/auth.js';
-import MentalHealthLog from '../models/MentalHealthLog.js';
+import { clerkAuthMiddleware } from '../middleware/clerkMiddleWare.js';
+import {
+  getMentalHealthLogs,
+  addMentalHealthLog,
+  updateMentalHealthLog,
+  deleteMentalHealthLog,
+  getMentalHealthStats
+} from '../controllers/mentalHealthController.js';
 
 const router = express.Router();
 
-router.get('/', authenticateUser, async (req, res) => {
-  try {
-    const logs = await MentalHealthLog.find({ userId: req.user.id }).sort({ date: -1 });
-    res.json({ success: true, count: logs.length, data: logs });
-  } catch (error) {
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
-});
+// Apply authentication middleware to all routes
+router.use(clerkAuthMiddleware);
 
-router.post('/', authenticateUser, async (req, res) => {
-  try {
-    const log = new MentalHealthLog({ ...req.body, userId: req.user.id });
-    await log.save();
-    res.status(201).json({ success: true, data: log });
-  } catch (error) {
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
-});
+// Get all mental health logs for a user
+router.get('/', getMentalHealthLogs);
+
+// Add a new mental health log
+router.post('/', addMentalHealthLog);
+
+// Update a mental health log
+router.put('/:id', updateMentalHealthLog);
+
+// Delete a mental health log
+router.delete('/:id', deleteMentalHealthLog);
+
+// Get mental health statistics
+router.get('/stats', getMentalHealthStats);
 
 export default router; 

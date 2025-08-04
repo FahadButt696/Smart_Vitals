@@ -1,26 +1,31 @@
 import express from 'express';
-import { authenticateUser } from '../middleware/auth.js';
-import SleepLog from '../models/SleepLog.js';
+import { clerkAuthMiddleware } from '../middleware/clerkMiddleWare.js';
+import {
+  getSleepLogs,
+  addSleepLog,
+  updateSleepLog,
+  deleteSleepLog,
+  getSleepStats
+} from '../controllers/sleepController.js';
 
 const router = express.Router();
 
-router.get('/', authenticateUser, async (req, res) => {
-  try {
-    const logs = await SleepLog.find({ userId: req.user.id }).sort({ date: -1 });
-    res.json({ success: true, count: logs.length, data: logs });
-  } catch (error) {
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
-});
+// Apply authentication middleware to all routes
+router.use(clerkAuthMiddleware);
 
-router.post('/', authenticateUser, async (req, res) => {
-  try {
-    const log = new SleepLog({ ...req.body, userId: req.user.id });
-    await log.save();
-    res.status(201).json({ success: true, data: log });
-  } catch (error) {
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
-});
+// Get all sleep logs for a user
+router.get('/', getSleepLogs);
+
+// Add a new sleep log
+router.post('/', addSleepLog);
+
+// Update a sleep log
+router.put('/:id', updateSleepLog);
+
+// Delete a sleep log
+router.delete('/:id', deleteSleepLog);
+
+// Get sleep statistics
+router.get('/stats', getSleepStats);
 
 export default router; 

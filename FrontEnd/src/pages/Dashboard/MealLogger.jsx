@@ -18,6 +18,7 @@ import {
   FaCoffee,
   FaLeaf
 } from "react-icons/fa";
+import DashboardLayout from "../../components/custom/DashboardLayout.jsx";
 
 const MealLogger = () => {
   const { user } = useUser();
@@ -86,242 +87,221 @@ const MealLogger = () => {
 
   return (
     <SignedIn>
-      <div className="min-h-screen relative overflow-hidden">
-        {/* Background */}
-        <div className="absolute inset-0 z-0">
-          <div 
-            className="w-full h-full bg-cover bg-center bg-no-repeat"
-            style={{
-              backgroundImage: `url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080"><defs><radialGradient id="a" cx="0.5" cy="0.5" r="0.5"><stop offset="0%" stop-color="%230ea5e9" stop-opacity="0.1"/><stop offset="100%" stop-color="%238b5cf6" stop-opacity="0.05"/></radialGradient><pattern id="b" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="%23ffffff" fill-opacity="0.1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23a)"/><rect width="100%" height="100%" fill="url(%23b)"/></svg>')`,
-              filter: 'brightness(0.3) contrast(1.2) saturate(0.8)',
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-900/80 via-cyan-900/60 to-neutral-900/80"></div>
+      <DashboardLayout 
+        title="Meal Logger" 
+        subtitle="Track your meals and nutrition with AI-powered recognition"
+      >
+        {/* Header Actions */}
+        <div className="flex justify-end mb-6">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setShowAddMeal(true)}
+            className="p-4 bg-gradient-to-r from-cyan-400 to-purple-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
+          >
+            <FaPlus className="inline mr-2" />
+            Add Meal
+          </motion.button>
         </div>
 
-        <div className="relative z-10 p-6 lg:p-8">
-          {/* Header */}
+        {/* Nutrition Summary */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
+            className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-xl p-4"
           >
-            <div className="flex justify-between items-center mb-4">
-              <div>
-                <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">Meal Logger</h1>
-                <p className="text-white/60">Track your meals and nutrition with AI-powered recognition</p>
-              </div>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setShowAddMeal(true)}
-                className="p-4 bg-gradient-to-r from-cyan-400 to-purple-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
-              >
-                <FaPlus className="inline mr-2" />
-                Add Meal
-              </motion.button>
+            <div className="flex items-center gap-3 mb-2">
+              <FaFire className="text-orange-400" />
+              <span className="text-white/60 text-sm">Calories</span>
             </div>
+            <div className="text-2xl font-bold text-white">{nutritionSummary.totalCalories}</div>
+            <div className="text-white/40 text-xs">/ {nutritionSummary.targetCalories}</div>
+          </motion.div>
 
-            {/* Nutrition Summary */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-xl p-4"
-              >
-                <div className="flex items-center gap-3 mb-2">
-                  <FaFire className="text-orange-400" />
-                  <span className="text-white/60 text-sm">Calories</span>
-                </div>
-                <div className="text-2xl font-bold text-white">{nutritionSummary.totalCalories}</div>
-                <div className="text-white/40 text-xs">/ {nutritionSummary.targetCalories}</div>
-              </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-xl p-4"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <FaBreadSlice className="text-green-400" />
+              <span className="text-white/60 text-sm">Protein</span>
+            </div>
+            <div className="text-2xl font-bold text-white">{nutritionSummary.protein}g</div>
+            <div className="text-white/40 text-xs">Target: 80g</div>
+          </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-xl p-4"
-              >
-                <div className="flex items-center gap-3 mb-2">
-                  <FaBreadSlice className="text-green-400" />
-                  <span className="text-white/60 text-sm">Protein</span>
-                </div>
-                <div className="text-2xl font-bold text-white">{nutritionSummary.protein}g</div>
-                <div className="text-white/40 text-xs">Target: 80g</div>
-              </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-xl p-4"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <FaTint className="text-blue-400" />
+              <span className="text-white/60 text-sm">Carbs</span>
+            </div>
+            <div className="text-2xl font-bold text-white">{nutritionSummary.carbs}g</div>
+            <div className="text-white/40 text-xs">Target: 250g</div>
+          </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-xl p-4"
-              >
-                <div className="flex items-center gap-3 mb-2">
-                                          <FaTint className="text-blue-400" />
-                  <span className="text-white/60 text-sm">Carbs</span>
-                </div>
-                <div className="text-2xl font-bold text-white">{nutritionSummary.carbs}g</div>
-                <div className="text-white/40 text-xs">Target: 250g</div>
-              </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-xl p-4"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <FaLeaf className="text-purple-400" />
+              <span className="text-white/60 text-sm">Fat</span>
+            </div>
+            <div className="text-2xl font-bold text-white">{nutritionSummary.fat}g</div>
+            <div className="text-white/40 text-xs">Target: 65g</div>
+          </motion.div>
+        </div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-xl p-4"
-              >
-                <div className="flex items-center gap-3 mb-2">
-                  <FaLeaf className="text-purple-400" />
-                  <span className="text-white/60 text-sm">Fat</span>
-                </div>
-                <div className="text-2xl font-bold text-white">{nutritionSummary.fat}g</div>
-                <div className="text-white/40 text-xs">Target: 65g</div>
-              </motion.div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Meal List */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="lg:col-span-2"
+          >
+            <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+              <div className="flex gap-4 mb-6">
+                {mealTypes.map((type) => (
+                  <motion.button
+                    key={type.id}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setSelectedMealType(type.id)}
+                    className={`flex items-center gap-2 p-3 rounded-xl transition-all duration-200 ${
+                      selectedMealType === type.id
+                        ? 'bg-gradient-to-r ' + type.color + ' text-white'
+                        : 'bg-white/10 text-white/70 hover:bg-white/20'
+                    }`}
+                  >
+                    <type.icon />
+                    <span className="font-medium">{type.label}</span>
+                  </motion.button>
+                ))}
+              </div>
+
+              <div className="space-y-4">
+                {todayMeals
+                  .filter(meal => meal.type === selectedMealType)
+                  .map((meal, index) => (
+                    <motion.div
+                      key={meal.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="flex items-center gap-4 p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all duration-200"
+                    >
+                      <div className="text-3xl">{meal.image}</div>
+                      <div className="flex-1">
+                        <h3 className="text-white font-medium">{meal.name}</h3>
+                        <div className="flex items-center gap-4 text-white/60 text-sm">
+                          <span className="flex items-center gap-1">
+                            <FaClock className="text-xs" />
+                            {meal.time}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <FaFire className="text-xs" />
+                            {meal.calories} cal
+                          </span>
+                        </div>
+                      </div>
+                      <div className="text-right text-white/60 text-sm">
+                        <div>P: {meal.protein}g</div>
+                        <div>C: {meal.carbs}g</div>
+                        <div>F: {meal.fat}g</div>
+                      </div>
+                      <div className="flex gap-2">
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          className="p-2 text-cyan-400 hover:bg-cyan-400/20 rounded-lg transition-all duration-200"
+                        >
+                          <FaEdit className="text-sm" />
+                        </motion.button>
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          className="p-2 text-red-400 hover:bg-red-400/20 rounded-lg transition-all duration-200"
+                        >
+                          <FaTrash className="text-sm" />
+                        </motion.button>
+                      </div>
+                    </motion.div>
+                  ))}
+              </div>
             </div>
           </motion.div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Meal List */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="lg:col-span-2"
-            >
-              <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
-                <div className="flex gap-4 mb-6">
-                  {mealTypes.map((type) => (
-                    <motion.button
-                      key={type.id}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => setSelectedMealType(type.id)}
-                      className={`flex items-center gap-2 p-3 rounded-xl transition-all duration-200 ${
-                        selectedMealType === type.id
-                          ? 'bg-gradient-to-r ' + type.color + ' text-white'
-                          : 'bg-white/10 text-white/70 hover:bg-white/20'
-                      }`}
-                    >
-                      <type.icon />
-                      <span className="font-medium">{type.label}</span>
-                    </motion.button>
-                  ))}
-                </div>
-
-                <div className="space-y-4">
-                  {todayMeals
-                    .filter(meal => meal.type === selectedMealType)
-                    .map((meal, index) => (
-                      <motion.div
-                        key={meal.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        className="flex items-center gap-4 p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all duration-200"
-                      >
-                        <div className="text-3xl">{meal.image}</div>
-                        <div className="flex-1">
-                          <h3 className="text-white font-medium">{meal.name}</h3>
-                          <div className="flex items-center gap-4 text-white/60 text-sm">
-                            <span className="flex items-center gap-1">
-                              <FaClock className="text-xs" />
-                              {meal.time}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <FaFire className="text-xs" />
-                              {meal.calories} cal
-                            </span>
-                          </div>
-                        </div>
-                        <div className="text-right text-white/60 text-sm">
-                          <div>P: {meal.protein}g</div>
-                          <div>C: {meal.carbs}g</div>
-                          <div>F: {meal.fat}g</div>
-                        </div>
-                        <div className="flex gap-2">
-                          <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            className="p-2 text-cyan-400 hover:bg-cyan-400/20 rounded-lg transition-all duration-200"
-                          >
-                            <FaEdit className="text-sm" />
-                          </motion.button>
-                          <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            className="p-2 text-red-400 hover:bg-red-400/20 rounded-lg transition-all duration-200"
-                          >
-                            <FaTrash className="text-sm" />
-                          </motion.button>
-                        </div>
-                      </motion.div>
-                    ))}
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Quick Add & AI Features */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="space-y-6"
-            >
-              {/* Quick Add */}
-              <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
-                <h3 className="text-xl font-bold text-white mb-4">Quick Add</h3>
-                <div className="space-y-3">
-                  {quickAddFoods.map((food, index) => (
-                    <motion.button
-                      key={food.name}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="w-full flex items-center justify-between p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-all duration-200"
-                    >
-                      <div className="flex items-center gap-3">
-                        <food.icon className="text-cyan-400" />
-                        <span className="text-white font-medium">{food.name}</span>
-                      </div>
-                      <span className="text-white/60 text-sm">{food.calories} cal</span>
-                    </motion.button>
-                  ))}
-                </div>
-              </div>
-
-              {/* AI Features */}
-              <div className="bg-gradient-to-br from-cyan-900/30 to-blue-900/30 backdrop-blur-xl border border-cyan-400/20 rounded-2xl p-6">
-                <h3 className="text-xl font-bold text-white mb-4">AI Features</h3>
-                <div className="space-y-3">
+          {/* Quick Add & AI Features */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="space-y-6"
+          >
+            {/* Quick Add */}
+            <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+              <h3 className="text-xl font-bold text-white mb-4">Quick Add</h3>
+              <div className="space-y-3">
+                {quickAddFoods.map((food, index) => (
                   <motion.button
+                    key={food.name}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="w-full flex items-center gap-3 p-3 bg-gradient-to-r from-cyan-400/20 to-purple-400/20 rounded-xl hover:from-cyan-400/30 hover:to-purple-400/30 transition-all duration-200"
+                    className="w-full flex items-center justify-between p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-all duration-200"
                   >
-                    <FaCamera className="text-cyan-400" />
-                    <span className="text-white font-medium">Photo Recognition</span>
+                    <div className="flex items-center gap-3">
+                      <food.icon className="text-cyan-400" />
+                      <span className="text-white font-medium">{food.name}</span>
+                    </div>
+                    <span className="text-white/60 text-sm">{food.calories} cal</span>
                   </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="w-full flex items-center gap-3 p-3 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-xl hover:from-purple-400/30 hover:to-pink-400/30 transition-all duration-200"
-                  >
-                    <FaSearch className="text-purple-400" />
-                    <span className="text-white font-medium">Voice Search</span>
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="w-full flex items-center gap-3 p-3 bg-gradient-to-r from-green-400/20 to-emerald-400/20 rounded-xl hover:from-green-400/30 hover:to-emerald-400/30 transition-all duration-200"
-                  >
-                    <FaLeaf className="text-green-400" />
-                    <span className="text-white font-medium">Nutrition Analysis</span>
-                  </motion.button>
-                </div>
+                ))}
               </div>
-            </motion.div>
-          </div>
+            </div>
+
+            {/* AI Features */}
+            <div className="bg-gradient-to-br from-cyan-900/30 to-blue-900/30 backdrop-blur-xl border border-cyan-400/20 rounded-2xl p-6">
+              <h3 className="text-xl font-bold text-white mb-4">AI Features</h3>
+              <div className="space-y-3">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full flex items-center gap-3 p-3 bg-gradient-to-r from-cyan-400/20 to-purple-400/20 rounded-xl hover:from-cyan-400/30 hover:to-purple-400/30 transition-all duration-200"
+                >
+                  <FaCamera className="text-cyan-400" />
+                  <span className="text-white font-medium">Photo Recognition</span>
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full flex items-center gap-3 p-3 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-xl hover:from-purple-400/30 hover:to-pink-400/30 transition-all duration-200"
+                >
+                  <FaSearch className="text-purple-400" />
+                  <span className="text-white font-medium">Voice Search</span>
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full flex items-center gap-3 p-3 bg-gradient-to-r from-green-400/20 to-emerald-400/20 rounded-xl hover:from-green-400/30 hover:to-emerald-400/30 transition-all duration-200"
+                >
+                  <FaLeaf className="text-green-400" />
+                  <span className="text-white font-medium">Nutrition Analysis</span>
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
         </div>
 
         {/* Add Meal Modal */}
@@ -376,7 +356,7 @@ const MealLogger = () => {
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
+      </DashboardLayout>
     </SignedIn>
   );
 };

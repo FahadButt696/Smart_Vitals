@@ -1,13 +1,16 @@
 import express from 'express';
-import { authenticateUser } from '../middleware/auth.js';
+import { clerkAuthMiddleware } from '../middleware/clerkMiddleWare.js';
 import User from '../models/User.js';
 
 const router = express.Router();
 
+// Apply authentication middleware to all routes
+router.use(clerkAuthMiddleware);
+
 // @desc    Get user by ID
 // @route   GET /api/users/:id
 // @access  Private
-router.get('/:id', authenticateUser, async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select('-__v');
     

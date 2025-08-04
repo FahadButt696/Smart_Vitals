@@ -1,26 +1,31 @@
 import express from 'express';
-import { authenticateUser } from '../middleware/auth.js';
-import WeightLog from '../models/WeightLog.js';
+import { clerkAuthMiddleware } from '../middleware/clerkMiddleWare.js';
+import {
+  getWeightLogs,
+  addWeightLog,
+  updateWeightLog,
+  deleteWeightLog,
+  getWeightStats
+} from '../controllers/weightController.js';
 
 const router = express.Router();
 
-router.get('/', authenticateUser, async (req, res) => {
-  try {
-    const logs = await WeightLog.find({ userId: req.user.id }).sort({ date: -1 });
-    res.json({ success: true, count: logs.length, data: logs });
-  } catch (error) {
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
-});
+// Apply authentication middleware to all routes
+router.use(clerkAuthMiddleware);
 
-router.post('/', authenticateUser, async (req, res) => {
-  try {
-    const log = new WeightLog({ ...req.body, userId: req.user.id });
-    await log.save();
-    res.status(201).json({ success: true, data: log });
-  } catch (error) {
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
-});
+// Get all weight logs for a user
+router.get('/', getWeightLogs);
+
+// Add a new weight log
+router.post('/', addWeightLog);
+
+// Update a weight log
+router.put('/:id', updateWeightLog);
+
+// Delete a weight log
+router.delete('/:id', deleteWeightLog);
+
+// Get weight statistics
+router.get('/stats', getWeightStats);
 
 export default router; 

@@ -1,26 +1,35 @@
 import express from 'express';
-import { authenticateUser } from '../middleware/auth.js';
-import DietPlan from '../models/DietPlan.js';
+import { clerkAuthMiddleware } from '../middleware/clerkMiddleWare.js';
+import {
+  getDietPlans,
+  addDietPlan,
+  updateDietPlan,
+  deleteDietPlan,
+  generateDietPlan,
+  generateAIMealPlan
+} from '../controllers/dietController.js';
 
 const router = express.Router();
 
-router.get('/', authenticateUser, async (req, res) => {
-  try {
-    const plans = await DietPlan.find({ userId: req.user.id }).sort({ startDate: -1 });
-    res.json({ success: true, count: plans.length, data: plans });
-  } catch (error) {
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
-});
+// Apply authentication middleware to all routes
+router.use(clerkAuthMiddleware);
 
-router.post('/', authenticateUser, async (req, res) => {
-  try {
-    const plan = new DietPlan({ ...req.body, userId: req.user.id });
-    await plan.save();
-    res.status(201).json({ success: true, data: plan });
-  } catch (error) {
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
-});
+// Get all diet plans for a user
+router.get('/', getDietPlans);
+
+// Add a new diet plan
+router.post('/', addDietPlan);
+
+// Update a diet plan
+router.put('/:id', updateDietPlan);
+
+// Delete a diet plan
+router.delete('/:id', deleteDietPlan);
+
+// Generate AI diet plan
+router.post('/generate', generateDietPlan);
+
+// Generate AI meal plan
+router.post('/generate-ai', generateAIMealPlan);
 
 export default router; 

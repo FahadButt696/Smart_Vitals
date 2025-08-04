@@ -15,6 +15,7 @@ import {
   FaRobot,
   FaLightbulb
 } from "react-icons/fa";
+import DashboardLayout from "../../components/custom/DashboardLayout.jsx";
 
 const CalorieTracker = () => {
   const { user } = useUser();
@@ -61,199 +62,188 @@ const CalorieTracker = () => {
 
   return (
     <SignedIn>
-      <div className="min-h-screen relative overflow-hidden">
-        {/* Background */}
-        <div className="absolute inset-0 z-0">
-          <div 
-            className="w-full h-full bg-cover bg-center bg-no-repeat"
-            style={{
-              backgroundImage: `url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080"><defs><radialGradient id="a" cx="0.5" cy="0.5" r="0.5"><stop offset="0%" stop-color="%230ea5e9" stop-opacity="0.1"/><stop offset="100%" stop-color="%238b5cf6" stop-opacity="0.05"/></radialGradient><pattern id="b" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="%23ffffff" fill-opacity="0.1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23a)"/><rect width="100%" height="100%" fill="url(%23b)"/></svg>')`,
-              filter: 'brightness(0.3) contrast(1.2) saturate(0.8)',
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-900/80 via-cyan-900/60 to-neutral-900/80"></div>
+      <DashboardLayout 
+        title="Calorie Tracker" 
+        subtitle="Track your daily nutrition with AI-powered insights"
+      >
+        {/* Header Actions */}
+        <div className="flex justify-end mb-6">
+          <div className="flex gap-3">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="p-4 bg-gradient-to-r from-cyan-400 to-purple-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
+            >
+              <FaCamera className="inline mr-2" />
+              Scan Food
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="p-4 bg-gradient-to-r from-purple-400 to-pink-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
+            >
+              <FaSearch className="inline mr-2" />
+              Search Food
+            </motion.button>
+          </div>
         </div>
 
-        <div className="relative z-10 p-6 lg:p-8">
-          {/* Header */}
+        {/* Main Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Calorie Overview */}
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
+            className="lg:col-span-2"
           >
-            <div className="flex justify-between items-center mb-4">
-              <div>
-                <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">Calorie Tracker</h1>
-                <p className="text-white/60">Track your daily nutrition with AI-powered insights</p>
+            <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6 mb-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-white">Today's Nutrition</h2>
+                <input
+                  type="date"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  className="p-2 bg-white/10 border border-white/20 rounded-lg text-white"
+                />
               </div>
-              <div className="flex gap-3">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="p-4 bg-gradient-to-r from-cyan-400 to-purple-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
-                >
-                  <FaCamera className="inline mr-2" />
-                  Scan Food
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="p-4 bg-gradient-to-r from-green-400 to-emerald-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
-                >
-                  <FaPlus className="inline mr-2" />
-                  Add Food
-                </motion.button>
+
+              {/* Calorie Progress */}
+              <div className="mb-6">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-white/80">Calories</span>
+                  <span className="text-white font-medium">{nutritionData.consumed} / {nutritionData.target}</span>
+                </div>
+                <div className="w-full bg-white/10 rounded-full h-3">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${(nutritionData.consumed / nutritionData.target) * 100}%` }}
+                    className="bg-gradient-to-r from-cyan-400 to-purple-400 h-3 rounded-full"
+                  />
+                </div>
+                <div className="flex justify-between text-sm mt-2">
+                  <span className="text-white/60">Remaining: {nutritionData.remaining} cal</span>
+                  <span className="text-white/60">{Math.round((nutritionData.consumed / nutritionData.target) * 100)}%</span>
+                </div>
+              </div>
+
+              {/* Macro Breakdown */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {macroTargets.map((macro, index) => (
+                  <motion.div
+                    key={macro.name}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="text-center"
+                  >
+                    <div className="flex items-center justify-center mb-2">
+                      <macro.icon className={`text-2xl bg-gradient-to-r ${macro.color} bg-clip-text text-transparent`} />
+                    </div>
+                    <div className="text-white font-bold">{macro.current}{macro.unit}</div>
+                    <div className="text-white/60 text-sm">/ {macro.target}{macro.unit}</div>
+                    <div className="w-full bg-white/10 rounded-full h-1 mt-2">
+                      <div
+                        className={`bg-gradient-to-r ${macro.color} h-1 rounded-full`}
+                        style={{ width: `${Math.min((macro.current / macro.target) * 100, 100)}%` }}
+                      />
+                    </div>
+                  </motion.div>
+                ))}
               </div>
             </div>
 
-            {/* Main Calorie Display */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6 text-center"
-              >
-                <div className="text-4xl font-bold text-white mb-2">{nutritionData.consumed}</div>
-                <div className="text-white/60 text-sm">Calories Consumed</div>
-                <div className="w-full bg-white/10 rounded-full h-2 mt-4">
-                  <div 
-                    className="h-2 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full transition-all duration-300" 
-                    style={{ width: `${(nutritionData.consumed / nutritionData.target) * 100}%` }}
-                  ></div>
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6 text-center"
-              >
-                <div className="text-4xl font-bold text-white mb-2">{nutritionData.remaining}</div>
-                <div className="text-white/60 text-sm">Calories Remaining</div>
-                <div className="text-green-400 text-sm mt-2">On track!</div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6 text-center"
-              >
-                <div className="text-4xl font-bold text-white mb-2">{nutritionData.target}</div>
-                <div className="text-white/60 text-sm">Daily Target</div>
-                <div className="text-cyan-400 text-sm mt-2">Based on your goals</div>
-              </motion.div>
+            {/* AI Insights */}
+            <div className="bg-gradient-to-br from-cyan-900/30 to-blue-900/30 backdrop-blur-xl border border-cyan-400/20 rounded-2xl p-6">
+              <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                <FaRobot className="text-cyan-400" />
+                AI Insights
+              </h3>
+              <div className="space-y-4">
+                {aiInsights.map((insight, index) => (
+                  <motion.div
+                    key={insight.title}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="flex items-start gap-3 p-4 bg-white/5 rounded-xl"
+                  >
+                    <insight.icon className={`text-lg mt-1 ${
+                      insight.type === 'info' ? 'text-cyan-400' :
+                      insight.type === 'warning' ? 'text-orange-400' :
+                      'text-red-400'
+                    }`} />
+                    <div>
+                      <h4 className="text-white font-medium mb-1">{insight.title}</h4>
+                      <p className="text-white/70 text-sm">{insight.insight}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
             </div>
           </motion.div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Macro Tracking */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="lg:col-span-2"
-            >
-              <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
-                <h3 className="text-xl font-bold text-white mb-6">Macro Nutrients</h3>
-                <div className="space-y-4">
-                  {macroTargets.map((macro, index) => (
-                    <motion.div
-                      key={macro.name}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      className="p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all duration-200"
-                    >
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-3">
-                          <div className={`p-2 rounded-lg bg-gradient-to-r ${macro.color}`}>
-                            <macro.icon className="text-white text-sm" />
-                          </div>
-                          <div>
-                            <p className="text-white font-medium">{macro.name}</p>
-                            <p className="text-white/60 text-sm">{macro.current}/{macro.target} {macro.unit}</p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-white font-bold">{Math.round((macro.current / macro.target) * 100)}%</div>
-                        </div>
-                      </div>
-                      <div className="w-full bg-white/10 rounded-full h-2">
-                        <div 
-                          className={`h-2 bg-gradient-to-r ${macro.color} rounded-full transition-all duration-300`}
-                          style={{ width: `${Math.min((macro.current / macro.target) * 100, 100)}%` }}
-                        ></div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
+          {/* Quick Actions & Stats */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="space-y-6"
+          >
+            {/* Quick Add */}
+            <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+              <h3 className="text-xl font-bold text-white mb-4">Quick Add</h3>
+              <div className="space-y-3">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full flex items-center gap-3 p-3 bg-gradient-to-r from-cyan-400/20 to-purple-400/20 rounded-xl hover:from-cyan-400/30 hover:to-purple-400/30 transition-all duration-200"
+                >
+                  <FaPlus className="text-cyan-400" />
+                  <span className="text-white font-medium">Add Food</span>
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full flex items-center gap-3 p-3 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-xl hover:from-purple-400/30 hover:to-pink-400/30 transition-all duration-200"
+                >
+                  <FaCalculator className="text-purple-400" />
+                  <span className="text-white font-medium">Calculate Recipe</span>
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full flex items-center gap-3 p-3 bg-gradient-to-r from-green-400/20 to-emerald-400/20 rounded-xl hover:from-green-400/30 hover:to-emerald-400/30 transition-all duration-200"
+                >
+                  <FaChartLine className="text-green-400" />
+                  <span className="text-white font-medium">View Trends</span>
+                </motion.button>
               </div>
-            </motion.div>
+            </div>
 
-            {/* AI Insights */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="space-y-6"
-            >
-              {/* AI Insights */}
-              <div className="bg-gradient-to-br from-cyan-900/30 to-blue-900/30 backdrop-blur-xl border border-cyan-400/20 rounded-2xl p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <FaRobot className="text-cyan-400 text-xl" />
-                  <h3 className="text-xl font-bold text-white">AI Insights</h3>
+            {/* Weekly Stats */}
+            <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+              <h3 className="text-xl font-bold text-white mb-4">This Week</h3>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-white/70">Average Calories</span>
+                  <span className="text-white font-medium">1,850</span>
                 </div>
-                <div className="space-y-4">
-                  {aiInsights.map((insight, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      className="p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all duration-200"
-                    >
-                      <div className="flex items-center gap-3 mb-2">
-                        <insight.icon className="text-cyan-400" />
-                        <span className="text-white font-medium text-sm">{insight.title}</span>
-                      </div>
-                      <p className="text-white/80 text-sm">{insight.insight}</p>
-                    </motion.div>
-                  ))}
+                <div className="flex justify-between items-center">
+                  <span className="text-white/70">Days Tracked</span>
+                  <span className="text-white font-medium">5/7</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-white/70">Goal Achievement</span>
+                  <span className="text-white font-medium">92%</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-white/70">Streak</span>
+                  <span className="text-white font-medium">3 days</span>
                 </div>
               </div>
-
-              {/* Quick Add */}
-              <div className="bg-gradient-to-br from-purple-900/30 to-pink-900/30 backdrop-blur-xl border border-purple-400/20 rounded-2xl p-6">
-                <h3 className="text-xl font-bold text-white mb-4">Quick Add</h3>
-                <div className="space-y-3">
-                  {[
-                    { name: 'Apple', calories: 95, macros: '0.5g protein, 25g carbs' },
-                    { name: 'Chicken Breast', calories: 165, macros: '31g protein, 0g carbs' },
-                    { name: 'Greek Yogurt', calories: 130, macros: '17g protein, 9g carbs' },
-                    { name: 'Almonds', calories: 160, macros: '6g protein, 6g carbs' },
-                  ].map((food, index) => (
-                    <motion.button
-                      key={food.name}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="w-full flex items-center justify-between p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-all duration-200"
-                    >
-                      <div>
-                        <span className="text-white font-medium">{food.name}</span>
-                        <p className="text-white/60 text-xs">{food.macros}</p>
-                      </div>
-                      <span className="text-white/60 text-sm">{food.calories} cal</span>
-                    </motion.button>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          </div>
+            </div>
+          </motion.div>
         </div>
-      </div>
+      </DashboardLayout>
     </SignedIn>
   );
 };

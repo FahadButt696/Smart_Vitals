@@ -19,6 +19,7 @@ import {
   FaTrophy,
   FaRunning,
 } from "react-icons/fa";
+import DashboardLayout from "../../components/custom/DashboardLayout.jsx";
 
 const WorkoutLogger = () => {
   const { user } = useUser();
@@ -97,252 +98,186 @@ const WorkoutLogger = () => {
 
   return (
     <SignedIn>
-      <div className="min-h-screen relative overflow-hidden">
-        {/* Background */}
-        <div className="absolute inset-0 z-0">
-          <div 
-            className="w-full h-full bg-cover bg-center bg-no-repeat"
-            style={{
-              backgroundImage: `url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080"><defs><radialGradient id="a" cx="0.5" cy="0.5" r="0.5"><stop offset="0%" stop-color="%230ea5e9" stop-opacity="0.1"/><stop offset="100%" stop-color="%238b5cf6" stop-opacity="0.05"/></radialGradient><pattern id="b" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="%23ffffff" fill-opacity="0.1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23a)"/><rect width="100%" height="100%" fill="url(%23b)"/></svg>')`,
-              filter: 'brightness(0.3) contrast(1.2) saturate(0.8)',
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-900/80 via-cyan-900/60 to-neutral-900/80"></div>
+      <DashboardLayout 
+        title="Workout Logger" 
+        subtitle="Track your fitness journey with AI-powered insights"
+      >
+        {/* Header Actions */}
+        <div className="flex justify-end mb-6">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setShowAddWorkout(true)}
+            className="p-4 bg-gradient-to-r from-cyan-400 to-purple-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
+          >
+            <FaPlus className="inline mr-2" />
+            Add Workout
+          </motion.button>
         </div>
 
-        <div className="relative z-10 p-6 lg:p-8">
-          {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
-          >
-            <div className="flex justify-between items-center mb-4">
-              <div>
-                <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">Workout Logger</h1>
-                <p className="text-white/60">Track your fitness journey with AI-powered recommendations</p>
+        {/* Workout Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          {workoutStats.map((stat, index) => (
+            <motion.div
+              key={stat.label}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-xl p-4"
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <stat.icon className={`text-xl bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`} />
+                <span className="text-white/60 text-sm">{stat.label}</span>
               </div>
-              <div className="flex gap-3">
-                {isWorkoutActive ? (
-                  <>
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="p-4 bg-gradient-to-r from-orange-400 to-red-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
-                    >
-                      <FaPause className="inline mr-2" />
-                      Pause
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => setIsWorkoutActive(false)}
-                      className="p-4 bg-gradient-to-r from-red-400 to-pink-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
-                    >
-                      <FaStop className="inline mr-2" />
-                      Stop
-                    </motion.button>
-                  </>
-                ) : (
+              <div className="text-2xl font-bold text-white">{stat.value}</div>
+              <div className="text-white/40 text-xs">{stat.unit}</div>
+            </motion.div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Workout List */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="lg:col-span-2"
+          >
+            <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+              <div className="flex gap-4 mb-6">
+                {workoutTypes.map((type) => (
                   <motion.button
+                    key={type.id}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => setIsWorkoutActive(true)}
-                    className="p-4 bg-gradient-to-r from-green-400 to-emerald-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
+                    onClick={() => setActiveTab(type.id)}
+                    className={`flex items-center gap-2 p-3 rounded-xl transition-all duration-200 ${
+                      activeTab === type.id
+                        ? 'bg-gradient-to-r ' + type.color + ' text-white'
+                        : 'bg-white/10 text-white/70 hover:bg-white/20'
+                    }`}
                   >
-                    <FaPlay className="inline mr-2" />
-                    Start Workout
+                    <type.icon />
+                    <span className="font-medium">{type.label}</span>
                   </motion.button>
-                )}
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setShowAddWorkout(true)}
-                  className="p-4 bg-gradient-to-r from-cyan-400 to-purple-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
-                >
-                  <FaPlus className="inline mr-2" />
-                  Add Workout
-                </motion.button>
+                ))}
               </div>
-            </div>
 
-            {/* Workout Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-              {workoutStats.map((stat, index) => (
-                <motion.div
-                  key={stat.label}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-xl p-4"
-                >
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className={`p-2 rounded-lg bg-gradient-to-r ${stat.color}`}>
-                      <stat.icon className="text-white text-sm" />
-                    </div>
-                    <span className="text-white/60 text-sm">{stat.label}</span>
-                  </div>
-                  <div className="text-2xl font-bold text-white">{stat.value}</div>
-                  <div className="text-white/40 text-xs">{stat.unit}</div>
-                </motion.div>
-              ))}
+              <div className="space-y-4">
+                {todayWorkouts
+                  .filter(workout => workout.type === activeTab)
+                  .map((workout, index) => (
+                    <motion.div
+                      key={workout.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="flex items-center gap-4 p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all duration-200"
+                    >
+                      <div className="flex-1">
+                        <h3 className="text-white font-medium">{workout.name}</h3>
+                        <div className="flex items-center gap-4 text-white/60 text-sm mt-1">
+                          <span className="flex items-center gap-1">
+                            <FaClock className="text-xs" />
+                            {workout.time}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <FaFire className="text-xs" />
+                            {workout.calories} cal
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <FaDumbbell className="text-xs" />
+                            {workout.duration}
+                          </span>
+                        </div>
+                        <div className="text-white/50 text-xs mt-2">
+                          {workout.exercises.join(', ')}
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          className="p-2 text-cyan-400 hover:bg-cyan-400/20 rounded-lg transition-all duration-200"
+                        >
+                          <FaEdit className="text-sm" />
+                        </motion.button>
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          className="p-2 text-red-400 hover:bg-red-400/20 rounded-lg transition-all duration-200"
+                        >
+                          <FaTrash className="text-sm" />
+                        </motion.button>
+                      </div>
+                    </motion.div>
+                  ))}
+              </div>
             </div>
           </motion.div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Workout List */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="lg:col-span-2"
-            >
-              <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
-                <div className="flex gap-4 mb-6">
-                  {workoutTypes.map((type) => (
-                    <motion.button
-                      key={type.id}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => setActiveTab(type.id)}
-                      className={`flex items-center gap-2 p-3 rounded-xl transition-all duration-200 ${
-                        activeTab === type.id
-                          ? 'bg-gradient-to-r ' + type.color + ' text-white'
-                          : 'bg-white/10 text-white/70 hover:bg-white/20'
-                      }`}
-                    >
-                      <type.icon />
-                      <span className="font-medium">{type.label}</span>
-                    </motion.button>
-                  ))}
-                </div>
-
-                <div className="space-y-4">
-                  {todayWorkouts
-                    .filter(workout => workout.type === activeTab || activeTab === 'today')
-                    .map((workout, index) => (
-                      <motion.div
-                        key={workout.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        className="flex items-center gap-4 p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all duration-200"
-                      >
-                        <div className={`p-3 rounded-xl bg-gradient-to-r ${
-                          workoutTypes.find(t => t.id === workout.type)?.color || 'from-gray-400 to-gray-500'
-                        }`}>
-                          {(() => {
-                            const IconComponent = workoutTypes.find(t => t.id === workout.type)?.icon;
-                            return IconComponent ? <IconComponent className="text-white text-xl" /> : null;
-                          })()}
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="text-white font-medium">{workout.name}</h3>
-                          <div className="flex items-center gap-4 text-white/60 text-sm">
-                            <span className="flex items-center gap-1">
-                              <FaClock className="text-xs" />
-                              {workout.duration}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <FaFire className="text-xs" />
-                              {workout.calories} cal
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <FaClock className="text-xs" />
-                              {workout.time}
-                            </span>
-                          </div>
-                          <div className="flex gap-2 mt-2">
-                            {workout.exercises.slice(0, 3).map((exercise, idx) => (
-                              <span key={idx} className="px-2 py-1 bg-white/10 rounded-lg text-white/80 text-xs">
-                                {exercise}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                        <div className="flex gap-2">
-                          <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            className="p-2 text-cyan-400 hover:bg-cyan-400/20 rounded-lg transition-all duration-200"
-                          >
-                            <FaEdit className="text-sm" />
-                          </motion.button>
-                          <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            className="p-2 text-red-400 hover:bg-red-400/20 rounded-lg transition-all duration-200"
-                          >
-                            <FaTrash className="text-sm" />
-                          </motion.button>
-                        </div>
-                      </motion.div>
-                    ))}
-                </div>
-              </div>
-            </motion.div>
-
+          {/* AI Suggestions & Quick Actions */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="space-y-6"
+          >
             {/* AI Suggestions */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="space-y-6"
-            >
-              {/* AI Recommendations */}
-              <div className="bg-gradient-to-br from-cyan-900/30 to-blue-900/30 backdrop-blur-xl border border-cyan-400/20 rounded-2xl p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <FaRobot className="text-cyan-400 text-xl" />
-                  <h3 className="text-xl font-bold text-white">AI Recommendations</h3>
-                </div>
-                <div className="space-y-4">
-                  {aiSuggestions.map((suggestion, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      className="p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all duration-200"
-                    >
-                      <div className="flex items-center gap-3 mb-2">
-                        <suggestion.icon className="text-cyan-400" />
-                        <span className="text-white font-medium text-sm">{suggestion.title}</span>
-                      </div>
-                      <p className="text-white text-sm mb-1">{suggestion.suggestion}</p>
-                      <p className="text-white/60 text-xs">{suggestion.reason}</p>
-                    </motion.div>
-                  ))}
-                </div>
+            <div className="bg-gradient-to-br from-cyan-900/30 to-blue-900/30 backdrop-blur-xl border border-cyan-400/20 rounded-2xl p-6">
+              <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                <FaRobot className="text-cyan-400" />
+                AI Suggestions
+              </h3>
+              <div className="space-y-4">
+                {aiSuggestions.map((suggestion, index) => (
+                  <motion.div
+                    key={suggestion.title}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="p-4 bg-white/5 rounded-xl"
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <suggestion.icon className="text-cyan-400 text-sm" />
+                      <h4 className="text-white font-medium text-sm">{suggestion.title}</h4>
+                    </div>
+                    <p className="text-white/70 text-sm mb-1">{suggestion.suggestion}</p>
+                    <p className="text-white/50 text-xs">{suggestion.reason}</p>
+                  </motion.div>
+                ))}
               </div>
+            </div>
 
-              {/* Quick Start */}
-              <div className="bg-gradient-to-br from-purple-900/30 to-pink-900/30 backdrop-blur-xl border border-purple-400/20 rounded-2xl p-6">
-                <h3 className="text-xl font-bold text-white mb-4">Quick Start</h3>
-                <div className="space-y-3">
-                  {[
-                    { name: 'Quick Cardio', duration: '15 min', icon: FaRunning },
-                    { name: 'Strength Training', duration: '30 min', icon: FaDumbbell },
-                    { name: 'Yoga Session', duration: '20 min', icon: FaHeart },
-                    { name: 'HIIT Workout', duration: '25 min', icon: FaFire },
-                  ].map((workout, index) => (
-                    <motion.button
-                      key={workout.name}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="w-full flex items-center justify-between p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-all duration-200"
-                    >
-                      <div className="flex items-center gap-3">
-                        <workout.icon className="text-purple-400" />
-                        <span className="text-white font-medium">{workout.name}</span>
-                      </div>
-                      <span className="text-white/60 text-sm">{workout.duration}</span>
-                    </motion.button>
-                  ))}
-                </div>
+            {/* Quick Actions */}
+            <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+              <h3 className="text-xl font-bold text-white mb-4">Quick Actions</h3>
+              <div className="space-y-3">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full flex items-center gap-3 p-3 bg-gradient-to-r from-cyan-400/20 to-purple-400/20 rounded-xl hover:from-cyan-400/30 hover:to-purple-400/30 transition-all duration-200"
+                >
+                  <FaPlay className="text-cyan-400" />
+                  <span className="text-white font-medium">Start Workout</span>
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full flex items-center gap-3 p-3 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-xl hover:from-purple-400/30 hover:to-pink-400/30 transition-all duration-200"
+                >
+                  <FaChartLine className="text-purple-400" />
+                  <span className="text-white font-medium">View Progress</span>
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full flex items-center gap-3 p-3 bg-gradient-to-r from-green-400/20 to-emerald-400/20 rounded-xl hover:from-green-400/30 hover:to-emerald-400/30 transition-all duration-200"
+                >
+                  <FaTrophy className="text-green-400" />
+                  <span className="text-white font-medium">Set Goals</span>
+                </motion.button>
               </div>
-            </motion.div>
-          </div>
+            </div>
+          </motion.div>
         </div>
 
         {/* Add Workout Modal */}
@@ -397,7 +332,7 @@ const WorkoutLogger = () => {
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
+      </DashboardLayout>
     </SignedIn>
   );
 };

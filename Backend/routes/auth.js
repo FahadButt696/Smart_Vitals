@@ -1,15 +1,19 @@
 import express from 'express';
-import { authenticateUser } from '../middleware/auth.js';
+import { clerkAuthMiddleware } from '../middleware/clerkMiddleWare.js';
 import User from '../models/User.js';
 
 const router = express.Router();
 
+// Apply authentication middleware to all routes
+router.use(clerkAuthMiddleware);
+
 // @desc    Get current user profile
 // @route   GET /api/auth/profile
 // @access  Private
-router.get('/profile', authenticateUser, async (req, res) => {
+router.get('/profile', async (req, res) => {
   try {
-    const user = await User.findOne({ clerkUserId: req.user.id });
+    const { userId } = req.auth;
+    const user = await User.findOne({ clerkId: userId });
     
     if (!user) {
       return res.status(404).json({
@@ -33,8 +37,9 @@ router.get('/profile', authenticateUser, async (req, res) => {
 // @desc    Create or update user profile
 // @route   POST /api/auth/profile
 // @access  Private
-router.post('/profile', authenticateUser, async (req, res) => {
+router.post('/profile', async (req, res) => {
   try {
+    const { userId } = req.auth;
     const {
       firstName,
       lastName,
@@ -49,7 +54,7 @@ router.post('/profile', authenticateUser, async (req, res) => {
       preferences
     } = req.body;
 
-    let user = await User.findOne({ clerkUserId: req.user.id });
+    let user = await User.findOne({ clerkId: userId });
 
     if (user) {
       // Update existing user
@@ -69,11 +74,9 @@ router.post('/profile', authenticateUser, async (req, res) => {
     } else {
       // Create new user
       user = new User({
-        clerkUserId: req.user.id,
-        email: req.user.email,
-        firstName: firstName || req.user.firstName,
-        lastName: lastName || req.user.lastName,
-        profilePicture: req.user.profilePicture,
+        clerkId: userId,
+        firstName,
+        lastName,
         dateOfBirth,
         gender,
         height,

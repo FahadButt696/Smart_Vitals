@@ -4,6 +4,18 @@ import cors from 'cors';
 import connectDB from './config/db.js';
 import mealRoutes from './routes/mealRoutes.js'
 import userRoutes from './routes/userRoutes.js'
+import calorieRoutes from './routes/calories.js';
+import weightRoutes from './routes/weight.js';
+import waterRoutes from './routes/water.js';
+import sleepRoutes from './routes/sleep.js';
+import workoutRoutes from './routes/workouts.js';
+import mentalHealthRoutes from './routes/mentalHealth.js';
+import symptomRoutes from './routes/symptoms.js';
+import dietRoutes from './routes/diet.js';
+import reminderRoutes from './routes/reminders.js';
+import chatRoutes from './routes/chat.js';
+import voiceAssistantRoutes from './routes/voiceAssistant.js';
+import dashboardRoutes from './routes/dashboard.js';
 import { clerkAuthMiddleware } from './middleware/clerkMiddleWare.js';
 
 dotenv.config();
@@ -26,6 +38,18 @@ app.use(cors({
 // Routes
 app.use("/api/meal", mealRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/calories", calorieRoutes);
+app.use("/api/weight", weightRoutes);
+app.use("/api/water", waterRoutes);
+app.use("/api/sleep", sleepRoutes);
+app.use("/api/workouts", workoutRoutes);
+app.use("/api/mental-health", mentalHealthRoutes);
+app.use("/api/symptoms", symptomRoutes);
+app.use("/api/diet", dietRoutes);
+app.use("/api/reminders", reminderRoutes);
+app.use("/api/chat", chatRoutes);
+app.use("/api/voice-assistant", voiceAssistantRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 // Health check
 app.get('/', (req, res) => {
