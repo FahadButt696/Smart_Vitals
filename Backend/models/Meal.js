@@ -1,74 +1,52 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
+
+// Reusable nutrient schema
+const nutrientSchema = new mongoose.Schema({
+  value: { type: Number, min: 0 },
+  unit: { type: String }
+}, { _id: false });
+
+// Serving size schema
+const servingSizeSchema = new mongoose.Schema({
+  unit: { type: String, required: true },
+  servingWeight: { type: Number, min: 0 }
+}, { _id: false });
 
 const mealSchema = new mongoose.Schema({
-  userId: { 
-    type: String, 
+  userId: { // Clerk ID (string, not ObjectId)
+    type: String,
     required: true,
     index: true
   },
-  foodName: { 
-    type: String, 
-    required: true 
+  name: { // Food name
+    type: String,
+    required: true
   },
-  calories: { 
-    type: Number, 
-    required: true,
-    min: 0
-  },
-  mealType: {
+  mealType: { // Breakfast, lunch, etc.
     type: String,
     enum: ['breakfast', 'lunch', 'dinner', 'snack', 'pre_workout', 'post_workout'],
     default: 'snack'
   },
-  protein: {
+  score: { // CalorieMama confidence score
     type: Number,
-    min: 0,
-    default: 0
+    min: 0
   },
-  carbs: {
-    type: Number,
-    min: 0,
-    default: 0
-  },
-  fat: {
-    type: Number,
-    min: 0,
-    default: 0
-  },
-  fiber: {
-    type: Number,
-    min: 0,
-    default: 0
-  },
-  sugar: {
-    type: Number,
-    min: 0,
-    default: 0
-  },
-  sodium: {
-    type: Number,
-    min: 0,
-    default: 0
-  },
-  notes: {
-    type: String,
-    trim: true,
-    default: ''
-  },
-  timestamp: { 
-    type: Date, 
-    default: Date.now,
-    index: true
+  group: String, // e.g., "Potato"
+  foodId: String, // CalorieMama food_id
+  calories: nutrientSchema,
+  protein: nutrientSchema,
+  carbs: nutrientSchema,
+  fat: nutrientSchema,
+  servingSizes: [servingSizeSchema],
+  imageUrl: String, // Optional: save uploaded image path/URL
+  timestamp: {
+    type: Date,
+    default: Date.now
   }
 }, {
-  timestamps: true,
-  toJSON: { virtuals: true },
-  toObject: { virtuals: true }
+  timestamps: true
 });
 
-// Indexes for better query performance
 mealSchema.index({ userId: 1, timestamp: -1 });
-mealSchema.index({ userId: 1, mealType: 1, timestamp: -1 });
-mealSchema.index({ timestamp: -1 });
 
 export default mongoose.model("Meal", mealSchema);

@@ -1,243 +1,182 @@
-import Meal from '../models/Meal.js';
+import axios from "axios";
+import FormData from "form-data";
+import Meal from "../models/mealModel.js";
+import multer from "multer";
 
-// Get all meals for a user
-export const getMeals = async (req, res) => {
+const upload = multer({ storage: multer.memoryStorage() });
+
+/**
+ * Add meal via CalorieMama image
+ */
+export const addMealFromImage = async (req, res) => {
   try {
-    const { userId } = req.auth;
-    const { date, mealType } = req.query;
+    if (!req.file) return res.status(400).json({ error: "No image uploaded" });
 
-    let query = { userId };
+    const formData = new FormData();
+    formData.append("media", req.file.buffer, { filename: req.file.originalname });
 
-    // Filter by date if provided
-    if (date) {
-      const startDate = new Date(date);
-      startDate.setHours(0, 0, 0, 0);
-      const endDate = new Date(startDate);
-      endDate.setHours(23, 59, 59, 999);
-      query.timestamp = { $gte: startDate, $lte: endDate };
-    }
-
-    // Filter by meal type if provided
-    if (mealType) {
-      query.mealType = mealType;
-    }
-
-    const meals = await Meal.find(query).sort({ timestamp: -1 });
-
-    res.json({
-      success: true,
-      data: meals
-    });
-  } catch (error) {
-    console.error('Error getting meals:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error retrieving meals'
-    });
-  }
-};
-
-// Add a new meal
-export const addMeal = async (req, res) => {
-  try {
-    const { userId } = req.auth;
-    const mealData = {
-      ...req.body,
-      userId
-    };
-
-    const meal = new Meal(mealData);
-    await meal.save();
-
-    res.status(201).json({
-      success: true,
-      data: meal
-    });
-  } catch (error) {
-    console.error('Error adding meal:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error adding meal'
-    });
-  }
-};
-
-// Process image upload for meal recognition
-export const processMealImage = async (req, res) => {
-  try {
-    const { userId } = req.auth;
-    const { imageUrl } = req.body;
-
-    // Simulate CalorieMama API call
-    const aiAnalysis = await analyzeMealImage(imageUrl);
-    
-    const mealData = {
-      userId,
-      foodName: aiAnalysis.foodName,
-      calories: aiAnalysis.calories,
-      protein: aiAnalysis.protein,
-      carbs: aiAnalysis.carbs,
-      fat: aiAnalysis.fat,
-      fiber: aiAnalysis.fiber,
-      sugar: aiAnalysis.sugar,
-      sodium: aiAnalysis.sodium,
-      mealType: aiAnalysis.mealType,
-      notes: `AI detected: ${aiAnalysis.confidence}% confidence`,
-      aiDetected: true,
-      aiConfidence: aiAnalysis.confidence
-    };
-
-    const meal = new Meal(mealData);
-    await meal.save();
-
-    res.status(201).json({
-      success: true,
-      data: meal,
-      aiAnalysis
-    });
-  } catch (error) {
-    console.error('Error processing meal image:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error processing meal image'
-    });
-  }
-};
-
-// Simulate CalorieMama API analysis
-const analyzeMealImage = async (imageUrl) => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  // Mock analysis results
-  const foodItems = [
-    { name: 'Grilled Chicken Breast', calories: 165, protein: 31, carbs: 0, fat: 3.6, fiber: 0, sugar: 0, sodium: 74 },
-    { name: 'Mixed Green Salad', calories: 25, protein: 2, carbs: 4, fat: 0.3, fiber: 2, sugar: 1, sodium: 15 },
-    { name: 'Olive Oil Dressing', calories: 120, protein: 0, carbs: 0, fat: 14, fiber: 0, sugar: 0, sodium: 0 }
-  ];
-
-  const selectedFood = foodItems[Math.floor(Math.random() * foodItems.length)];
-  
-  return {
-    foodName: selectedFood.name,
-    calories: selectedFood.calories,
-    protein: selectedFood.protein,
-    carbs: selectedFood.carbs,
-    fat: selectedFood.fat,
-    fiber: selectedFood.fiber,
-    sugar: selectedFood.sugar,
-    sodium: selectedFood.sodium,
-    mealType: 'lunch',
-    confidence: Math.floor(Math.random() * 30) + 70 // 70-100% confidence
-  };
-};
-
-// Update a meal
-export const updateMeal = async (req, res) => {
-  try {
-    const { userId } = req.auth;
-    const { id } = req.params;
-
-    const meal = await Meal.findOneAndUpdate(
-      { _id: id, userId },
-      req.body,
-      { new: true, runValidators: true }
+    const apiRes = await axios.post(
+      `https://api-2445582032290.production.gw.apicast.io/v1/foodrecognition?user_key=${process.env.CALORIEMAMA_API_KEY}`,
+      formData,
+      { headers: formData.getHeaders() }
     );
 
-    if (!meal) {
-      return res.status(404).json({
-        success: false,
-        message: 'Meal not found'
-      });
-    }
+    const topResult = apiRes.data.results[0]?.items[0];
+    if (!topResult) return res.status(404).json({ error: "No food detected" });
 
-    res.json({
-      success: true,
-      data: meal
+    const meal = new Meal({
+      userId: req.body.userId, // for Postman testing
+      name: topResult.name,
+      mealType: req.body.mealType || "snack",
+      score: topResult.score,
+      group: topResult.group,
+      foodId: topResult.food_id,
+      calories: { value: topResult.nutrition.calories, unit: "kcal" },
+      protein: { value: topResult.nutrition.protein, unit: "g" },
+      carbs: { value: topResult.nutrition.totalCarbs, unit: "g" },
+      fat: { value: topResult.nutrition.totalFat, unit: "g" },
+      servingSizes: topResult.servingSizes.map(s => ({
+        unit: s.unit,
+        servingWeight: s.servingWeight
+      }))
     });
-  } catch (error) {
-    console.error('Error updating meal:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error updating meal'
-    });
+
+    await meal.save();
+    res.status(201).json({ success: true, meal });
+  } catch (err) {
+    console.error("Error adding meal from image:", err.message);
+    res.status(500).json({ error: "Failed to process image" });
   }
 };
 
-// Delete a meal
+/**
+ * Add meal manually
+ */
+export const addMealManual = async (req, res) => {
+  try {
+    const meal = new Meal(req.body);
+    await meal.save();
+    res.status(201).json({ success: true, meal });
+  } catch (err) {
+    console.error("Error adding manual meal:", err.message);
+    res.status(500).json({ error: "Failed to add meal" });
+  }
+};
+
+/**
+ * Delete meal
+ */
 export const deleteMeal = async (req, res) => {
   try {
-    const { userId } = req.auth;
-    const { id } = req.params;
-
-    const meal = await Meal.findOneAndDelete({ _id: id, userId });
-
-    if (!meal) {
-      return res.status(404).json({
-        success: false,
-        message: 'Meal not found'
-      });
-    }
-
-    res.json({
-      success: true,
-      message: 'Meal deleted successfully'
-    });
-  } catch (error) {
-    console.error('Error deleting meal:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error deleting meal'
-    });
+    const deleted = await Meal.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ error: "Meal not found" });
+    res.json({ success: true, message: "Meal deleted" });
+  } catch (err) {
+    console.error("Error deleting meal:", err.message);
+    res.status(500).json({ error: "Failed to delete meal" });
   }
 };
 
-// Get meal statistics
-export const getMealStats = async (req, res) => {
+/**
+ * Update meal manually
+ */
+export const updateMealManual = async (req, res) => {
   try {
-    const { userId } = req.auth;
-    const { days = 7 } = req.query;
-
-    const endDate = new Date();
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - parseInt(days));
-
-    const meals = await Meal.find({
-      userId,
-      timestamp: { $gte: startDate, $lte: endDate }
-    });
-
-    // Calculate statistics
-    const totalMeals = meals.length;
-    const totalCalories = meals.reduce((sum, meal) => sum + (meal.calories || 0), 0);
-    const avgCaloriesPerMeal = totalMeals > 0 ? totalCalories / totalMeals : 0;
-
-    // Meal type distribution
-    const mealTypeStats = {};
-    meals.forEach(meal => {
-      const type = meal.mealType || 'unknown';
-      mealTypeStats[type] = (mealTypeStats[type] || 0) + 1;
-    });
-
-    // Average daily calories
-    const avgDailyCalories = totalCalories / parseInt(days);
-
-    res.json({
-      success: true,
-      data: {
-        totalMeals,
-        totalCalories,
-        avgCaloriesPerMeal: Math.round(avgCaloriesPerMeal),
-        avgDailyCalories: Math.round(avgDailyCalories),
-        mealTypeDistribution: mealTypeStats,
-        period: `${days} days`
-      }
-    });
-  } catch (error) {
-    console.error('Error getting meal stats:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error retrieving meal statistics'
-    });
+    const updated = await Meal.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updated) return res.status(404).json({ error: "Meal not found" });
+    res.json({ success: true, updated });
+  } catch (err) {
+    console.error("Error updating manual meal:", err.message);
+    res.status(500).json({ error: "Failed to update meal" });
   }
 };
+
+/**
+ * Update meal via image
+ */
+export const updateMealFromImage = async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: "No image uploaded" });
+
+    const formData = new FormData();
+    formData.append("media", req.file.buffer, { filename: req.file.originalname });
+
+    const apiRes = await axios.post(
+      `https://api-2445582032290.production.gw.apicast.io/v1/foodrecognition?user_key=${process.env.CALORIEMAMA_API_KEY}`,
+      formData,
+      { headers: formData.getHeaders() }
+    );
+
+    const topResult = apiRes.data.results[0]?.items[0];
+    if (!topResult) return res.status(404).json({ error: "No food detected" });
+
+    const updated = await Meal.findByIdAndUpdate(
+      req.params.id,
+      {
+        name: topResult.name,
+        mealType: req.body.mealType || "snack",
+        score: topResult.score,
+        group: topResult.group,
+        foodId: topResult.food_id,
+        calories: { value: topResult.nutrition.calories, unit: "kcal" },
+        protein: { value: topResult.nutrition.protein, unit: "g" },
+        carbs: { value: topResult.nutrition.totalCarbs, unit: "g" },
+        fat: { value: topResult.nutrition.totalFat, unit: "g" },
+        servingSizes: topResult.servingSizes.map(s => ({
+          unit: s.unit,
+          servingWeight: s.servingWeight
+        }))
+      },
+      { new: true }
+    );
+
+    if (!updated) return res.status(404).json({ error: "Meal not found" });
+    res.json({ success: true, updated });
+  } catch (err) {
+    console.error("Error updating meal from image:", err.message);
+    res.status(500).json({ error: "Failed to update meal" });
+  }
+};
+
+/**
+ * Get all meals (for dashboard)
+ */
+export const getAllMeals = async (req, res) => {
+  try {
+    const meals = await Meal.find({ userId: req.query.userId }).sort({ timestamp: -1 });
+    res.json({ success: true, meals });
+  } catch (err) {
+    console.error("Error fetching meals:", err.message);
+    res.status(500).json({ error: "Failed to fetch meals" });
+  }
+};
+
+/**
+ * Get meal by MongoDB _id
+ */
+export const getMealById = async (req, res) => {
+  try {
+    const meal = await Meal.findById(req.params.id);
+    if (!meal) return res.status(404).json({ error: "Meal not found" });
+    res.json({ success: true, meal });
+  } catch (err) {
+    console.error("Error fetching meal:", err.message);
+    res.status(500).json({ error: "Failed to fetch meal" });
+  }
+};
+
+/**
+ * Get meal by CalorieMama food_id
+ */
+export const getMealByFoodId = async (req, res) => {
+  try {
+    const meals = await Meal.find({ foodId: req.params.foodId });
+    if (!meals.length) return res.status(404).json({ error: "No meals found with this foodId" });
+    res.json({ success: true, meals });
+  } catch (err) {
+    console.error("Error fetching meal by foodId:", err.message);
+    res.status(500).json({ error: "Failed to fetch meal" });
+  }
+};
+
+export const mealImageUpload = upload.single("mealImage");
