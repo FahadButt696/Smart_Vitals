@@ -4,6 +4,7 @@ import cors from 'cors';
 import connectDB from './config/db.js';
 import mealRoutes from './routes/mealRoutes.js'
 import userRoutes from './routes/userRoutes.js'
+import waterRoutes from './routes/waterRoutes.js'
 import { clerkAuthMiddleware } from './middleware/clerkMiddleWare.js';
 
 dotenv.config();
@@ -19,7 +20,7 @@ app.use("/uploads", express.static("uploads"));
 
 // CORS configuration
 app.use(cors({
-  origin: ["http://localhost:5173"],
+  origin: ["http://localhost:5173", "http://localhost:5174"],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
@@ -28,6 +29,7 @@ app.use(cors({
 // Routes
 app.use("/api/meal", mealRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/water", waterRoutes);
 
 // Health check
 app.get('/', (req, res) => {

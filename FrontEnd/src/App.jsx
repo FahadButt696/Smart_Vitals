@@ -17,6 +17,7 @@ import { Toaster } from 'react-hot-toast';
 // Dashboard Pages
 import Profile from './pages/Dashboard/Profile';
 import MealLogger from './pages/Dashboard/MealLoggerEnhanced';
+import WaterTracker from './pages/Dashboard/WaterTracker';
 
 function App() {
   const location = useLocation();
@@ -43,6 +44,7 @@ function App() {
         {/* Dashboard Routes */}
         <Route path="/Dashboard/profile" element={<Profile />} />
         <Route path="/Dashboard/meals" element={<MealLogger />} />
+        <Route path="/Dashboard/water" element={<WaterTracker />} />
       </Routes>
       {!isAuthPage && <Footer />}
       

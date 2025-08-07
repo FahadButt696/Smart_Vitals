@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useUser, UserButton } from "@clerk/clerk-react";
+import { useSidebar } from "./DashboardLayout.jsx";
 import { 
   FaBars,
   FaTimes,
@@ -21,31 +22,46 @@ import {
   FaBell,
   FaMicrophone,
   FaCog,
-  FaSignOutAlt
+  FaSignOutAlt,
+  FaHeart,
+  FaBullseye,
+  FaRobot,
+  FaWater,
+  FaLeaf
 } from "react-icons/fa";
 
-const GlobalSidebar = ({ isOpen, onToggle }) => {
+const GlobalSidebar = () => {
   const { user } = useUser();
   const navigate = useNavigate();
   const location = useLocation();
   const [activeSection, setActiveSection] = useState('overview');
+  const { sidebarOpen, setSidebarOpen } = useSidebar();
 
   const menuItems = [
-    { id: 'overview', label: 'Overview', icon: FaHome, route: '/Dashboard' },
-    { id: 'profile', label: 'Profile', icon: FaUser, route: '/Dashboard/profile' },
-    { id: 'meals', label: 'Meal Logger', icon: FaUtensils, route: '/Dashboard/meals' },
-    { id: 'calories', label: 'Calorie Tracker', icon: FaCalculator, route: '/Dashboard/calories' },
-    { id: 'workout', label: 'Workout Logger', icon: FaDumbbell, route: '/Dashboard/workout' },
-    { id: 'weight', label: 'Weight Progress', icon: FaWeight, route: '/Dashboard/weight' },
-    { id: 'water', label: 'Water Intake', icon: FaTint, route: '/Dashboard/water' },
-    { id: 'sleep', label: 'Sleep Tracker', icon: FaBed, route: '/Dashboard/sleep' },
+    // Main Dashboard
+    { id: 'overview', label: 'Dashboard', icon: FaHome, route: '/Dashboard' },
+    
+    // Health Tracking
+    { id: 'meals', label: 'Meals', icon: FaUtensils, route: '/Dashboard/meals' },
+    { id: 'water', label: 'Water', icon: FaTint, route: '/Dashboard/water' },
+    { id: 'sleep', label: 'Sleep', icon: FaBed, route: '/Dashboard/sleep' },
+    { id: 'workout', label: 'Workouts', icon: FaDumbbell, route: '/Dashboard/workout' },
+    { id: 'weight', label: 'Progress', icon: FaWeight, route: '/Dashboard/weight' },
+    
+    // AI & Analytics
+    { id: 'ai-assistant', label: 'AI Assistant', icon: FaRobot, route: '/Dashboard/ai-assistant' },
+    { id: 'analytics', label: 'Analytics', icon: FaChartLine, route: '/Dashboard/analytics' },
+    { id: 'reports', label: 'Reports', icon: FaFilePdf, route: '/Dashboard/reports' },
+    
+    // Additional Features
     { id: 'mental-health', label: 'Mental Health', icon: FaBrain, route: '/Dashboard/mental-health' },
     { id: 'symptom-checker', label: 'Symptom Checker', icon: FaThermometerHalf, route: '/Dashboard/symptom-checker' },
     { id: 'meal-plan', label: 'Meal Plan Generator', icon: FaUtensilSpoon, route: '/Dashboard/meal-plan' },
-    { id: 'reports', label: 'Health Reports', icon: FaFilePdf, route: '/Dashboard/reports' },
-    { id: 'analytics', label: 'Analytics', icon: FaChartLine, route: '/Dashboard/analytics' },
     { id: 'reminders', label: 'Reminders', icon: FaBell, route: '/Dashboard/reminders' },
-    { id: 'voice-assistant', label: 'Voice Assistant', icon: FaMicrophone, route: '/Dashboard/voice-assistant' },
+    { id: 'voice-assistant', label: 'Chatbot', icon: FaMicrophone, route: '/Dashboard/voice-assistant' },
+    
+    // Settings & Profile
+    { id: 'profile', label: 'Profile', icon: FaUser, route: '/Dashboard/profile' },
     { id: 'settings', label: 'Settings', icon: FaCog, route: '/Dashboard/settings' },
   ];
 
@@ -69,8 +85,12 @@ const GlobalSidebar = ({ isOpen, onToggle }) => {
     setActiveSection(routeId);
     // Close sidebar on mobile after navigation
     if (window.innerWidth < 1024) {
-      onToggle(false);
+      setSidebarOpen(false);
     }
+  };
+
+  const handleToggle = () => {
+    setSidebarOpen(!sidebarOpen);
   };
 
   return (
@@ -79,32 +99,32 @@ const GlobalSidebar = ({ isOpen, onToggle }) => {
       <motion.button
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
-        onClick={() => onToggle(!isOpen)}
+        onClick={handleToggle}
         className={`fixed top-4 z-50 p-3 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-xl text-white shadow-lg backdrop-blur-sm transition-all duration-300 ${
-          isOpen ? 'left-72' : 'left-4'
+          sidebarOpen ? 'left-72' : 'left-4'
         }`}
         style={{ zIndex: 9999 }}
       >
-        {isOpen ? <FaTimes /> : <FaBars />}
+        {sidebarOpen ? <FaTimes /> : <FaBars />}
       </motion.button>
 
       {/* Sidebar */}
       <motion.div
         initial={{ x: -320 }}
-        animate={{ x: isOpen ? 0 : -320 }}
+        animate={{ x: sidebarOpen ? 0 : -320 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        className="fixed left-0 top-0 h-full w-80 bg-gradient-to-b from-gray-900/95 to-black/95 backdrop-blur-xl border-r border-white/20 z-40 shadow-2xl sidebar-scroll"
+        className="fixed left-0 top-0 h-full w-80 bg-gradient-to-b from-gray-900/95 to-black/95 backdrop-blur-xl border-r border-cyan-400/20 z-40 shadow-2xl sidebar-scroll"
         style={{ zIndex: 9998 }}
       >
         <div className="p-6 h-full flex flex-col">
-          {/* Logo and User */}
+          {/* Brand Header */}
           <div className="mb-8">
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent mb-4">
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent mb-4 text-center">
               Smart Vitals
             </h1>
-            <div className="flex items-center gap-3 p-4 bg-white/10 rounded-xl backdrop-blur-sm border border-white/20">
+            <div className="flex items-center gap-3 p-4 bg-white/10 rounded-xl backdrop-blur-sm border border-cyan-400/20">
               <div className="w-10 h-10 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full flex items-center justify-center">
-                <FaUser className="text-white" />
+                <FaHeart className="text-white" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-white font-medium truncate">{user?.username || "User"}</p>
@@ -126,27 +146,29 @@ const GlobalSidebar = ({ isOpen, onToggle }) => {
             {menuItems.map((item) => (
               <motion.button
                 key={item.id}
-                whileHover={{ x: 5 }}
+                whileHover={{ x: 5, scale: 1.02 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleNavigation(item.route)}
                 className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all duration-200 ${
                   activeSection === item.id
                     ? 'bg-gradient-to-r from-cyan-400/20 to-purple-400/20 border border-cyan-400/30 text-white shadow-lg'
-                    : 'text-white/70 hover:text-white hover:bg-white/10'
+                    : 'text-white/70 hover:text-white hover:bg-white/10 border border-transparent hover:border-cyan-400/20'
                 }`}
               >
-                <item.icon className="text-lg flex-shrink-0" />
+                <item.icon className={`text-lg flex-shrink-0 ${
+                  activeSection === item.id ? 'text-cyan-400' : 'text-white/60'
+                }`} />
                 <span className="font-medium truncate">{item.label}</span>
               </motion.button>
             ))}
           </nav>
 
-          {/* Bottom Actions - Only Sign Out */}
-          <div className="space-y-2 mt-6">
+          {/* Bottom Actions */}
+          <div className="space-y-2 mt-6 pt-6 border-t border-cyan-400/20">
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full flex items-center gap-3 p-3 rounded-xl text-red-400 hover:text-red-300 hover:bg-red-400/10 transition-all duration-200"
+              className="w-full flex items-center gap-3 p-3 rounded-xl text-red-400 hover:text-red-300 hover:bg-red-400/10 transition-all duration-200 border border-transparent hover:border-red-400/20"
             >
               <FaSignOutAlt className="text-lg flex-shrink-0" />
               <span className="font-medium">Sign Out</span>
@@ -157,12 +179,12 @@ const GlobalSidebar = ({ isOpen, onToggle }) => {
 
       {/* Mobile Overlay */}
       <AnimatePresence>
-        {isOpen && window.innerWidth < 1024 && (
+        {sidebarOpen && window.innerWidth < 1024 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => onToggle(false)}
+            onClick={() => setSidebarOpen(false)}
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30 lg:hidden"
             style={{ zIndex: 9997 }}
           />

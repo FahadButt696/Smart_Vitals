@@ -50,6 +50,18 @@ router.get("/me", clerkAuthMiddleware, async (req, res) => {
   }
 });
 
+// 🔹 Get user by clerk ID (without auth middleware for water tracker)
+router.get("/:clerkId", async (req, res) => {
+  try {
+    const { clerkId } = req.params;
+    const user = await User.findOne({ clerkId });
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.status(200).json(user);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // 🔹 Delete current user
 router.delete("/delete", clerkAuthMiddleware, async (req, res) => {
   const { userId } = req.auth;

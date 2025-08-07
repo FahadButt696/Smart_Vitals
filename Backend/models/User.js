@@ -103,6 +103,12 @@ const userSchema = new mongoose.Schema(
       enum: ["Balanced", "High protein", "Low carb", "Custom"],
       default: "Balanced",
     },
+    waterIntakeGoal: {
+      type: Number,
+      default: 3000, // Default 2 liters in ml
+      min: 500,
+      max: 5000,
+    },
     wantsMentalSupport: {
       type: Boolean,
       default: false,
