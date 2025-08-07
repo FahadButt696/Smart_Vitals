@@ -16,20 +16,7 @@ import { Toaster } from 'react-hot-toast';
 
 // Dashboard Pages
 import Profile from './pages/Dashboard/Profile';
-import MealLogger from './pages/Dashboard/MealLogger';
-import CalorieTracker from './pages/Dashboard/CalorieTracker';
-import WorkoutLogger from './pages/Dashboard/WorkoutLogger';
-import WeightProgress from './pages/Dashboard/WeightProgress';
-import WaterIntake from './pages/Dashboard/WaterIntake';
-import SleepTracker from './pages/Dashboard/SleepTracker';
-import MentalHealth from './pages/Dashboard/MentalHealth';
-import SymptomChecker from './pages/Dashboard/SymptomChecker';
-import MealPlanGenerator from './pages/Dashboard/MealPlanGenerator';
-import HealthReports from './pages/Dashboard/HealthReports';
-import Analytics from './pages/Dashboard/Analytics';
-import Reminders from './pages/Dashboard/Reminders';
-import VoiceAssistant from './pages/Dashboard/VoiceAssistant';
-import Settings from './pages/Dashboard/Settings';
+import MealLogger from './pages/Dashboard/MealLoggerEnhanced';
 
 function App() {
   const location = useLocation();
@@ -56,19 +43,6 @@ function App() {
         {/* Dashboard Routes */}
         <Route path="/Dashboard/profile" element={<Profile />} />
         <Route path="/Dashboard/meals" element={<MealLogger />} />
-        <Route path="/Dashboard/calories" element={<CalorieTracker />} />
-        <Route path="/Dashboard/workout" element={<WorkoutLogger />} />
-        <Route path="/Dashboard/weight" element={<WeightProgress />} />
-        <Route path="/Dashboard/water" element={<WaterIntake />} />
-        <Route path="/Dashboard/sleep" element={<SleepTracker />} />
-        <Route path="/Dashboard/mental-health" element={<MentalHealth />} />
-        <Route path="/Dashboard/symptom-checker" element={<SymptomChecker />} />
-        <Route path="/Dashboard/meal-plan" element={<MealPlanGenerator />} />
-        <Route path="/Dashboard/reports" element={<HealthReports />} />
-        <Route path="/Dashboard/analytics" element={<Analytics />} />
-        <Route path="/Dashboard/reminders" element={<Reminders />} />
-        <Route path="/Dashboard/voice-assistant" element={<VoiceAssistant />} />
-        <Route path="/Dashboard/settings" element={<Settings />} />
       </Routes>
       {!isAuthPage && <Footer />}
       
