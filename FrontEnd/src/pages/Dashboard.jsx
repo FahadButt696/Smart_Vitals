@@ -62,16 +62,13 @@ const Dashboard = () => {
     if (user) {
       fetchWaterStats();
       fetchMealStats();
+      fetchSleepStats();
     }
   }, [user]);
 
   const fetchWaterStats = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/water/stats?userId=${user.id}`, {
-        headers: {
-          'Authorization': `Bearer ${await user.getToken()}`
-        }
-      });
+      const response = await fetch(`http://localhost:5000/api/water/stats?userId=${user.id}`);
       
       if (response.ok) {
         const data = await response.json();
@@ -90,11 +87,7 @@ const Dashboard = () => {
 
   const fetchMealStats = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/meal?userId=${user.id}`, {
-        headers: {
-          'Authorization': `Bearer ${await user.getToken()}`
-        }
-      });
+      const response = await fetch(`http://localhost:5000/api/meal?userId=${user.id}`);
       
       if (response.ok) {
         const data = await response.json();
@@ -116,6 +109,24 @@ const Dashboard = () => {
       }
     } catch (error) {
       console.error('Error fetching meal stats:', error);
+    }
+  };
+
+  const fetchSleepStats = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/sleep/stats?userId=${user.id}`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Update today's stats with real sleep data
+        setTodayStats(prev => ({
+          ...prev,
+          sleepHours: Math.round((data.stats.today.duration || 0) * 100) / 100
+        }));
+      }
+    } catch (error) {
+      console.error('Error fetching sleep stats:', error);
     }
   };
 
@@ -196,10 +207,14 @@ const Dashboard = () => {
     },
     {
       type: 'sleep',
-      title: 'Great Sleep Pattern',
-      description: 'You\'re consistently getting 7-8 hours. Keep up this healthy sleep routine!',
+      title: todayStats.sleepHours >= 7 ? 'Great Sleep!' : 'Improve Sleep',
+      description: todayStats.sleepHours >= 7 
+        ? `Excellent! You got ${todayStats.sleepHours}h of sleep. Keep maintaining this healthy routine!`
+        : todayStats.sleepHours > 0 
+          ? `You got ${todayStats.sleepHours}h of sleep. Aim for 7-9 hours for optimal health.`
+          : 'No sleep data logged today. Start tracking your sleep for better health insights.',
       icon: FaBed,
-      priority: 'low'
+      priority: todayStats.sleepHours >= 7 ? 'low' : todayStats.sleepHours > 0 ? 'medium' : 'high'
     }
   ];
 
@@ -243,7 +258,7 @@ const Dashboard = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:shadow-lg transition-all duration-300 group"
+              className="backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:shadow-lg transition-all duration-300 group health-stat-card"
             >
               <div className="flex items-center justify-between mb-4">
                 <div className={`p-3 rounded-xl bg-gradient-to-r ${stat.color} group-hover:scale-110 transition-transform duration-300`}>
@@ -330,7 +345,7 @@ const Dashboard = () => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className={`p-4 rounded-xl border ${getPriorityColor(rec.priority)} hover:shadow-lg transition-all duration-300`}
+                    className={`p-4 rounded-xl border ${getPriorityColor(rec.priority)} hover:shadow-lg transition-all duration-300 ai-recommendation`}
                   >
                     <div className="flex items-start gap-3">
                       <div className="p-2 rounded-lg bg-white/10">
@@ -365,7 +380,7 @@ const Dashboard = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => handleNavigation('/Dashboard/meals')}
-                  className="p-3 bg-gradient-to-r from-cyan-400 to-purple-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
+                  className="p-3 bg-gradient-to-r from-cyan-400 to-purple-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200 add-meal-btn"
                 >
                   <FaPlus className="inline mr-2" />
                   Add Meal
@@ -454,7 +469,7 @@ const Dashboard = () => {
                     whileHover={{ scale: 1.02, x: 5 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => handleNavigation(action.route)}
-                    className={`w-full p-4 bg-gradient-to-r ${action.color} rounded-xl text-white hover:shadow-lg transition-all duration-200 flex items-center justify-between group`}
+                    className={`w-full p-4 bg-gradient-to-r ${action.color} rounded-xl text-white hover:shadow-lg transition-all duration-200 flex items-center justify-between group quick-action`}
                   >
                     <div className="flex items-center gap-3">
                       <action.icon className="text-xl" />

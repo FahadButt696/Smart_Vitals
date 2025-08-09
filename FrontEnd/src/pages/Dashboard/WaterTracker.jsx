@@ -591,7 +591,7 @@ const WaterTracker = () => {
               whileTap={{ scale: 0.95 }}
               onClick={() => addWater(item.amount)}
               disabled={addingWater || backendError}
-              className="p-4 bg-gradient-to-r from-cyan-400/20 to-blue-400/20 border border-cyan-400/30 rounded-xl hover:from-cyan-400/30 hover:to-blue-400/30 transition-all duration-200 group disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-4 bg-gradient-to-r from-cyan-400/20 to-blue-400/20 border border-cyan-400/30 rounded-xl hover:from-cyan-400/30 hover:to-blue-400/30 transition-all duration-200 group disabled:opacity-50 disabled:cursor-not-allowed water-amount-btn"
             >
               <item.icon className="text-2xl text-cyan-400 mx-auto mb-2" />
               <div className="text-white font-medium">{item.amount}ml</div>
@@ -605,7 +605,7 @@ const WaterTracker = () => {
           whileTap={{ scale: 0.98 }}
           onClick={() => setShowCustomModal(true)}
           disabled={backendError}
-          className="w-full p-3 bg-gradient-to-r from-purple-400 to-pink-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full p-3 bg-gradient-to-r from-purple-400 to-pink-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed quick-add-btn"
         >
           <FaPlus className="inline mr-2" />
           Add Custom Amount
@@ -632,7 +632,7 @@ const WaterTracker = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setActiveGraphView('daily')}
-                className={`px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 ${
+                className={`px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 graph-view-btn ${
                   activeGraphView === 'daily'
                     ? 'bg-gradient-to-r from-blue-400 to-cyan-400 text-white'
                     : 'bg-white/10 text-white/70 hover:bg-white/20'
@@ -645,7 +645,7 @@ const WaterTracker = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setActiveGraphView('weekly')}
-                className={`px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 ${
+                className={`px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 graph-view-btn ${
                   activeGraphView === 'weekly'
                     ? 'bg-gradient-to-r from-green-400 to-emerald-400 text-white'
                     : 'bg-white/10 text-white/70 hover:bg-white/20'
@@ -658,7 +658,7 @@ const WaterTracker = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setActiveGraphView('monthly')}
-                className={`px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 ${
+                className={`px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 graph-view-btn ${
                   activeGraphView === 'monthly'
                     ? 'bg-gradient-to-r from-purple-400 to-pink-400 text-white'
                     : 'bg-white/10 text-white/70 hover:bg-white/20'
@@ -866,7 +866,7 @@ const WaterTracker = () => {
                       whileTap={{ scale: 0.9 }}
                       onClick={() => setEditingLog(log)}
                       disabled={backendError}
-                      className="p-2 text-blue-400 hover:bg-blue-400/20 rounded-lg border border-blue-400/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="p-2 text-blue-400 hover:bg-blue-400/20 rounded-lg border border-blue-400/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed edit-water-btn"
                     >
                       <FaEdit />
                     </motion.button>
@@ -875,7 +875,7 @@ const WaterTracker = () => {
                       whileTap={{ scale: 0.9 }}
                       onClick={() => setDeletingLog(log)}
                       disabled={backendError}
-                      className="p-2 text-red-400 hover:bg-red-400/20 rounded-lg border border-red-400/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="p-2 text-red-400 hover:bg-red-400/20 rounded-lg border border-red-400/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed delete-water-btn"
                     >
                       <FaTrash />
                     </motion.button>
@@ -897,7 +897,7 @@ const WaterTracker = () => {
                     whileTap={{ scale: 0.95 }}
                     onClick={prevPage}
                     disabled={currentPage === 1}
-                    className="p-2 bg-gradient-to-r from-cyan-400 to-purple-400 text-white rounded-lg hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="p-2 bg-gradient-to-r from-cyan-400 to-purple-400 text-white rounded-lg hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed prev-btn"
                   >
                     <FaChevronLeft />
                   </motion.button>
@@ -921,7 +921,7 @@ const WaterTracker = () => {
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={() => paginate(pageNum)}
-                          className={`px-3 py-2 rounded-lg transition-all duration-200 ${
+                          className={`px-3 py-2 rounded-lg transition-all duration-200 pagination-btn ${
                             currentPage === pageNum
                               ? 'bg-gradient-to-r from-cyan-400 to-purple-400 text-white'
                               : 'bg-white/10 text-white/70 hover:bg-white/20'
@@ -938,7 +938,7 @@ const WaterTracker = () => {
                     whileTap={{ scale: 0.95 }}
                     onClick={nextPage}
                     disabled={currentPage === totalPages}
-                    className="p-2 bg-gradient-to-r from-cyan-400 to-purple-400 text-white rounded-lg hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="p-2 bg-gradient-to-r from-cyan-400 to-purple-400 text-white rounded-lg hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed next-btn"
                   >
                     <FaChevronRight />
                   </motion.button>

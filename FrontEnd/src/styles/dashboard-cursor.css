@@ -1,0 +1,422 @@
+/* Dashboard Cursor Pointer Styles */
+
+/* Buttons */
+button,
+.btn,
+[role="button"] {
+  cursor: pointer !important;
+}
+
+/* Navigation items */
+nav button,
+nav a,
+.nav-item,
+.menu-item {
+  cursor: pointer !important;
+}
+
+/* Cards and clickable containers */
+.card,
+.clickable,
+.hover\:cursor-pointer {
+  cursor: pointer !important;
+}
+
+/* Quick action buttons */
+.quick-action,
+.action-button {
+  cursor: pointer !important;
+}
+
+/* Add meal button */
+.add-meal-btn,
+.log-sleep-btn,
+.track-water-btn {
+  cursor: pointer !important;
+}
+
+/* Sleep tracker specific elements */
+.sleep-quality-btn,
+.edit-sleep-btn,
+.delete-sleep-btn,
+.sleep-duration-card {
+  cursor: pointer !important;
+}
+
+/* Water tracker specific elements */
+.water-amount-btn,
+.quick-add-btn,
+.edit-water-btn,
+.delete-water-btn {
+  cursor: pointer !important;
+}
+
+/* Meal logger specific elements */
+.meal-type-btn,
+.upload-btn,
+.search-btn,
+.add-item-btn {
+  cursor: pointer !important;
+}
+
+/* Profile specific elements */
+.edit-profile-btn,
+.save-profile-btn,
+.camera-btn {
+  cursor: pointer !important;
+}
+
+/* Sidebar navigation */
+.sidebar-nav button,
+.sidebar-item {
+  cursor: pointer !important;
+}
+
+/* Toggle buttons */
+.toggle-btn,
+.sidebar-toggle {
+  cursor: pointer !important;
+}
+
+/* Pagination controls */
+.pagination-btn,
+.prev-btn,
+.next-btn {
+  cursor: pointer !important;
+}
+
+/* Filter controls */
+.filter-btn,
+.filter-option {
+  cursor: pointer !important;
+}
+
+/* Chart controls */
+.chart-control,
+.graph-view-btn {
+  cursor: pointer !important;
+}
+
+/* Modal close buttons */
+.close-btn,
+.modal-close {
+  cursor: pointer !important;
+}
+
+/* Form elements that are clickable */
+input[type="file"],
+input[type="radio"],
+input[type="checkbox"],
+select {
+  cursor: pointer !important;
+}
+
+/* Links */
+a,
+.link {
+  cursor: pointer !important;
+}
+
+/* Interactive elements with hover effects */
+.hover\:scale-105,
+.hover\:shadow-lg,
+.hover\:bg-white\/10 {
+  cursor: pointer !important;
+}
+
+/* Motion buttons from framer-motion */
+[data-framer-motion] {
+  cursor: pointer !important;
+}
+
+/* User button and profile elements */
+.user-button,
+.profile-avatar {
+  cursor: pointer !important;
+}
+
+/* AI recommendation cards */
+.ai-recommendation,
+.recommendation-card {
+  cursor: pointer !important;
+}
+
+/* Health stats cards */
+.health-stat-card,
+.stat-card {
+  cursor: pointer !important;
+}
+
+/* Recent activity items */
+.activity-item,
+.recent-activity {
+  cursor: pointer !important;
+}
+
+/* Meal items */
+.meal-item,
+.food-item {
+  cursor: pointer !important;
+}
+
+/* Water log items */
+.water-log-item,
+.log-item {
+  cursor: pointer !important;
+}
+
+/* Settings and configuration elements */
+.settings-item,
+.config-item {
+  cursor: pointer !important;
+}
+
+/* Notification and alert elements */
+.notification,
+.alert,
+.toast {
+  cursor: pointer !important;
+}
+
+/* Overlay and modal elements */
+.overlay,
+.modal-backdrop {
+  cursor: pointer !important;
+}
+
+/* Custom amount input in water tracker */
+.custom-amount-input {
+  cursor: text !important;
+}
+
+/* Search input in meal logger */
+.search-input {
+  cursor: text !important;
+}
+
+/* Text inputs should remain text cursor */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+textarea {
+  cursor: text !important;
+}
+
+/* Disabled elements should show not-allowed cursor */
+button:disabled,
+.btn:disabled,
+[disabled] {
+  cursor: not-allowed !important;
+}
+
+/* Additional comprehensive rules for all interactive elements */
+.motion-button,
+[class*="motion"],
+[class*="hover:scale"],
+[class*="hover:shadow"],
+[class*="hover:bg"],
+[class*="transition-all"],
+[class*="transition-colors"],
+[class*="transition-transform"] {
+  cursor: pointer !important;
+}
+
+/* Ensure all clickable divs have pointer cursor */
+div[onClick],
+div[role="button"],
+div[tabindex] {
+  cursor: pointer !important;
+}
+
+/* Framer motion components */
+[data-framer-motion],
+[style*="transform"] {
+  cursor: pointer !important;
+}
+
+/* All elements with onClick handlers */
+[onClick] {
+  cursor: pointer !important;
+}
+
+/* Interactive cards and containers */
+.backdrop-blur-xl,
+.bg-gradient-to-br,
+.bg-gradient-to-r {
+  cursor: pointer !important;
+}
+
+/* Ensure proper cursor for non-interactive elements */
+input[type="text"]:not([onClick]),
+input[type="email"]:not([onClick]),
+input[type="password"]:not([onClick]),
+input[type="number"]:not([onClick]),
+textarea:not([onClick]),
+p:not([onClick]),
+span:not([onClick]),
+h1:not([onClick]),
+h2:not([onClick]),
+h3:not([onClick]),
+h4:not([onClick]),
+h5:not([onClick]),
+h6:not([onClick]) {
+  cursor: default !important;
+}
+
+/* Responsive improvements for sleep tracker */
+@media (max-width: 640px) {
+  /* Mobile-specific styles */
+  .backdrop-blur-xl {
+    padding: 1rem !important;
+  }
+  
+  /* Ensure charts are properly sized on mobile */
+  .chart-container {
+    min-height: 200px !important;
+  }
+  
+  /* Improve button sizing on mobile */
+  .log-sleep-btn,
+  .edit-sleep-btn,
+  .delete-sleep-btn {
+    min-height: 44px !important;
+    min-width: 44px !important;
+  }
+  
+  /* Better spacing for mobile cards */
+  .sleep-card {
+    margin-bottom: 1rem !important;
+  }
+  
+  /* Improve modal responsiveness */
+  .modal-backdrop {
+    padding: 1rem !important;
+  }
+  
+  /* Better text sizing for mobile */
+  .mobile-text {
+    font-size: 0.875rem !important;
+  }
+  
+  /* Improve grid layouts on mobile */
+  .mobile-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+}
+
+/* Tablet improvements */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .backdrop-blur-xl {
+    padding: 1.5rem !important;
+  }
+  
+  .chart-container {
+    min-height: 250px !important;
+  }
+}
+
+/* Ensure charts are responsive */
+.chart-container {
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Improve chart readability on small screens */
+@media (max-width: 768px) {
+  .chart-container canvas {
+    max-height: 200px !important;
+  }
+}
+
+/* Sidebar Scrollbar Styles */
+.sidebar-scroll {
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+.sidebar-scroll::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+/* Weight Tracker Specific Styles */
+.weight-card {
+  cursor: pointer !important;
+  transition: all 0.3s ease;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.weight-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.log-weight-btn,
+.edit-weight-btn,
+.delete-weight-btn {
+  cursor: pointer !important;
+  transition: all 0.2s ease;
+}
+
+.log-weight-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(6, 182, 212, 0.3);
+}
+
+.edit-weight-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+.delete-weight-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+}
+
+/* Enhanced Chart Animations */
+.chart-container {
+  transition: all 0.3s ease;
+}
+
+.chart-container:hover {
+  transform: scale(1.01);
+}
+
+/* Form Input Animations */
+.weight-card input:focus,
+.weight-card select:focus,
+.weight-card textarea:focus {
+  transform: scale(1.02);
+  transition: all 0.2s ease;
+}
+
+/* Loading Animation Enhancement */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(6, 182, 212, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.8);
+  }
+}
+
+.weight-card.loading {
+  animation: pulse-glow 2s infinite;
+}
+
+@media (max-width: 640px) {
+  .weight-card {
+    margin-bottom: 1rem;
+  }
+
+  .log-weight-btn,
+  .edit-weight-btn,
+  .delete-weight-btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+} 

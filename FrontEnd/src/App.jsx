@@ -18,6 +18,8 @@ import { Toaster } from 'react-hot-toast';
 import Profile from './pages/Dashboard/Profile';
 import MealLogger from './pages/Dashboard/MealLoggerEnhanced';
 import WaterTracker from './pages/Dashboard/WaterTracker';
+import SleepTracker from './pages/Dashboard/SleepTracker';
+import WeightTracker from './pages/Dashboard/WeightTracker';
 
 function App() {
   const location = useLocation();
@@ -45,6 +47,8 @@ function App() {
         <Route path="/Dashboard/profile" element={<Profile />} />
         <Route path="/Dashboard/meals" element={<MealLogger />} />
         <Route path="/Dashboard/water" element={<WaterTracker />} />
+        <Route path="/Dashboard/sleep" element={<SleepTracker />} />
+        <Route path="/Dashboard/weight" element={<WeightTracker />} />
       </Routes>
       {!isAuthPage && <Footer />}
       

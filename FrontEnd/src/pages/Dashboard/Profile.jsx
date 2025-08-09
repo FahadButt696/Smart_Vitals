@@ -92,7 +92,7 @@ const Profile = () => {
                     <motion.button
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
-                      className="absolute bottom-0 right-0 p-2 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full text-white"
+                      className="absolute bottom-0 right-0 p-2 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full text-white camera-btn"
                     >
                       <FaCamera className="text-sm" />
                     </motion.button>
@@ -129,7 +129,7 @@ const Profile = () => {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setIsEditing(!isEditing)}
-                  className="w-full mt-6 p-3 bg-gradient-to-r from-cyan-400 to-purple-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
+                  className="w-full mt-6 p-3 bg-gradient-to-r from-cyan-400 to-purple-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200 edit-profile-btn"
                 >
                   {isEditing ? <FaSave className="inline mr-2" /> : <FaEdit className="inline mr-2" />}
                   {isEditing ? 'Save Changes' : 'Edit Profile'}

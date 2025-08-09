@@ -5,6 +5,8 @@ import connectDB from './config/db.js';
 import mealRoutes from './routes/mealRoutes.js'
 import userRoutes from './routes/userRoutes.js'
 import waterRoutes from './routes/waterRoutes.js'
+import sleepRoutes from './routes/sleepRoutes.js'
+import weightRoutes from './routes/weightRoutes.js'
 import { clerkAuthMiddleware } from './middleware/clerkMiddleWare.js';
 
 dotenv.config();
@@ -30,6 +32,8 @@ app.use(cors({
 app.use("/api/meal", mealRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/water", waterRoutes);
+app.use("/api/sleep", sleepRoutes);
+app.use("/api/weight", weightRoutes);
 
 // Health check
 app.get('/', (req, res) => {

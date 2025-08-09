@@ -86,12 +86,21 @@ export const BarChart = ({ data, height = 200, color = "from-blue-400 to-cyan-40
         bodyColor: 'white',
         borderColor: 'rgba(59, 130, 246, 0.5)',
         borderWidth: 1,
+        titleFont: {
+          size: 12
+        },
+        bodyFont: {
+          size: 11
+        }
       },
     },
     scales: {
       x: {
         ticks: {
           color: 'rgba(255, 255, 255, 0.6)',
+          font: {
+            size: 10
+          }
         },
         grid: {
           color: 'rgba(255, 255, 255, 0.1)',
@@ -100,6 +109,9 @@ export const BarChart = ({ data, height = 200, color = "from-blue-400 to-cyan-40
       y: {
         ticks: {
           color: 'rgba(255, 255, 255, 0.6)',
+          font: {
+            size: 10
+          }
         },
         grid: {
           color: 'rgba(255, 255, 255, 0.1)',
@@ -117,70 +129,99 @@ export const BarChart = ({ data, height = 200, color = "from-blue-400 to-cyan-40
 
 // Line Chart Component using Charts.js
 export const LineChart = ({ data, height = 200, color = "from-green-400 to-emerald-400" }) => {
-  if (!data || data.length === 0) {
-    return <div className="text-white/60 text-center py-4">No data available</div>;
+  try {
+    // Handle both array format and Chart.js format
+    let chartData;
+    
+    if (data && data.labels && data.datasets) {
+      // Chart.js format (labels and datasets)
+      chartData = data;
+    } else if (data && Array.isArray(data) && data.length > 0) {
+      // Array format (array of objects with label and value)
+      chartData = {
+        labels: data.map(item => item.label),
+        datasets: [
+          {
+            label: 'Value',
+            data: data.map(item => item.value),
+            borderColor: 'rgba(34, 197, 94, 1)',
+            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: 'rgba(34, 197, 94, 1)',
+            pointBorderColor: 'white',
+            pointBorderWidth: 2,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+          },
+        ],
+      };
+    } else {
+      return <div className="text-white/60 text-center py-4">No data available</div>;
+    }
+
+    // Validate chart data
+    if (!chartData.labels || !chartData.datasets || !Array.isArray(chartData.labels) || !Array.isArray(chartData.datasets)) {
+      return <div className="text-white/60 text-center py-4">Invalid chart data</div>;
+    }
+
+    const options = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false,
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          titleColor: 'white',
+          bodyColor: 'white',
+          borderColor: 'rgba(34, 197, 94, 0.5)',
+          borderWidth: 1,
+          titleFont: {
+            size: 12
+          },
+          bodyFont: {
+            size: 11
+          }
+        },
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: 'rgba(255, 255, 255, 0.6)',
+            font: {
+              size: 10
+            }
+          },
+          grid: {
+            color: 'rgba(255, 255, 255, 0.1)',
+          },
+        },
+        y: {
+          ticks: {
+            color: 'rgba(255, 255, 255, 0.6)',
+            font: {
+              size: 10
+            }
+          },
+          grid: {
+            color: 'rgba(255, 255, 255, 0.1)',
+          },
+        },
+      },
+    };
+
+    return (
+      <div style={{ height }}>
+        <Line data={chartData} options={options} />
+      </div>
+    );
+  } catch (error) {
+    console.error('Error rendering LineChart:', error);
+    return <div className="text-white/60 text-center py-4">Unable to display chart</div>;
   }
-
-  const chartData = {
-    labels: data.map(item => item.label),
-    datasets: [
-      {
-        label: 'Value',
-        data: data.map(item => item.value),
-        borderColor: 'rgba(34, 197, 94, 1)',
-        backgroundColor: 'rgba(34, 197, 94, 0.1)',
-        borderWidth: 2,
-        fill: true,
-        tension: 0.4,
-        pointBackgroundColor: 'rgba(34, 197, 94, 1)',
-        pointBorderColor: 'white',
-        pointBorderWidth: 2,
-        pointRadius: 4,
-        pointHoverRadius: 6,
-      },
-    ],
-  };
-
-  const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        display: false,
-      },
-      tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        titleColor: 'white',
-        bodyColor: 'white',
-        borderColor: 'rgba(34, 197, 94, 0.5)',
-        borderWidth: 1,
-      },
-    },
-    scales: {
-      x: {
-        ticks: {
-          color: 'rgba(255, 255, 255, 0.6)',
-        },
-        grid: {
-          color: 'rgba(255, 255, 255, 0.1)',
-        },
-      },
-      y: {
-        ticks: {
-          color: 'rgba(255, 255, 255, 0.6)',
-        },
-        grid: {
-          color: 'rgba(255, 255, 255, 0.1)',
-        },
-      },
-    },
-  };
-
-  return (
-    <div style={{ height }}>
-      <Line data={chartData} options={options} />
-    </div>
-  );
 };
 
 // Doughnut Chart Component using Charts.js
@@ -223,6 +264,9 @@ export const DoughnutChart = ({ data, height = 200 }) => {
           color: 'rgba(255, 255, 255, 0.8)',
           padding: 20,
           usePointStyle: true,
+          font: {
+            size: 10
+          }
         },
       },
       tooltip: {
@@ -231,6 +275,12 @@ export const DoughnutChart = ({ data, height = 200 }) => {
         bodyColor: 'white',
         borderColor: 'rgba(255, 255, 255, 0.2)',
         borderWidth: 1,
+        titleFont: {
+          size: 12
+        },
+        bodyFont: {
+          size: 11
+        }
       },
     },
   };

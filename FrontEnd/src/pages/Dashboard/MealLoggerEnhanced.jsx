@@ -410,7 +410,7 @@ const MealLoggerEnhanced = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setShowAddMeal(true)}
-            className="p-4 bg-gradient-to-r from-cyan-400 to-purple-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200 whitespace-nowrap"
+            className="p-4 bg-gradient-to-r from-cyan-400 to-purple-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200 whitespace-nowrap upload-btn"
           >
             <FaCamera className="inline mr-2" />
             Take Photo
@@ -478,7 +478,7 @@ const MealLoggerEnhanced = () => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setSelectedMealType(type.id)}
-                    className={`flex items-center gap-2 p-3 rounded-xl transition-all duration-200 ${
+                    className={`flex items-center gap-2 p-3 rounded-xl transition-all duration-200 meal-type-btn ${
                       selectedMealType === type.id
                         ? 'bg-gradient-to-r ' + type.color + ' text-white'
                         : 'bg-white/10 text-white/70 hover:bg-white/20'

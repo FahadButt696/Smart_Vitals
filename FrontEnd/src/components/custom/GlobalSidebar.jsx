@@ -46,7 +46,7 @@ const GlobalSidebar = () => {
     { id: 'water', label: 'Water', icon: FaTint, route: '/Dashboard/water' },
     { id: 'sleep', label: 'Sleep', icon: FaBed, route: '/Dashboard/sleep' },
     { id: 'workout', label: 'Workouts', icon: FaDumbbell, route: '/Dashboard/workout' },
-    { id: 'weight', label: 'Progress', icon: FaWeight, route: '/Dashboard/weight' },
+    { id: 'weight', label: 'Weight Tracker', icon: FaWeight, route: '/Dashboard/weight' },
     
     // AI & Analytics
     { id: 'ai-assistant', label: 'AI Assistant', icon: FaRobot, route: '/Dashboard/ai-assistant' },
@@ -100,7 +100,7 @@ const GlobalSidebar = () => {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         onClick={handleToggle}
-        className={`fixed top-4 z-50 p-3 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-xl text-white shadow-lg backdrop-blur-sm transition-all duration-300 ${
+        className={`fixed top-4 z-50 p-3 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-xl text-white shadow-lg backdrop-blur-sm transition-all duration-300 sidebar-toggle ${
           sidebarOpen ? 'left-72' : 'left-4'
         }`}
         style={{ zIndex: 9999 }}
@@ -149,7 +149,7 @@ const GlobalSidebar = () => {
                 whileHover={{ x: 5, scale: 1.02 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleNavigation(item.route)}
-                className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all duration-200 ${
+                className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all duration-200 sidebar-item ${
                   activeSection === item.id
                     ? 'bg-gradient-to-r from-cyan-400/20 to-purple-400/20 border border-cyan-400/30 text-white shadow-lg'
                     : 'text-white/70 hover:text-white hover:bg-white/10 border border-transparent hover:border-cyan-400/20'
@@ -191,18 +191,7 @@ const GlobalSidebar = () => {
         )}
       </AnimatePresence>
 
-      {/* CSS for hiding scrollbar */}
-      <style jsx>{`
-        .sidebar-scroll {
-          overflow-y: auto;
-          overflow-x: hidden;
-          scrollbar-width: none; /* Firefox */
-          -ms-overflow-style: none; /* IE and Edge */
-        }
-        .sidebar-scroll::-webkit-scrollbar {
-          display: none; /* Chrome, Safari and Opera */
-        }
-      `}</style>
+      {/* CSS for hiding scrollbar is now in dashboard-cursor.css */}
     </>
   );
 };
