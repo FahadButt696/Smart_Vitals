@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '@clerk/clerk-react';
 import { toast } from 'react-hot-toast';
-import DashboardLayout from '@/components/custom/DashboardLayout';
+
 import { 
   FaWeight, 
   FaPlus, 
@@ -482,7 +482,7 @@ const WeightTracker = () => {
       // Apply filters
       const now = new Date();
       switch (filter) {
-        case 'thisWeek':
+        case 'thisWeek': {
           const weekStart = new Date(now);
           weekStart.setDate(now.getDate() - 7);
           filteredLogs = filteredLogs.filter(log => {
@@ -490,13 +490,15 @@ const WeightTracker = () => {
             return new Date(log.timestamp) >= weekStart;
           });
           break;
-        case 'thisMonth':
+        }
+        case 'thisMonth': {
           const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
           filteredLogs = filteredLogs.filter(log => {
             if (!log || !log.timestamp) return false;
             return new Date(log.timestamp) >= monthStart;
           });
           break;
+        }
         default:
           break;
       }
@@ -777,11 +779,9 @@ const WeightTracker = () => {
 
   if (loading) {
     return (
-      <DashboardLayout title="Weight Tracker" subtitle="Track your weight progress">
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400"></div>
-        </div>
-      </DashboardLayout>
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400"></div>
+      </div>
     );
   }
 
@@ -789,7 +789,7 @@ const WeightTracker = () => {
   const filteredLogs = getFilteredAndSortedLogs();
 
   return (
-    <DashboardLayout title="Weight Tracker" subtitle="Track your weight progress and trends">
+    <>
       {/* Today's Progress */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -1585,7 +1585,7 @@ const WeightTracker = () => {
           </motion.div>
         )}
       </AnimatePresence>
-    </DashboardLayout>
+    </>
   );
 };
 

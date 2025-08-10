@@ -24,7 +24,6 @@ import {
   FaFilter
 } from 'react-icons/fa';
 import { BarChart, ProgressBar, LineChart, DoughnutChart } from '@/components/custom/ChartComponents';
-import DashboardLayout from '@/components/custom/DashboardLayout';
 import toast from 'react-hot-toast';
 
 const SleepTracker = () => {
@@ -429,16 +428,14 @@ const SleepTracker = () => {
 
   if (loading) {
     return (
-      <DashboardLayout title="Sleep Tracker" subtitle="Monitor your sleep patterns">
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-cyan-400"></div>
-        </div>
-      </DashboardLayout>
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-cyan-400"></div>
+      </div>
     );
   }
 
   return (
-    <DashboardLayout title="Sleep Tracker" subtitle="Monitor your sleep patterns and quality">
+    <>
       {/* Today's Sleep Summary */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -1168,7 +1165,7 @@ const SleepTracker = () => {
           </motion.div>
         )}
       </AnimatePresence>
-    </DashboardLayout>
+    </>
   );
 };
 

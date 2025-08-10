@@ -10,7 +10,7 @@ import {
   useMotionValueEvent,
 } from 'framer-motion';
 import { IconMenu2, IconX } from '@tabler/icons-react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 
 function cn(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -84,13 +84,13 @@ export const NavItems = ({ items, className, onItemClick, activePage }) => {
         const shouldShowEffect = isHovered || isActive;
         
         return (
-          <a
+          <Link
+            to={item.link}
             onMouseEnter={() => setHovered(idx)}
             onMouseLeave={() => setHovered(null)}
             onClick={onItemClick}
             className="relative px-4 py-2 text-white dark:text-white transition-all duration-300"
             key={`link-${idx}`}
-            href={item.link}
           >
             {shouldShowEffect && (
               <motion.div
@@ -114,7 +114,7 @@ export const NavItems = ({ items, className, onItemClick, activePage }) => {
             )}>
               {item.name}
             </span>
-          </a>
+          </Link>
         );
       })}
     </motion.div>
@@ -208,8 +208,8 @@ export const MobileNavToggle = ({ isOpen, onClick }) => {
 
 export const NavbarLogo = () => {
   return (
-    <a
-      href="#"
+    <Link
+      to="/"
       className="relative z-20 mr-4 flex items-center space-x-2  py-1 text-sm font-normal text-white"
     >
       <img src={logoChat} alt="logo3" width={70} height={70} className="m-0" />
@@ -217,13 +217,13 @@ export const NavbarLogo = () => {
       <span className="relative right-3 font-bold italic  bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent">
         SMART VITALS
       </span>
-    </a>
+    </Link>
   );
 };
 
 export const NavbarButton = ({
   href,
-  as: Tag = 'a',
+  as: Tag = 'button',
   children,
   className,
   variant = 'primary',
@@ -244,7 +244,6 @@ export const NavbarButton = ({
 
   return (
     <Tag
-      href={href || undefined}
       className={cn(baseStyles, variantStyles[variant], className)}
       {...props}
     >
@@ -279,12 +278,16 @@ export default function CustomNavbar() {
           onItemClick={() => setIsMobileMenuOpen(false)}
         />
         <div className="flex items-center space-x-4">
-          <NavbarButton href="/Login" variant="secondary" className="px-4 py-2">
-            Sign In
-          </NavbarButton>
-          <NavbarButton href="Signup" variant="primary" className="px-4 py-2">
-            Sign Up
-          </NavbarButton>
+          <Link to="/Login">
+            <NavbarButton variant="secondary" className="px-4 py-2">
+              Sign In
+            </NavbarButton>
+          </Link>
+          <Link to="/Signup">
+            <NavbarButton variant="primary" className="px-4 py-2">
+              Sign Up
+            </NavbarButton>
+          </Link>
         </div>
       </NavBody>
 
@@ -301,9 +304,9 @@ export default function CustomNavbar() {
           {navItems.map((item, idx) => {
             const isActive = location.pathname === item.link;
             return (
-              <a
+              <Link
                 key={`mobile-link-${idx}`}
-                href={item.link}
+                to={item.link}
                 className={cn(
                   "block w-full px-4 py-3 text-lg text-white rounded-md transition-all duration-300 relative overflow-hidden",
                   isActive && "bg-gradient-to-r from-cyan-400/30 to-purple-400/30 border border-cyan-400/50"
@@ -318,16 +321,20 @@ export default function CustomNavbar() {
                 )}>
                   {item.name}
                 </span>
-              </a>
+              </Link>
             );
           })}
           <div className="flex flex-col space-y-4 w-full mt-4 border-t border-neutral-700 pt-4">
-            <NavbarButton href="Login" variant="secondary" className="w-full ">
-              Sign In
-            </NavbarButton>
-            <NavbarButton href="Signup" variant="primary" className="w-full">
-              Sign Up
-            </NavbarButton>
+            <Link to="/Login" className="w-full">
+              <NavbarButton variant="secondary" className="w-full">
+                Sign In
+              </NavbarButton>
+            </Link>
+            <Link to="/Signup" className="w-full">
+              <NavbarButton variant="primary" className="w-full">
+                Sign Up
+              </NavbarButton>
+            </Link>
           </div>
         </MobileNavMenu>
       </MobileNav>

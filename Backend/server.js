@@ -7,6 +7,7 @@ import userRoutes from './routes/userRoutes.js'
 import waterRoutes from './routes/waterRoutes.js'
 import sleepRoutes from './routes/sleepRoutes.js'
 import weightRoutes from './routes/weightRoutes.js'
+import workoutRoutes from './routes/workoutRoutes.js'
 import { clerkAuthMiddleware } from './middleware/clerkMiddleWare.js';
 
 dotenv.config();
@@ -18,7 +19,6 @@ const app = express();
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use("/uploads", express.static("uploads"));
-
 
 // CORS configuration
 app.use(cors({
@@ -34,6 +34,7 @@ app.use("/api/user", userRoutes);
 app.use("/api/water", waterRoutes);
 app.use("/api/sleep", sleepRoutes);
 app.use("/api/weight", weightRoutes);
+app.use("/api/workout", workoutRoutes);
 
 // Health check
 app.get('/', (req, res) => {

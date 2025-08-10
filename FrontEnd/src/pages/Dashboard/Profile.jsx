@@ -2,20 +2,20 @@ import { SignedIn, useUser } from "@clerk/clerk-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { 
-  FaUser, 
-  FaEnvelope, 
-  FaCalendar, 
-  FaWeight, 
-  FaRuler, 
-  FaBullseye, 
-  FaEdit, 
-  FaSave,
-  FaCamera,
-  FaHeart,
-  FaDumbbell,
-  FaTint,
-  FaBed
-} from "react-icons/fa";
+  User, 
+  Mail, 
+  Calendar, 
+  Weight, 
+  Ruler, 
+  Target, 
+  Edit3, 
+  Save,
+  Camera,
+  Heart,
+  Dumbbell,
+  Droplets,
+  Bed
+} from "lucide-react";
 
 const Profile = () => {
   const { user } = useUser();
@@ -32,10 +32,10 @@ const Profile = () => {
   });
 
   const healthStats = [
-    { label: 'Current Weight', value: '75 kg', icon: FaWeight, color: 'from-cyan-400 to-blue-500' },
-    { label: 'Target Weight', value: '70 kg', icon: FaBullseye, color: 'from-purple-400 to-pink-500' },
-    { label: 'Height', value: '175 cm', icon: FaRuler, color: 'from-green-400 to-emerald-500' },
-    { label: 'BMI', value: '24.5', icon: FaHeart, color: 'from-orange-400 to-red-500' },
+    { label: 'Current Weight', value: '75 kg', icon: Weight, color: 'from-cyan-400 to-blue-500' },
+    { label: 'Target Weight', value: '70 kg', icon: Target, color: 'from-purple-400 to-pink-500' },
+    { label: 'Height', value: '175 cm', icon: Ruler, color: 'from-green-400 to-emerald-500' },
+    { label: 'BMI', value: '24.5', icon: Heart, color: 'from-orange-400 to-red-500' },
   ];
 
   const recentActivities = [
@@ -87,14 +87,14 @@ const Profile = () => {
                 <div className="text-center mb-6">
                   <div className="relative inline-block">
                     <div className="w-24 h-24 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <FaUser className="text-white text-3xl" />
+                      <User className="text-white text-3xl" />
                     </div>
                     <motion.button
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       className="absolute bottom-0 right-0 p-2 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full text-white camera-btn"
                     >
-                      <FaCamera className="text-sm" />
+                      <Camera className="text-sm" />
                     </motion.button>
                   </div>
                   <h2 className="text-xl font-bold text-white mb-2">{profileData.fullName}</h2>
@@ -103,21 +103,21 @@ const Profile = () => {
 
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 p-3 bg-white/5 rounded-xl">
-                    <FaEnvelope className="text-cyan-400" />
+                    <Mail className="text-cyan-400" />
                     <div>
                       <p className="text-white/60 text-sm">Email</p>
                       <p className="text-white font-medium">{profileData.email}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-3 bg-white/5 rounded-xl">
-                    <FaCalendar className="text-purple-400" />
+                    <Calendar className="text-purple-400" />
                     <div>
                       <p className="text-white/60 text-sm">Age</p>
                       <p className="text-white font-medium">{profileData.age} years</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-3 bg-white/5 rounded-xl">
-                    <FaWeight className="text-green-400" />
+                    <Weight className="text-green-400" />
                     <div>
                       <p className="text-white/60 text-sm">Current Weight</p>
                       <p className="text-white font-medium">{profileData.weight}</p>
@@ -131,7 +131,7 @@ const Profile = () => {
                   onClick={() => setIsEditing(!isEditing)}
                   className="w-full mt-6 p-3 bg-gradient-to-r from-cyan-400 to-purple-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200 edit-profile-btn"
                 >
-                  {isEditing ? <FaSave className="inline mr-2" /> : <FaEdit className="inline mr-2" />}
+                  {isEditing ? <Save className="inline mr-2" /> : <Edit3 className="inline mr-2" />}
                   {isEditing ? 'Save Changes' : 'Edit Profile'}
                 </motion.button>
               </div>
@@ -181,7 +181,7 @@ const Profile = () => {
                     >
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-gradient-to-r from-cyan-400/20 to-purple-400/20 rounded-lg">
-                          <FaHeart className="text-cyan-400 text-sm" />
+                          <Heart className="text-cyan-400 text-sm" />
                         </div>
                         <div>
                           <p className="text-white text-sm font-medium">{activity.activity}</p>

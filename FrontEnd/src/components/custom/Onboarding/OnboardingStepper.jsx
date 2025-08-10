@@ -152,7 +152,7 @@ const OnboardingStepper = ({ onStepChange }) => {
 
       // Redirect after 3 seconds
       setTimeout(() => {
-        navigate("/dashboard");
+        navigate("/Dashboard");
       }, 3000);
       
     } catch (err) {

@@ -2,27 +2,24 @@ import { SignedIn, useUser } from "@clerk/clerk-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
 import { 
-  FaCamera, 
-  FaPlus, 
-  FaTrash, 
-  FaArrowLeft,
-  FaTimes,
-  FaUpload,
-  FaFire,
-  FaBreadSlice,
-  FaHamburger,
-  FaPizzaSlice,
-  FaAppleAlt,
-  FaSearch,
-  FaEdit,
-  FaClock,
-  FaTint,
-  FaLeaf,
-  FaUtensils,
-  FaSpinner
-} from "react-icons/fa";
-import DashboardLayout from "../../components/custom/DashboardLayout.jsx";
-
+  Camera, 
+  Plus, 
+  Trash2, 
+  ArrowLeft,
+  X,
+  Upload,
+  Flame,
+  Utensils,
+  Hamburger,
+  Pizza,
+  Apple,
+  Search,
+  Edit3,
+  Clock,
+  Droplets,
+  Leaf,
+  Loader2
+} from "lucide-react";
 const MealLoggerEnhanced = () => {
   const { user } = useUser();
   const [showAddMeal, setShowAddMeal] = useState(false);
@@ -60,10 +57,10 @@ const MealLoggerEnhanced = () => {
   const fileInputRef = useRef(null);
 
   const mealTypes = [
-    { id: 'breakfast', label: 'Breakfast', icon: FaBreadSlice, color: 'from-orange-400 to-yellow-500' },
-    { id: 'lunch', label: 'Lunch', icon: FaHamburger, color: 'from-green-400 to-emerald-500' },
-    { id: 'dinner', label: 'Dinner', icon: FaPizzaSlice, color: 'from-purple-400 to-pink-500' },
-    { id: 'snack', label: 'Snacks', icon: FaAppleAlt, color: 'from-cyan-400 to-blue-500' },
+    { id: 'breakfast', label: 'Breakfast', icon: Utensils, color: 'from-orange-400 to-yellow-500' },
+    { id: 'lunch', label: 'Lunch', icon: Hamburger, color: 'from-green-400 to-emerald-500' },
+    { id: 'dinner', label: 'Dinner', icon: Pizza, color: 'from-purple-400 to-pink-500' },
+    { id: 'snack', label: 'Snacks', icon: Apple, color: 'from-cyan-400 to-blue-500' },
   ];
 
   // Fetch today's meals on component mount
@@ -355,10 +352,7 @@ const MealLoggerEnhanced = () => {
 
   return (
     <SignedIn>
-      <DashboardLayout
-        title="Meal Logger"
-        subtitle="Track your meals and nutrition with AI-powered recognition"
-      >
+      <>
         {/* Header with Search Bar */}
         <div className="flex flex-col lg:flex-row gap-4 mb-6">
           <div className="flex-1">
@@ -371,13 +365,13 @@ const MealLoggerEnhanced = () => {
                 onKeyPress={(e) => e.key === 'Enter' && searchFoods(searchQuery)}
                 className="w-full p-4 pl-12 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/60 focus:outline-none focus:border-cyan-400 transition-all"
               />
-              <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/60" />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/60" />
               <button
                 onClick={() => searchFoods(searchQuery)}
                 disabled={isSearching}
                 className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white/60 hover:text-white disabled:opacity-50"
               >
-                {isSearching ? <FaSpinner className="animate-spin" /> : 'Search'}
+                {isSearching ? <Loader2 className="animate-spin" /> : 'Search'}
               </button>
             </div>
             
@@ -412,7 +406,7 @@ const MealLoggerEnhanced = () => {
             onClick={() => setShowAddMeal(true)}
             className="p-4 bg-gradient-to-r from-cyan-400 to-purple-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200 whitespace-nowrap upload-btn"
           >
-            <FaCamera className="inline mr-2" />
+            <Camera className="inline mr-2" />
             Take Photo
           </motion.button>
         </div>
@@ -421,7 +415,7 @@ const MealLoggerEnhanced = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-gradient-to-br from-orange-400/20 to-red-400/20 border border-orange-400/30 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
-              <FaFire className="text-orange-400" />
+              <Flame className="text-orange-400" />
               <span className="text-white font-medium">Calories</span>
             </div>
             <div className="text-2xl font-bold text-white">
@@ -434,7 +428,7 @@ const MealLoggerEnhanced = () => {
           
           <div className="bg-gradient-to-br from-blue-400/20 to-cyan-400/20 border border-blue-400/30 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
-              <FaLeaf className="text-blue-400" />
+              <Leaf className="text-blue-400" />
               <span className="text-white font-medium">Protein</span>
             </div>
             <div className="text-2xl font-bold text-white">
@@ -444,7 +438,7 @@ const MealLoggerEnhanced = () => {
           
           <div className="bg-gradient-to-br from-green-400/20 to-emerald-400/20 border border-green-400/30 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
-              <FaBreadSlice className="text-green-400" />
+              <Utensils className="text-green-400" />
               <span className="text-white font-medium">Carbs</span>
             </div>
             <div className="text-2xl font-bold text-white">
@@ -454,7 +448,7 @@ const MealLoggerEnhanced = () => {
           
           <div className="bg-gradient-to-br from-yellow-400/20 to-orange-400/20 border border-yellow-400/30 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
-              <FaTint className="text-yellow-400" />
+              <Droplets className="text-yellow-400" />
               <span className="text-white font-medium">Fat</span>
             </div>
             <div className="text-2xl font-bold text-white">
@@ -529,7 +523,7 @@ const MealLoggerEnhanced = () => {
 
                 {todayMeals.filter(meal => meal.mealType === selectedMealType).length === 0 && (
                   <div className="text-center py-8 text-white/60">
-                    <FaUtensils className="text-4xl mx-auto mb-4" />
+                    <Utensils className="text-4xl mx-auto mb-4" />
                     <p>No {selectedMealType} meals logged today</p>
                     <p className="text-sm">Search for foods or take a photo to get started</p>
                   </div>
@@ -551,14 +545,14 @@ const MealLoggerEnhanced = () => {
                   onClick={() => setShowAddMeal(true)}
                   className="w-full p-3 bg-white/10 rounded-xl text-white hover:bg-white/20 transition-all"
                 >
-                  <FaCamera className="inline mr-2" />
+                  <Camera className="inline mr-2" />
                   Take Photo
                 </button>
                 <button 
                   onClick={() => setShowManualEntry(true)}
                   className="w-full p-3 bg-white/10 rounded-xl text-white hover:bg-white/20 transition-all"
                 >
-                  <FaEdit className="inline mr-2" />
+                  <Edit3 className="inline mr-2" />
                   Manual Entry
                 </button>
               </div>
@@ -591,7 +585,7 @@ const MealLoggerEnhanced = () => {
                     }}
                     className="text-white/60 hover:text-white"
                   >
-                    <FaTimes size={24} />
+                    <X size={24} />
                   </button>
                 </div>
 
@@ -680,7 +674,7 @@ const MealLoggerEnhanced = () => {
                     disabled={isLoading || !selectedManualFood || !selectedManualServing}
                     className="w-full p-3 bg-gradient-to-r from-cyan-400 to-purple-400 text-white rounded-xl font-medium hover:shadow-lg transition-all disabled:opacity-50"
                   >
-                    {isLoading ? <FaSpinner className="animate-spin mx-auto" /> : 'Add Meal'}
+                    {isLoading ? <Loader2 className="animate-spin mx-auto" /> : 'Add Meal'}
                   </button>
                 </div>
               </motion.div>
@@ -713,7 +707,7 @@ const MealLoggerEnhanced = () => {
                     }}
                     className="text-white/60 hover:text-white"
                   >
-                    <FaTimes size={24} />
+                    <X size={24} />
                   </button>
                 </div>
 
@@ -790,12 +784,12 @@ const MealLoggerEnhanced = () => {
                         >
                           {isLoading ? (
                             <div className="space-y-4">
-                              <FaSpinner className="text-4xl mx-auto animate-spin text-cyan-400" />
+                              <Loader2 className="text-4xl mx-auto animate-spin text-cyan-400" />
                               <p className="text-white">Analyzing image...</p>
                             </div>
                           ) : (
                             <div className="space-y-4">
-                              <FaUpload className="text-4xl mx-auto text-cyan-400" />
+                              <Upload className="text-4xl mx-auto text-cyan-400" />
                               <p className="text-white">Click to upload or drag image here</p>
                               <p className="text-white/60 text-sm">Supports JPG, PNG, GIF</p>
                             </div>
@@ -859,7 +853,7 @@ const MealLoggerEnhanced = () => {
                           onClick={() => setCurrentStep('groupSelection')}
                           className="text-white/60 hover:text-white"
                         >
-                          <FaArrowLeft />
+                          <ArrowLeft />
                         </button>
                         <h3 className="text-xl font-semibold text-white">Select Food from {selectedGroup}</h3>
                       </div>
@@ -901,7 +895,7 @@ const MealLoggerEnhanced = () => {
                           onClick={() => setCurrentStep('foodSelection')}
                           className="text-white/60 hover:text-white"
                         >
-                          <FaArrowLeft />
+                          <ArrowLeft />
                         </button>
                         <h3 className="text-xl font-semibold text-white">Select Serving Size</h3>
                       </div>
@@ -984,7 +978,7 @@ const MealLoggerEnhanced = () => {
                               onClick={() => setMealItems(mealItems.filter((_, i) => i !== index))}
                               className="text-red-400 hover:text-red-300"
                             >
-                              <FaTrash size={14} />
+                              <Trash2 size={14} />
                             </button>
                           </div>
                         </div>
@@ -1003,7 +997,7 @@ const MealLoggerEnhanced = () => {
                       disabled={isLoading}
                       className="w-full mt-4 p-3 bg-gradient-to-r from-cyan-400 to-purple-400 text-white rounded-xl font-medium hover:shadow-lg transition-all disabled:opacity-50"
                     >
-                      {isLoading ? <FaSpinner className="animate-spin mx-auto" /> : 'Save Meal'}
+                      {isLoading ? <Loader2 className="animate-spin mx-auto" /> : 'Save Meal'}
                     </button>
                   </div>
                 )}
@@ -1011,7 +1005,7 @@ const MealLoggerEnhanced = () => {
             </motion.div>
           )}
         </AnimatePresence>
-      </DashboardLayout>
+      </>
     </SignedIn>
   );
 };

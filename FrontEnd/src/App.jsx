@@ -20,6 +20,7 @@ import MealLogger from './pages/Dashboard/MealLoggerEnhanced';
 import WaterTracker from './pages/Dashboard/WaterTracker';
 import SleepTracker from './pages/Dashboard/SleepTracker';
 import WeightTracker from './pages/Dashboard/WeightTracker';
+import WorkoutTracker from './pages/Dashboard/WorkoutTracker';
 
 function App() {
   const location = useLocation();
@@ -40,15 +41,17 @@ function App() {
         <Route path="/Contact" element={<Contact />} />
         <Route path="/Login" element={<Login />} />
         <Route path="/Signup" element={<Signup />} />
-        <Route path="/Dashboard" element={<Dashboard />} />
         <Route path="/Onboarding" element={<Onboarding/>}/>
         
-        {/* Dashboard Routes */}
-        <Route path="/Dashboard/profile" element={<Profile />} />
-        <Route path="/Dashboard/meals" element={<MealLogger />} />
-        <Route path="/Dashboard/water" element={<WaterTracker />} />
-        <Route path="/Dashboard/sleep" element={<SleepTracker />} />
-        <Route path="/Dashboard/weight" element={<WeightTracker />} />
+        {/* Dashboard Routes - Nested within Dashboard component */}
+        <Route path="/Dashboard" element={<Dashboard />}>
+          <Route path="profile" element={<Profile />} />
+          <Route path="meals" element={<MealLogger />} />
+          <Route path="water" element={<WaterTracker />} />
+          <Route path="sleep" element={<SleepTracker />} />
+          <Route path="weight" element={<WeightTracker />} />
+          <Route path="workout" element={<WorkoutTracker />} />
+        </Route>
       </Routes>
       {!isAuthPage && <Footer />}
       

@@ -42,7 +42,7 @@ const AuthPanel = () => {
                 path="/Signup"
                 routing="path"
                 signInUrl="/Login"
-                fallbackRedirectUrl="/Home"
+                fallbackRedirectUrl="/"
                 className="bg-amber-300"
               />
             </div>
@@ -54,7 +54,7 @@ const AuthPanel = () => {
                 path="/Login"
                 routing="path"
                 signUpUrl="/Signup"
-                fallbackRedirectUrl="/Home"
+                fallbackRedirectUrl="/"
               />
               {/* <SignUp path="/sign-up" routing="virtual" signInUrl="/sign-in" /> */}
             </div>

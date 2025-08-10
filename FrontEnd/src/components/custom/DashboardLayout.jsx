@@ -1,17 +1,7 @@
-import { useState, useEffect, createContext, useContext } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import GlobalSidebar from "./GlobalSidebar.jsx";
-
-// Create context for sidebar state
-const SidebarContext = createContext();
-
-export const useSidebar = () => {
-  const context = useContext(SidebarContext);
-  if (!context) {
-    throw new Error('useSidebar must be used within a SidebarProvider');
-  }
-  return context;
-};
+import SidebarContext from "./SidebarContext.jsx";
 
 const DashboardLayout = ({ children, title, subtitle }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -38,12 +28,7 @@ const DashboardLayout = ({ children, title, subtitle }) => {
         <div className="absolute inset-0 z-0">
           <div className="w-full h-full bg-gradient-to-r from-gray-900 via-cyan-900 to-neutral-900"></div>
           {/* Subtle pattern overlay */}
-          <div 
-            className="absolute inset-0 opacity-10"
-            style={{
-              backgroundImage: `url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%23ffffff" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>')`,
-            }}
-          />
+          <div className="absolute inset-0 opacity-10"></div>
         </div>
 
         {/* Global Sidebar */}
@@ -53,7 +38,7 @@ const DashboardLayout = ({ children, title, subtitle }) => {
         <motion.div 
           className="relative z-10 transition-all duration-300 min-h-screen"
           animate={{ 
-            marginLeft: sidebarOpen ? '20rem' : '1rem',
+            marginLeft: sidebarOpen ? '22rem' : '1rem',
             paddingLeft: sidebarOpen ? '1rem' : '0'
           }}
           style={{ 

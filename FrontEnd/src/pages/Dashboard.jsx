@@ -1,44 +1,43 @@
 import { SignedIn, useUser } from "@clerk/clerk-react";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { 
-  FaUtensils, 
-  FaCalculator,
-  FaPlus,
-  FaFire,
-  FaClock,
-  FaLightbulb,
-  FaTint,
-  FaBed,
-  FaDumbbell,
-  FaBrain,
-  FaChartPie,
-  FaChartBar,
-  FaChartLine,
-  FaRobot,
-  FaBell,
-  FaMicrophone,
-  FaFilePdf,
-  FaLeaf,
-  FaBreadSlice,
-  FaWeight,
-  FaThermometerHalf,
-  FaUtensilSpoon,
-  FaCog,
-  FaArrowRight,
-  FaWater,
-  FaHeart,
-  FaBullseye,
-  FaArrowUp,
-  FaArrowDown,
-  FaCheckCircle,
-  FaExclamationTriangle
-} from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+  Utensils, 
+  Calculator,
+  Plus,
+  Flame,
+  Clock,
+  Lightbulb,
+  Droplets,
+  Bed,
+  Dumbbell,
+  Brain,
+  PieChart,
+  BarChart3,
+  TrendingUp,
+  Bot,
+  Bell,
+  Mic,
+  FileText,
+  Leaf,
+  Weight,
+  Thermometer,
+  Settings,
+  ArrowRight,
+  Waves,
+  Heart,
+  Target,
+  ArrowUp,
+  ArrowDown,
+  CheckCircle,
+  AlertTriangle
+} from "lucide-react";
 import DashboardLayout from "@/components/custom/DashboardLayout";
 import { BarChart, ProgressBar, DoughnutChart, TrendIndicator } from "@/components/custom/ChartComponents";
 
-const Dashboard = () => {
+// Dashboard Overview Component
+const DashboardOverview = () => {
   const { user } = useUser();
   const navigate = useNavigate();
   const [todayStats, setTodayStats] = useState({
@@ -135,7 +134,7 @@ const Dashboard = () => {
       title: 'Calories Consumed', 
       value: todayStats.calories, 
       target: 2000, 
-      icon: FaFire, 
+      icon: Flame, 
       color: 'from-orange-400 to-red-500',
       unit: 'cal',
       progress: (todayStats.calories / 2000) * 100
@@ -144,7 +143,7 @@ const Dashboard = () => {
       title: 'Water Intake', 
       value: waterStats.todayTotal, 
       target: 2000, 
-      icon: FaTint, 
+      icon: Droplets, 
       color: 'from-blue-400 to-cyan-500',
       unit: 'ml',
       progress: (waterStats.todayTotal / 2000) * 100
@@ -153,7 +152,7 @@ const Dashboard = () => {
       title: 'Sleep Hours', 
       value: todayStats.sleepHours, 
       target: 8, 
-      icon: FaBed, 
+      icon: Bed, 
       color: 'from-purple-400 to-pink-500',
       unit: 'hrs',
       progress: (todayStats.sleepHours / 8) * 100
@@ -162,7 +161,7 @@ const Dashboard = () => {
       title: 'Meals Logged', 
       value: todayStats.mealsLogged, 
       target: 5, 
-      icon: FaUtensils, 
+      icon: Utensils, 
       color: 'from-green-400 to-emerald-500',
       unit: 'meals',
       progress: (todayStats.mealsLogged / 5) * 100
@@ -193,7 +192,7 @@ const Dashboard = () => {
       type: 'nutrition',
       title: 'Increase Protein Intake',
       description: 'You\'re 15% below your protein goal. Consider adding lean meats or legumes to your next meal.',
-      icon: FaLeaf,
+      icon: Leaf,
       priority: 'high'
     },
     {
@@ -202,7 +201,7 @@ const Dashboard = () => {
       description: waterStats.todayTotal >= 2000 
         ? `Excellent! You've consumed ${waterStats.todayTotal}ml today. Keep up the great work!`
         : `You've had ${waterStats.todayTotal}ml today. Aim for ${2000 - waterStats.todayTotal}ml more to reach your daily goal.`,
-      icon: FaTint,
+      icon: Droplets,
       priority: waterStats.todayTotal >= 2000 ? 'low' : 'medium'
     },
     {
@@ -213,16 +212,16 @@ const Dashboard = () => {
         : todayStats.sleepHours > 0 
           ? `You got ${todayStats.sleepHours}h of sleep. Aim for 7-9 hours for optimal health.`
           : 'No sleep data logged today. Start tracking your sleep for better health insights.',
-      icon: FaBed,
+      icon: Bed,
       priority: todayStats.sleepHours >= 7 ? 'low' : todayStats.sleepHours > 0 ? 'medium' : 'high'
     }
   ];
 
   const quickActions = [
-    { title: 'Log Sleep', icon: FaBed, route: '/Dashboard/sleep', color: 'from-purple-400 to-pink-500' },
-    { title: 'Track Water', icon: FaTint, route: '/Dashboard/water', color: 'from-blue-400 to-cyan-500' },
-    { title: 'Generate Workout', icon: FaDumbbell, route: '/Dashboard/workout', color: 'from-green-400 to-emerald-500' },
-    { title: 'Mental Health Bot', icon: FaBrain, route: '/Dashboard/mental-health', color: 'from-indigo-400 to-purple-500' },
+    { title: 'Log Sleep', icon: Bed, route: '/Dashboard/sleep', color: 'from-purple-400 to-pink-500' },
+    { title: 'Track Water', icon: Droplets, route: '/Dashboard/water', color: 'from-blue-400 to-cyan-500' },
+    { title: 'Generate Workout', icon: Dumbbell, route: '/Dashboard/workout', color: 'from-green-400 to-emerald-500' },
+    { title: 'Mental Health Bot', icon: Brain, route: '/Dashboard/mental-health', color: 'from-indigo-400 to-purple-500' },
   ];
 
   const handleNavigation = (route) => {
@@ -240,274 +239,331 @@ const Dashboard = () => {
 
   const getPriorityIcon = (priority) => {
     switch (priority) {
-      case 'high': return <FaExclamationTriangle className="text-red-400" />;
-      case 'medium': return <FaBullseye className="text-yellow-400" />;
-      case 'low': return <FaCheckCircle className="text-green-400" />;
-      default: return <FaLightbulb className="text-cyan-400" />;
+      case 'high': return <AlertTriangle className="text-red-400" />;
+      case 'medium': return <Target className="text-yellow-400" />;
+      case 'low': return <CheckCircle className="text-green-400" />;
+      default: return <Lightbulb className="text-cyan-400" />;
     }
   };
 
   return (
-    <SignedIn>
-      <DashboardLayout title="Dashboard" subtitle="Your health overview">
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {summaryCards.map((stat, index) => (
-            <motion.div
-              key={stat.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:shadow-lg transition-all duration-300 group health-stat-card"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div className={`p-3 rounded-xl bg-gradient-to-r ${stat.color} group-hover:scale-110 transition-transform duration-300`}>
-                  <stat.icon className="text-white text-xl" />
-                </div>
-                <div className="text-right">
-                  <div className="text-2xl font-bold text-white">{stat.value}</div>
-                  <div className="text-white/60 text-sm">/ {stat.target} {stat.unit}</div>
-                </div>
-              </div>
-              <h3 className="text-white font-medium mb-3">{stat.title}</h3>
-              <ProgressBar value={stat.value} max={stat.target} color={stat.color} showLabel={false} />
-            </motion.div>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          {/* Analytics Section */}
+    <>
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {summaryCards.map((stat, index) => (
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="lg:col-span-2"
-          >
-            <div className="backdrop-blur-xl border border-white/20 rounded-2xl p-6">
-              <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                <FaChartLine className="text-cyan-400" />
-                Analytics Overview
-              </h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Macronutrient Breakdown */}
-                <div className="bg-white/5 rounded-xl p-4">
-                  <h4 className="text-white font-medium mb-3 flex items-center gap-2">
-                    <FaChartPie className="text-cyan-400" />
-                    Macronutrients
-                  </h4>
-                  <DoughnutChart data={macronutrients} height={150} />
-                </div>
-
-                {/* Water Intake Chart */}
-                <div className="bg-white/5 rounded-xl p-4">
-                  <h4 className="text-white font-medium mb-3 flex items-center gap-2">
-                    <FaChartBar className="text-blue-400" />
-                    Weekly Water
-                  </h4>
-                  <BarChart data={waterData} height={150} />
-                </div>
-
-                {/* Weight Progress */}
-                <div className="bg-white/5 rounded-xl p-4">
-                  <h4 className="text-white font-medium mb-3 flex items-center gap-2">
-                    <FaChartLine className="text-green-400" />
-                    Weight Trend
-                  </h4>
-                  <TrendIndicator 
-                    value={todayStats.weight} 
-                    previousValue={76.5} 
-                    label="Current Weight (kg)" 
-                  />
-                  <div className="mt-3">
-                    <div className="text-white/60 text-sm">Weekly Progress</div>
-                    <div className="text-green-400 text-sm font-medium">-0.3kg this week</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* AI Recommendations */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="space-y-6"
-          >
-            <div className="backdrop-blur-xl border border-white/20 rounded-2xl p-6">
-              <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                <FaRobot className="text-cyan-400" />
-                AI Recommendations
-              </h3>
-              <div className="space-y-4">
-                {aiRecommendations.map((rec, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className={`p-4 rounded-xl border ${getPriorityColor(rec.priority)} hover:shadow-lg transition-all duration-300 ai-recommendation`}
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="p-2 rounded-lg bg-white/10">
-                        {getPriorityIcon(rec.priority)}
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="text-white font-medium text-sm mb-1">{rec.title}</h4>
-                        <p className="text-white/70 text-xs">{rec.description}</p>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Meal Log Section */}
-          <motion.div
+            key={stat.title}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="lg:col-span-2"
+            transition={{ delay: index * 0.1 }}
+            className="backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:shadow-lg transition-all duration-300 group health-stat-card"
           >
-            <div className="backdrop-blur-xl border border-white/20 rounded-2xl p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                  <FaUtensils className="text-cyan-400" />
-                  Today's Meals
-                </h3>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => handleNavigation('/Dashboard/meals')}
-                  className="p-3 bg-gradient-to-r from-cyan-400 to-purple-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200 add-meal-btn"
+            <div className="flex items-center justify-between mb-4">
+              <div className={`p-3 rounded-xl bg-gradient-to-r ${stat.color} group-hover:scale-110 transition-transform duration-300`}>
+                <stat.icon className="text-white text-xl" />
+              </div>
+              <div className="text-right">
+                <div className="text-2xl font-bold text-white">{stat.value}</div>
+                <div className="text-white/60 text-sm">/ {stat.target} {stat.unit}</div>
+              </div>
+            </div>
+            <h3 className="text-white font-medium mb-3">{stat.title}</h3>
+            <ProgressBar value={stat.value} max={stat.target} color={stat.color} showLabel={false} />
+          </motion.div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        {/* Analytics Section */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="lg:col-span-2"
+        >
+          <div className="backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+            <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+              <TrendingUp className="text-cyan-400" />
+              Analytics Overview
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Macronutrient Breakdown */}
+              <div className="bg-white/5 rounded-xl p-4">
+                <h4 className="text-white font-medium mb-3 flex items-center gap-2">
+                  <PieChart className="text-cyan-400" />
+                  Macronutrients
+                </h4>
+                <DoughnutChart data={macronutrients} height={150} />
+              </div>
+
+              {/* Water Intake Chart */}
+              <div className="bg-white/5 rounded-xl p-4">
+                <h4 className="text-white font-medium mb-3 flex items-center gap-2">
+                  <BarChart3 className="text-blue-400" />
+                  Weekly Water
+                </h4>
+                <BarChart data={waterData} height={150} />
+              </div>
+
+              {/* Weight Progress */}
+              <div className="bg-white/5 rounded-xl p-4">
+                <h4 className="text-white font-medium mb-3 flex items-center gap-2">
+                  <TrendingUp className="text-green-400" />
+                  Weight Trend
+                </h4>
+                <TrendIndicator 
+                  value={todayStats.weight} 
+                  previousValue={76.5} 
+                  label="Current Weight (kg)" 
+                />
+                <div className="mt-3">
+                  <div className="text-white/60 text-sm">Weekly Progress</div>
+                  <div className="text-green-400 text-sm font-medium">-0.3kg this week</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* AI Recommendations */}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="space-y-6"
+        >
+          <div className="backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+            <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+              <Bot className="text-cyan-400" />
+              AI Recommendations
+            </h3>
+            <div className="space-y-4">
+              {aiRecommendations.map((rec, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className={`p-4 rounded-xl border ${getPriorityColor(rec.priority)} hover:shadow-lg transition-all duration-300 ai-recommendation`}
                 >
-                  <FaPlus className="inline mr-2" />
-                  Add Meal
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 rounded-lg bg-white/10">
+                      {getPriorityIcon(rec.priority)}
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-white font-medium text-sm mb-1">{rec.title}</h4>
+                      <p className="text-white/70 text-xs">{rec.description}</p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Meal Log Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="lg:col-span-2"
+        >
+          <div className="backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                <Utensils className="text-cyan-400" />
+                Today's Meals
+              </h3>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => handleNavigation('/Dashboard/meals')}
+                className="p-3 bg-gradient-to-r from-cyan-400 to-purple-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200 add-meal-btn"
+              >
+                <Plus className="inline mr-2" />
+                Add Meal
+              </motion.button>
+            </div>
+            
+            <div className="space-y-4">
+              {/* Breakfast */}
+              <div className="bg-white/5 rounded-xl p-4">
+                <h4 className="text-white font-medium mb-3 flex items-center gap-2">
+                  <Utensils className="text-orange-400" />
+                  Breakfast
+                </h4>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between p-2 bg-white/5 rounded-lg">
+                    <div>
+                      <div className="text-white font-medium">Oatmeal with Berries</div>
+                      <div className="text-white/60 text-sm">1 cup oatmeal, 1/2 cup berries</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-white font-medium">320 cal</div>
+                      <div className="text-white/60 text-xs">P: 12g | C: 58g | F: 6g</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Lunch */}
+              <div className="bg-white/5 rounded-xl p-4">
+                <h4 className="text-white font-medium mb-3 flex items-center gap-2">
+                  <Utensils className="text-green-400" />
+                  Lunch
+                </h4>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between p-2 bg-white/5 rounded-lg">
+                    <div>
+                      <div className="text-white font-medium">Grilled Chicken Salad</div>
+                      <div className="text-white/60 text-sm">4 oz chicken, mixed greens, olive oil</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-white font-medium">450 cal</div>
+                      <div className="text-white/60 text-xs">P: 35g | C: 8g | F: 28g</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Dinner */}
+              <div className="bg-white/5 rounded-xl p-4">
+                <h4 className="text-white font-medium mb-3 flex items-center gap-2">
+                  <Utensils className="text-purple-400" />
+                  Dinner
+                </h4>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between p-2 bg-white/5 rounded-lg">
+                    <div>
+                      <div className="text-white font-medium">Salmon with Quinoa</div>
+                      <div className="text-white/60 text-sm">5 oz salmon, 1/2 cup quinoa, vegetables</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-white font-medium">680 cal</div>
+                      <div className="text-white/60 text-xs">P: 42g | C: 45g | F: 32g</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Quick Actions */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-6"
+        >
+          <div className="backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+            <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+              <Plus className="text-cyan-400" />
+              Quick Actions
+            </h3>
+            <div className="space-y-3">
+              {quickActions.map((action, index) => (
+                <motion.button
+                  key={action.title}
+                  whileHover={{ scale: 1.02, x: 5 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => handleNavigation(action.route)}
+                  className={`w-full p-4 bg-gradient-to-r ${action.color} rounded-xl text-white hover:shadow-lg transition-all duration-200 flex items-center justify-between group quick-action`}
+                >
+                  <div className="flex items-center gap-3">
+                    <action.icon className="text-xl" />
+                    <span className="font-medium">{action.title}</span>
+                  </div>
+                  <ArrowRight className="opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                 </motion.button>
+              ))}
+            </div>
+          </div>
+
+          {/* Health Tips */}
+          <div className="backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+              <Lightbulb className="text-cyan-400" />
+              Health Tips
+            </h3>
+            <div className="space-y-4">
+              <div className="p-4 bg-white/5 rounded-xl">
+                <h4 className="text-white font-medium text-sm mb-1">Stay Hydrated</h4>
+                <p className="text-white/70 text-sm">Drink water throughout the day to maintain optimal health.</p>
               </div>
-              
-              <div className="space-y-4">
-                {/* Breakfast */}
-                <div className="bg-white/5 rounded-xl p-4">
-                  <h4 className="text-white font-medium mb-3 flex items-center gap-2">
-                    <FaBreadSlice className="text-orange-400" />
-                    Breakfast
-                  </h4>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between p-2 bg-white/5 rounded-lg">
-                      <div>
-                        <div className="text-white font-medium">Oatmeal with Berries</div>
-                        <div className="text-white/60 text-sm">1 cup oatmeal, 1/2 cup berries</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-white font-medium">320 cal</div>
-                        <div className="text-white/60 text-xs">P: 12g | C: 58g | F: 6g</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Lunch */}
-                <div className="bg-white/5 rounded-xl p-4">
-                  <h4 className="text-white font-medium mb-3 flex items-center gap-2">
-                    <FaUtensils className="text-green-400" />
-                    Lunch
-                  </h4>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between p-2 bg-white/5 rounded-lg">
-                      <div>
-                        <div className="text-white font-medium">Grilled Chicken Salad</div>
-                        <div className="text-white/60 text-sm">4 oz chicken, mixed greens, olive oil</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-white font-medium">450 cal</div>
-                        <div className="text-white/60 text-xs">P: 35g | C: 8g | F: 28g</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Dinner */}
-                <div className="bg-white/5 rounded-xl p-4">
-                  <h4 className="text-white font-medium mb-3 flex items-center gap-2">
-                    <FaUtensils className="text-purple-400" />
-                    Dinner
-                  </h4>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between p-2 bg-white/5 rounded-lg">
-                      <div>
-                        <div className="text-white font-medium">Salmon with Quinoa</div>
-                        <div className="text-white/60 text-sm">5 oz salmon, 1/2 cup quinoa, vegetables</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-white font-medium">680 cal</div>
-                        <div className="text-white/60 text-xs">P: 42g | C: 45g | F: 32g</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+              <div className="p-4 bg-white/5 rounded-xl">
+                <h4 className="text-white font-medium text-sm mb-1">Consistent Sleep</h4>
+                <p className="text-white/70 text-sm">Aim for 7-9 hours of quality sleep each night.</p>
+              </div>
+              <div className="p-4 bg-white/5 rounded-xl">
+                <h4 className="text-white font-medium text-sm mb-1">Regular Exercise</h4>
+                <p className="text-white/70 text-sm">Include both cardio and strength training in your routine.</p>
               </div>
             </div>
-          </motion.div>
+          </div>
+        </motion.div>
+      </div>
+    </>
+  );
+};
 
-          {/* Quick Actions */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-6"
-          >
-            <div className="backdrop-blur-xl border border-white/20 rounded-2xl p-6">
-              <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                <FaPlus className="text-cyan-400" />
-                Quick Actions
-              </h3>
-              <div className="space-y-3">
-                {quickActions.map((action, index) => (
-                  <motion.button
-                    key={action.title}
-                    whileHover={{ scale: 1.02, x: 5 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => handleNavigation(action.route)}
-                    className={`w-full p-4 bg-gradient-to-r ${action.color} rounded-xl text-white hover:shadow-lg transition-all duration-200 flex items-center justify-between group quick-action`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <action.icon className="text-xl" />
-                      <span className="font-medium">{action.title}</span>
-                    </div>
-                    <FaArrowRight className="opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                  </motion.button>
-                ))}
-              </div>
-            </div>
+// Main Dashboard Component with Nested Routing
+const Dashboard = () => {
+  const location = useLocation();
+  
+  // Get the current route to determine the title
+  const getRouteTitle = () => {
+    const path = location.pathname;
+    if (path === '/Dashboard' || path === '/Dashboard/') return 'Dashboard';
+    if (path.includes('/profile')) return 'Profile';
+    if (path.includes('/meals')) return 'Meal Logger';
+    if (path.includes('/water')) return 'Water Tracker';
+    if (path.includes('/sleep')) return 'Sleep Tracker';
+    if (path.includes('/weight')) return 'Weight Tracker';
+    if (path.includes('/workout')) return 'Workout Tracker';
+    if (path.includes('/ai-assistant')) return 'AI Assistant';
+    if (path.includes('/analytics')) return 'Analytics';
+    if (path.includes('/reports')) return 'Reports';
+    if (path.includes('/mental-health')) return 'Mental Health';
+    if (path.includes('/symptom-checker')) return 'Symptom Checker';
+    if (path.includes('/meal-plan')) return 'Meal Plan Generator';
+    if (path.includes('/reminders')) return 'Reminders';
+    if (path.includes('/voice-assistant')) return 'Chatbot';
+    return 'Dashboard';
+  };
 
-            {/* Health Tips */}
-            <div className="backdrop-blur-xl border border-white/20 rounded-2xl p-6">
-              <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <FaLightbulb className="text-cyan-400" />
-                Health Tips
-              </h3>
-              <div className="space-y-4">
-                <div className="p-4 bg-white/5 rounded-xl">
-                  <h4 className="text-white font-medium text-sm mb-1">Stay Hydrated</h4>
-                  <p className="text-white/70 text-sm">Drink water throughout the day to maintain optimal health.</p>
-                </div>
-                <div className="p-4 bg-white/5 rounded-xl">
-                  <h4 className="text-white font-medium text-sm mb-1">Consistent Sleep</h4>
-                  <p className="text-white/70 text-sm">Aim for 7-9 hours of quality sleep each night.</p>
-                </div>
-                <div className="p-4 bg-white/5 rounded-xl">
-                  <h4 className="text-white font-medium text-sm mb-1">Regular Exercise</h4>
-                  <p className="text-white/70 text-sm">Include both cardio and strength training in your routine.</p>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        </div>
+  const getRouteSubtitle = () => {
+    const path = location.pathname;
+    if (path === '/Dashboard' || path === '/Dashboard/') return 'Your health overview';
+    if (path.includes('/profile')) return 'Manage your profile and settings';
+    if (path.includes('/meals')) return 'Track your meals and nutrition';
+    if (path.includes('/water')) return 'Monitor your daily water intake';
+    if (path.includes('/sleep')) return 'Track your sleep patterns';
+    if (path.includes('/weight')) return 'Monitor your weight progress';
+    if (path.includes('/workout')) return 'Track your fitness activities';
+    if (path.includes('/ai-assistant')) return 'Get AI-powered health insights and recommendations';
+    if (path.includes('/analytics')) return 'View detailed health analytics and trends';
+    if (path.includes('/reports')) return 'Generate and export health reports';
+    if (path.includes('/mental-health')) return 'Track and improve your mental well-being';
+    if (path.includes('/symptom-checker')) return 'Check symptoms and get health guidance';
+    if (path.includes('/meal-plan')) return 'Generate personalized meal plans';
+    if (path.includes('/reminders')) return 'Set and manage health reminders';
+    if (path.includes('/voice-assistant')) return 'Chat with your health assistant';
+    return 'Your health overview';
+  };
+
+  return (
+    <SignedIn>
+      <DashboardLayout title={getRouteTitle()} subtitle={getRouteSubtitle()}>
+        {/* Render the overview content for the main dashboard route */}
+        {(location.pathname === '/Dashboard' || location.pathname === '/Dashboard/') && (
+          <DashboardOverview />
+        )}
+        
+        {/* Render nested routes */}
+        <Outlet />
       </DashboardLayout>
     </SignedIn>
   );
 };
 
 export default Dashboard;
-

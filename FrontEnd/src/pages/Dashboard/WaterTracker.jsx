@@ -24,7 +24,6 @@ import {
   FaBed
 } from 'react-icons/fa';
 import { BarChart, ProgressBar, LineChart, DoughnutChart } from '@/components/custom/ChartComponents';
-import DashboardLayout from '@/components/custom/DashboardLayout';
 import toast from 'react-hot-toast';
 
 const WaterTracker = () => {
@@ -249,14 +248,15 @@ const WaterTracker = () => {
     let filtered = [...waterLogs];
     
     switch (filterType) {
-      case 'today':
+      case 'today': {
         const today = new Date();
         filtered = filtered.filter(log => {
           const logDate = new Date(log.timestamp);
           return logDate.toDateString() === today.toDateString();
         });
         break;
-      case 'week':
+      }
+      case 'week': {
         const weekAgo = new Date();
         weekAgo.setDate(weekAgo.getDate() - 7);
         filtered = filtered.filter(log => {
@@ -264,7 +264,8 @@ const WaterTracker = () => {
           return logDate >= weekAgo;
         });
         break;
-      case 'month':
+      }
+      case 'month': {
         const monthAgo = new Date();
         monthAgo.setMonth(monthAgo.getMonth() - 1);
         filtered = filtered.filter(log => {
@@ -272,7 +273,8 @@ const WaterTracker = () => {
           return logDate >= monthAgo;
         });
         break;
-      case 'custom':
+      }
+      case 'custom': {
         if (customDateRange.startDate && customDateRange.endDate) {
           const startDate = new Date(customDateRange.startDate);
           const endDate = new Date(customDateRange.endDate);
@@ -280,9 +282,10 @@ const WaterTracker = () => {
           filtered = filtered.filter(log => {
             const logDate = new Date(log.timestamp);
             return logDate >= startDate && logDate <= endDate;
-          });
+        });
         }
         break;
+      }
       default:
         // 'all' - no filtering
         break;
@@ -511,16 +514,14 @@ const WaterTracker = () => {
 
   if (loading) {
     return (
-      <DashboardLayout title="Water Tracker" subtitle="Stay hydrated, stay healthy">
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400"></div>
-        </div>
-      </DashboardLayout>
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400"></div>
+      </div>
     );
   }
 
-  return (
-    <DashboardLayout title="Water Tracker" subtitle="Stay hydrated, stay healthy">
+    return (
+    <>
       {/* Backend Error Warning */}
       {backendError && (
         <motion.div
@@ -1082,7 +1083,7 @@ const WaterTracker = () => {
           </motion.div>
         )}
       </AnimatePresence>
-    </DashboardLayout>
+    </>
   );
 };
 

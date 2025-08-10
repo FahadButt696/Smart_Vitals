@@ -2,33 +2,32 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useUser, UserButton } from "@clerk/clerk-react";
-import { useSidebar } from "./DashboardLayout.jsx";
+import { useSidebar } from "./SidebarContext.jsx";
 import { 
-  FaBars,
-  FaTimes,
-  FaHome,
-  FaUser,
-  FaUtensils,
-  FaCalculator,
-  FaDumbbell,
-  FaWeight,
-  FaTint,
-  FaBed,
-  FaBrain,
-  FaThermometerHalf,
-  FaUtensilSpoon,
-  FaFilePdf,
-  FaChartLine,
-  FaBell,
-  FaMicrophone,
-  FaCog,
-  FaSignOutAlt,
-  FaHeart,
-  FaBullseye,
-  FaRobot,
-  FaWater,
-  FaLeaf
-} from "react-icons/fa";
+  Menu,
+  X,
+  Home,
+  User,
+  Utensils,
+  Calculator,
+  Dumbbell,
+  Weight,
+  Droplets,
+  Bed,
+  Brain,
+  Thermometer,
+  FileText,
+  TrendingUp,
+  Bell,
+  Mic,
+  Settings,
+  LogOut,
+  Heart,
+  Target,
+  Bot,
+  Waves,
+  Leaf
+} from "lucide-react";
 
 const GlobalSidebar = () => {
   const { user } = useUser();
@@ -39,30 +38,30 @@ const GlobalSidebar = () => {
 
   const menuItems = [
     // Main Dashboard
-    { id: 'overview', label: 'Dashboard', icon: FaHome, route: '/Dashboard' },
+    { id: 'overview', label: 'Dashboard', icon: Home, route: '/Dashboard' },
     
     // Health Tracking
-    { id: 'meals', label: 'Meals', icon: FaUtensils, route: '/Dashboard/meals' },
-    { id: 'water', label: 'Water', icon: FaTint, route: '/Dashboard/water' },
-    { id: 'sleep', label: 'Sleep', icon: FaBed, route: '/Dashboard/sleep' },
-    { id: 'workout', label: 'Workouts', icon: FaDumbbell, route: '/Dashboard/workout' },
-    { id: 'weight', label: 'Weight Tracker', icon: FaWeight, route: '/Dashboard/weight' },
+    { id: 'meals', label: 'Meals', icon: Utensils, route: '/Dashboard/meals' },
+    { id: 'water', label: 'Water', icon: Droplets, route: '/Dashboard/water' },
+    { id: 'sleep', label: 'Sleep', icon: Bed, route: '/Dashboard/sleep' },
+    { id: 'workout', label: 'Workouts', icon: Dumbbell, route: '/Dashboard/workout' },
+    { id: 'weight', label: 'Weight Tracker', icon: Weight, route: '/Dashboard/weight' },
     
     // AI & Analytics
-    { id: 'ai-assistant', label: 'AI Assistant', icon: FaRobot, route: '/Dashboard/ai-assistant' },
-    { id: 'analytics', label: 'Analytics', icon: FaChartLine, route: '/Dashboard/analytics' },
-    { id: 'reports', label: 'Reports', icon: FaFilePdf, route: '/Dashboard/reports' },
+    { id: 'ai-assistant', label: 'AI Assistant', icon: Bot, route: '/Dashboard/ai-assistant' },
+    { id: 'analytics', label: 'Analytics', icon: TrendingUp, route: '/Dashboard/analytics' },
+    { id: 'reports', label: 'Reports', icon: FileText, route: '/Dashboard/reports' },
     
     // Additional Features
-    { id: 'mental-health', label: 'Mental Health', icon: FaBrain, route: '/Dashboard/mental-health' },
-    { id: 'symptom-checker', label: 'Symptom Checker', icon: FaThermometerHalf, route: '/Dashboard/symptom-checker' },
-    { id: 'meal-plan', label: 'Meal Plan Generator', icon: FaUtensilSpoon, route: '/Dashboard/meal-plan' },
-    { id: 'reminders', label: 'Reminders', icon: FaBell, route: '/Dashboard/reminders' },
-    { id: 'voice-assistant', label: 'Chatbot', icon: FaMicrophone, route: '/Dashboard/voice-assistant' },
+    { id: 'mental-health', label: 'Mental Health', icon: Brain, route: '/Dashboard/mental-health' },
+    { id: 'symptom-checker', label: 'Symptom Checker', icon: Thermometer, route: '/Dashboard/symptom-checker' },
+    { id: 'meal-plan', label: 'Meal Plan Generator', icon: Utensils, route: '/Dashboard/meal-plan' },
+    { id: 'reminders', label: 'Reminders', icon: Bell, route: '/Dashboard/reminders' },
+    { id: 'voice-assistant', label: 'Chatbot', icon: Mic, route: '/Dashboard/voice-assistant' },
     
     // Settings & Profile
-    { id: 'profile', label: 'Profile', icon: FaUser, route: '/Dashboard/profile' },
-    { id: 'settings', label: 'Settings', icon: FaCog, route: '/Dashboard/settings' },
+    { id: 'profile', label: 'Profile', icon: User, route: '/Dashboard/profile' },
+    { id: 'settings', label: 'Settings', icon: Settings, route: '/Dashboard/settings' },
   ];
 
   useEffect(() => {
@@ -101,20 +100,24 @@ const GlobalSidebar = () => {
         whileTap={{ scale: 0.9 }}
         onClick={handleToggle}
         className={`fixed top-4 z-50 p-3 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-xl text-white shadow-lg backdrop-blur-sm transition-all duration-300 sidebar-toggle ${
-          sidebarOpen ? 'left-72' : 'left-4'
+          sidebarOpen ? 'left-[21rem]' : 'left-4'
         }`}
         style={{ zIndex: 9999 }}
       >
-        {sidebarOpen ? <FaTimes /> : <FaBars />}
+        {sidebarOpen ? <X className="text-white" /> : <Menu className="text-white" />}
       </motion.button>
 
       {/* Sidebar */}
       <motion.div
-        initial={{ x: -320 }}
-        animate={{ x: sidebarOpen ? 0 : -320 }}
+        initial={{ x: -352 }}
+        animate={{ x: sidebarOpen ? 0 : -352 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        className="fixed left-0 top-0 h-full w-80 bg-gradient-to-b from-gray-900/95 to-black/95 backdrop-blur-xl border-r border-cyan-400/20 z-40 shadow-2xl sidebar-scroll"
-        style={{ zIndex: 9998 }}
+        className="fixed left-0 top-0 h-full w-88 bg-gradient-to-b from-gray-900/95 to-black/95 backdrop-blur-xl border-r border-cyan-400/20 z-40 shadow-2xl sidebar-scroll"
+        style={{ 
+          zIndex: 9998,
+          width: '22rem',
+          overflowX: 'hidden'
+        }}
       >
         <div className="p-6 h-full flex flex-col">
           {/* Brand Header */}
@@ -124,7 +127,7 @@ const GlobalSidebar = () => {
             </h1>
             <div className="flex items-center gap-3 p-4 bg-white/10 rounded-xl backdrop-blur-sm border border-cyan-400/20">
               <div className="w-10 h-10 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full flex items-center justify-center">
-                <FaHeart className="text-white" />
+                <Heart className="text-white" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-white font-medium truncate">{user?.username || "User"}</p>
@@ -142,7 +145,7 @@ const GlobalSidebar = () => {
           </div>
 
           {/* Navigation Menu */}
-          <nav className="flex-1 space-y-2 overflow-y-auto">
+          <nav className="flex-1 space-y-2 overflow-y-auto custom-scrollbar">
             {menuItems.map((item) => (
               <motion.button
                 key={item.id}
@@ -170,7 +173,7 @@ const GlobalSidebar = () => {
               whileTap={{ scale: 0.98 }}
               className="w-full flex items-center gap-3 p-3 rounded-xl text-red-400 hover:text-red-300 hover:bg-red-400/10 transition-all duration-200 border border-transparent hover:border-red-400/20"
             >
-              <FaSignOutAlt className="text-lg flex-shrink-0" />
+              <LogOut className="text-lg flex-shrink-0" />
               <span className="font-medium">Sign Out</span>
             </motion.button>
           </div>
@@ -191,7 +194,30 @@ const GlobalSidebar = () => {
         )}
       </AnimatePresence>
 
-      {/* CSS for hiding scrollbar is now in dashboard-cursor.css */}
+      {/* Custom Scrollbar Styles */}
+      <style jsx>{`
+        .custom-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(34, 211, 238, 0.3) transparent;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(34, 211, 238, 0.3);
+          border-radius: 3px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(34, 211, 238, 0.5);
+        }
+      `}</style>
     </>
   );
 };
