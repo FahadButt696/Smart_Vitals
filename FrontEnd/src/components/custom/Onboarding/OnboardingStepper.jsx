@@ -115,6 +115,7 @@ const OnboardingStepper = ({ onStepChange }) => {
         workoutDaysPerWeek: parseInt(data.workoutDaysPerWeek) || 3,
         workoutPreferences: data.workoutPreferences || [],
         mealPlanType: data.mealPlanType || "Balanced",
+        sleepGoal: data.sleepGoal || 8,
         wantsMentalSupport: data.wantsMentalSupport || false
       };
 
@@ -138,8 +139,8 @@ const OnboardingStepper = ({ onStepChange }) => {
       setShowSuccessMessage(true);
       
       // Show toast notification
-      toast.success('Registration successful! Welcome to Smart Vitals!', {
-        duration: 4000,
+      toast.success('Registration successful! Welcome to Smart Vitals! You can generate AI recommendations from the dashboard later.', {
+        duration: 5000,
         position: 'top-center',
         style: {
           background: 'linear-gradient(135deg, #0ea5e9, #8b5cf6)',
@@ -323,14 +324,14 @@ const OnboardingStepper = ({ onStepChange }) => {
                 Registration Successful!
               </motion.h2>
               
-              <motion.p 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="text-white/80 mb-6 text-sm sm:text-base"
-              >
-                Welcome to Smart Vitals! Your health journey starts now.
-              </motion.p>
+                             <motion.p 
+                 initial={{ opacity: 0, y: 20 }}
+                 animate={{ opacity: 1, y: 0 }}
+                 transition={{ delay: 0.4 }}
+                 className="text-white/80 mb-6 text-sm sm:text-base"
+               >
+                 Welcome to Smart Vitals! Your health journey starts now. You can generate personalized AI recommendations from the dashboard.
+               </motion.p>
               
               <motion.div
                 initial={{ opacity: 0, y: 20 }}

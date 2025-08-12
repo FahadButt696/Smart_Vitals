@@ -57,7 +57,7 @@ export const BarChart = ({ data, height = 200, color = "from-blue-400 to-cyan-40
   if (!data || data.length === 0) {
     return <div className="text-white/60 text-center py-4">No data available</div>;
   }
-
+  
   const chartData = {
     labels: data.map(item => item.label),
     datasets: [
@@ -119,7 +119,7 @@ export const BarChart = ({ data, height = 200, color = "from-blue-400 to-cyan-40
       },
     },
   };
-
+  
   return (
     <div style={{ height }}>
       <Bar data={chartData} options={options} />
@@ -292,6 +292,91 @@ export const DoughnutChart = ({ data, height = 200 }) => {
   );
 };
 
+// Area Chart Component using Charts.js
+export const AreaChart = ({ data, height = 200, color = "from-emerald-400 to-teal-400" }) => {
+  try {
+    if (!data || data.length === 0) {
+      return <div className="text-white/60 text-center py-4">No data available</div>;
+    }
+    
+    const chartData = {
+      labels: data.map(item => item.label),
+      datasets: [
+        {
+          label: 'Value',
+          data: data.map(item => item.value),
+          borderColor: 'rgba(16, 185, 129, 1)',
+          backgroundColor: 'rgba(16, 185, 129, 0.2)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: 'rgba(16, 185, 129, 1)',
+          pointBorderColor: 'white',
+          pointBorderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+        },
+      ],
+    };
+
+    const options = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false,
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          titleColor: 'white',
+          bodyColor: 'white',
+          borderColor: 'rgba(16, 185, 129, 0.5)',
+          borderWidth: 1,
+          titleFont: {
+            size: 12
+          },
+          bodyFont: {
+            size: 11
+          }
+        },
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: 'rgba(255, 255, 255, 0.6)',
+            font: {
+              size: 10
+            }
+          },
+          grid: {
+            color: 'rgba(255, 255, 255, 0.1)',
+          },
+        },
+        y: {
+          ticks: {
+            color: 'rgba(255, 255, 255, 0.6)',
+            font: {
+              size: 10
+            }
+          },
+          grid: {
+            color: 'rgba(255, 255, 255, 0.1)',
+          },
+        },
+      },
+    };
+
+    return (
+      <div style={{ height }}>
+        <Line data={chartData} options={options} />
+      </div>
+    );
+  } catch (error) {
+    console.error('Error rendering AreaChart:', error);
+    return <div className="text-white/60 text-center py-4">Unable to display chart</div>;
+  }
+};
+
 // Metric Card Component
 export const MetricCard = ({ title, value, change, icon: Icon, color = "from-cyan-400 to-purple-400" }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -317,6 +402,53 @@ export const MetricCard = ({ title, value, change, icon: Icon, color = "from-cya
       </div>
       <div className="text-2xl font-bold text-white mb-1">{value}</div>
       <div className="text-white/60 text-sm">{title}</div>
+    </motion.div>
+  );
+};
+
+// Mini Metric Card Component
+export const MiniMetricCard = ({ title, value, change, icon: Icon, color = "from-cyan-400 to-purple-400", size = "default" }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  
+  const sizeClasses = {
+    small: "p-3",
+    default: "p-4",
+    large: "p-6"
+  };
+  
+  const iconSizes = {
+    small: "text-sm",
+    default: "text-lg",
+    large: "text-xl"
+  };
+  
+  const textSizes = {
+    small: "text-sm",
+    default: "text-base",
+    large: "text-lg"
+  };
+  
+  return (
+    <motion.div
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+      whileHover={{ scale: 1.02 }}
+      className={`bg-white/5 rounded-xl ${sizeClasses[size]} border border-white/10 hover:border-cyan-400/30 transition-all duration-300`}
+    >
+      <div className="flex items-center justify-between mb-3">
+        <div className={`p-2 rounded-lg bg-gradient-to-r ${color}`}>
+          <Icon className={`text-white ${iconSizes[size]}`} />
+        </div>
+        {change && (
+          <div className={`text-sm font-medium ${
+            change > 0 ? 'text-green-400' : 'text-red-400'
+          }`}>
+            {change > 0 ? '+' : ''}{change}%
+          </div>
+        )}
+      </div>
+      <div className={`font-bold text-white mb-1 ${textSizes[size]}`}>{value}</div>
+      <div className={`text-white/60 ${textSizes[size]}`}>{title}</div>
     </motion.div>
   );
 };

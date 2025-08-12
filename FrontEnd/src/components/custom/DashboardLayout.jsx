@@ -38,7 +38,7 @@ const DashboardLayout = ({ children, title, subtitle }) => {
         <motion.div 
           className="relative z-10 transition-all duration-300 min-h-screen"
           animate={{ 
-            marginLeft: sidebarOpen ? '22rem' : '1rem',
+            marginLeft: sidebarOpen ? '17.5rem' : '3rem',
             paddingLeft: sidebarOpen ? '1rem' : '0'
           }}
           style={{ 

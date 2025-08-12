@@ -24,7 +24,9 @@ import {
   FaSort,
   FaTimes
 } from 'react-icons/fa';
-import { LineChart } from '@/components/custom/ChartComponents';
+import { LineChart, BarChart } from '@/components/custom/ChartComponents';
+import AIRecommendationCard from "@/components/custom/AIRecommendationCard";
+import { useAIRecommendations } from "@/hooks/useAIRecommendations";
 
 // Constants for validation
 const WEIGHT_LIMITS = {
@@ -41,6 +43,7 @@ const DATE_LIMITS = {
 
 const WeightTracker = () => {
   const { user } = useUser();
+  const { recommendations } = useAIRecommendations();
   const [weightLogs, setWeightLogs] = useState([]);
   const [stats, setStats] = useState({
     current: null,
@@ -201,6 +204,12 @@ const WeightTracker = () => {
       
       const data = await response.json();
       if (data.success) {
+        console.log('📥 Weight logs fetched successfully:', data.logs);
+        console.log('🔍 Weight logs data structure:', {
+          logsLength: data.logs?.length || 0,
+          sampleLog: data.logs?.[0],
+          allLogs: data.logs
+        });
         setWeightLogs(data.logs || []);
         setLastSync(new Date());
       } else {
@@ -333,6 +342,7 @@ const WeightTracker = () => {
       
       const data = await response.json();
       if (data.success) {
+        console.log('✅ Weight added successfully:', data);
         toast.success('Weight logged successfully!');
         setShowAddModal(false);
         setFormData({
@@ -343,6 +353,7 @@ const WeightTracker = () => {
           notes: ''
         });
         setErrors({});
+        console.log('🔄 Fetching updated weight logs...');
         fetchWeightLogs();
         fetchWeightStats();
       } else {
@@ -485,17 +496,23 @@ const WeightTracker = () => {
         case 'thisWeek': {
           const weekStart = new Date(now);
           weekStart.setDate(now.getDate() - 7);
+          const weekStartStr = weekStart.toISOString().split('T')[0];
           filteredLogs = filteredLogs.filter(log => {
             if (!log || !log.timestamp) return false;
-            return new Date(log.timestamp) >= weekStart;
+            const logDate = new Date(log.timestamp);
+            const logDateStr = logDate.toISOString().split('T')[0];
+            return logDateStr >= weekStartStr;
           });
           break;
         }
         case 'thisMonth': {
           const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+          const monthStartStr = monthStart.toISOString().split('T')[0];
           filteredLogs = filteredLogs.filter(log => {
             if (!log || !log.timestamp) return false;
-            return new Date(log.timestamp) >= monthStart;
+            const logDate = new Date(log.timestamp);
+            const logDateStr = logDate.toISOString().split('T')[0];
+            return logDateStr >= monthStartStr;
           });
           break;
         }
@@ -545,116 +562,114 @@ const WeightTracker = () => {
           }]
         };
       }
-
+  
       const now = new Date();
       let filteredLogs = [];
       let labels = [];
-
+  
       switch (view) {
         case 'daily':
-          // Last 7 days - show actual daily values (latest entry per day)
-          for (let i = 6; i >= 0; i--) {
-            const date = new Date(now);
-            date.setDate(date.getDate() - i);
-            const dateStr = date.toISOString().split('T')[0];
-            labels.push(date.toLocaleDateString('en-US', { weekday: 'short' }));
-            
-            // Get all logs for this day and find the latest one
-            const dayLogs = weightLogs.filter(log => {
-              if (!log || !log.timestamp) return false;
-              const logDate = new Date(log.timestamp);
-              return logDate.toISOString().split('T')[0] === dateStr;
+          // Today only - show all weight entries for today
+          const today = now.toISOString().split('T')[0];
+          
+          const todayLogs = weightLogs.filter(log => {
+            if (!log || !log.timestamp) return false;
+            const logDate = new Date(log.timestamp);
+            const logDateStr = logDate.toISOString().split('T')[0];
+            return logDateStr === today;
+          });
+          
+          if (todayLogs.length > 0) {
+            const sortedTodayLogs = todayLogs.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+            labels = sortedTodayLogs.map((log, index) => {
+              const time = new Date(log.timestamp).toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: true 
+              });
+              return `Entry ${index + 1} (${time})`;
             });
-            
-            if (dayLogs.length > 0) {
-              // Sort by timestamp and get the latest entry
-              const latestLog = dayLogs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0];
-              filteredLogs.push(latestLog.weight);
-            } else {
-              filteredLogs.push(null);
-            }
+            filteredLogs = sortedTodayLogs.map(log => log.weight);
+          } else {
+            labels = ['No weight logged today'];
+            filteredLogs = [0.1];
           }
           break;
         
         case 'weekly':
-          // Last 4 weeks - show weekly averages
-          for (let i = 3; i >= 0; i--) {
-            const date = new Date(now);
-            date.setDate(date.getDate() - (i * 7));
-            labels.push(`Week ${4 - i}`);
+          // Current week only - show daily breakdown
+          const currentWeekStart = new Date(now);
+          const dayOfWeek = now.getDay();
+          currentWeekStart.setDate(now.getDate() - dayOfWeek);
+          
+          const currentWeekEnd = new Date(currentWeekStart);
+          currentWeekEnd.setDate(currentWeekStart.getDate() + 6);
+          
+          for (let i = 0; i < 7; i++) {
+            const currentDate = new Date(currentWeekStart);
+            currentDate.setDate(currentWeekStart.getDate() + i);
             
-            const weekStart = new Date(date);
-            weekStart.setDate(weekStart.getDate() - 6);
-            const weekEnd = new Date(date);
-            
-            const weekLogs = weightLogs.filter(log => {
+            const dayLogs = weightLogs.filter(log => {
               if (!log || !log.timestamp) return false;
               const logDate = new Date(log.timestamp);
-              return logDate >= weekStart && logDate <= weekEnd;
+              const logDateStr = logDate.toISOString().split('T')[0];
+              const currentDateStr = currentDate.toISOString().split('T')[0];
+              return logDateStr === currentDateStr;
             });
             
-            if (weekLogs.length > 0) {
-              const avgWeight = weekLogs.reduce((sum, log) => sum + (log.weight || 0), 0) / weekLogs.length;
-              filteredLogs.push(parseFloat(avgWeight.toFixed(1)));
+            labels.push(currentDate.toLocaleDateString('en-US', { weekday: 'short' }));
+            
+            if (dayLogs.length > 0) {
+              const latestLog = dayLogs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0];
+              filteredLogs.push(latestLog.weight);
             } else {
-              filteredLogs.push(null);
+              filteredLogs.push(0);
             }
           }
           break;
         
         case 'monthly':
-          // Last 6 months - show monthly averages
-          for (let i = 5; i >= 0; i--) {
-            const date = new Date(now);
-            date.setMonth(date.getMonth() - i);
-            labels.push(date.toLocaleDateString('en-US', { month: 'short' }));
+          // Current month only - show daily breakdown
+          const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+          const currentMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+          
+          for (let i = 1; i <= currentMonthEnd.getDate(); i++) {
+            const currentDate = new Date(currentMonthStart.getFullYear(), currentMonthStart.getMonth(), i);
             
-            const monthStart = new Date(date.getFullYear(), date.getMonth(), 1);
-            const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-            
-            const monthLogs = weightLogs.filter(log => {
+            const dayLogs = weightLogs.filter(log => {
               if (!log || !log.timestamp) return false;
               const logDate = new Date(log.timestamp);
-              return logDate >= monthStart && logDate <= monthEnd;
+              const logDateStr = logDate.toISOString().split('T')[0];
+              const currentDateStr = currentDate.toISOString().split('T')[0];
+              return logDateStr === currentDateStr;
             });
             
-            if (monthLogs.length > 0) {
-              const avgWeight = monthLogs.reduce((sum, log) => sum + (log.weight || 0), 0) / monthLogs.length;
-              filteredLogs.push(parseFloat(avgWeight.toFixed(1)));
+            labels.push(i.toString());
+            
+            if (dayLogs.length > 0) {
+              const latestLog = dayLogs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0];
+              filteredLogs.push(latestLog.weight);
             } else {
-              filteredLogs.push(null);
+              filteredLogs.push(0);
             }
           }
           break;
         
         default:
-          break;
+          labels = ['No Data'];
+          filteredLogs = [0];
       }
-
-      return {
-        labels,
-        datasets: [{
-          label: `Weight (${stats.current?.unit || 'kg'})`,
-          data: filteredLogs,
-          borderColor: 'rgb(59, 130, 246)',
-          backgroundColor: 'rgba(59, 130, 246, 0.1)',
-          tension: 0.4,
-          fill: true
-        }]
-      };
+  
+      return labels.map((label, index) => ({
+        label: label,
+        value: filteredLogs[index] || 0
+      }));
+      
     } catch (error) {
-      console.error('Error generating chart data:', error);
-      return { 
-        labels: [], 
-        datasets: [{
-          label: 'Weight (kg)',
-          data: [],
-          borderColor: 'rgb(59, 130, 246)',
-          backgroundColor: 'rgba(59, 130, 246, 0.1)',
-          tension: 0.4,
-          fill: true
-        }]
-      };
+      return [{ 
+        label: 'Error', 
+        value: 0
+      }];
     }
   };
 
@@ -763,12 +778,88 @@ const WeightTracker = () => {
     }
   }, [user]);
 
+  // Debug chart data when weightLogs or chartView changes
+ 
+
   // Add error boundary for chart rendering
   const renderChart = () => {
     try {
-      return <LineChart data={getChartData(chartView)} />;
+      const chartData = getChartData(chartView);
+      
+      // Check if chartData is valid
+      if (!chartData || !Array.isArray(chartData)) {
+        return (
+          <div className="flex items-center justify-center h-full text-white/60">
+            <p>Error loading chart data</p>
+          </div>
+        );
+      }
+  
+      // Handle empty data case
+      if (chartData.length === 0 || chartData.every(item => item.value <= 0)) {
+        return (
+          <div className="flex items-center justify-center h-full text-white/60">
+            <p>No data available for {chartView} view</p>
+          </div>
+        );
+      }
+  
+      // Use appropriate chart type for each view
+      switch (chartView) {
+        case 'daily':
+          return (
+            <div className="h-[300px]">
+              <BarChart 
+                data={chartData} 
+                height={300}
+                options={{
+                  maintainAspectRatio: false,
+                  responsive: true,
+                  scales: {
+                    y: {
+                      beginAtZero: false,
+                      grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                      },
+                      ticks: {
+                        color: 'rgba(255, 255, 255, 0.6)'
+                      }
+                    },
+                    x: {
+                      grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                      },
+                      ticks: {
+                        color: 'rgba(255, 255, 255, 0.6)'
+                      }
+                    }
+                  }
+                }}
+              />
+            </div>
+          );
+        case 'weekly':
+          return (
+            <div className="h-[300px]">
+              <BarChart 
+                data={chartData} 
+                height={300}
+              />
+            </div>
+          );
+        case 'monthly':
+          return (
+            <div className="h-[300px]">
+              <BarChart 
+                data={chartData} 
+                height={300}
+              />
+            </div>
+          );
+        default:
+          return <LineChart data={chartData} />;
+      }
     } catch (error) {
-      console.error('Error rendering chart:', error);
       return (
         <div className="flex items-center justify-center h-full text-white/60">
           <p>Unable to display chart</p>
@@ -934,7 +1025,10 @@ const WeightTracker = () => {
                   key={view}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => setChartView(view)}
+                  onClick={() => {
+                    console.log('🔄 Chart view changing from', chartView, 'to', view);
+                    setChartView(view);
+                  }}
                   className={`px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 graph-view-btn ${
                     chartView === view
                       ? 'bg-gradient-to-r from-cyan-400 to-purple-400 text-white'
@@ -947,16 +1041,62 @@ const WeightTracker = () => {
             </div>
           </div>
           
-          {weightLogs.length > 0 ? (
-            <div className="h-64">
-              {renderChart()}
+          
+          {(() => {
+            const chartData = getChartData(chartView);
+            console.log('🔍 Chart container - chartData received:', chartData, 'chartView:', chartView);
+            console.log('🔍 Chart container - chartData type:', typeof chartData, 'isArray:', Array.isArray(chartData));
+            console.log('🔍 Chart container - chartData details:', {
+              length: chartData?.length,
+              firstItem: chartData?.[0],
+              allItems: chartData
+            });
+            
+            // Check if we have any data entries (not just values > 0)
+            const hasData = chartData && chartData.length > 0;
+            console.log('🔍 Chart container - hasData:', hasData, 'chartData.length:', chartData?.length);
+            
+            if (hasData) {
+              console.log('✅ Rendering chart with data:', chartData);
+              const renderedChart = renderChart();
+              console.log('🔍 renderChart returned:', renderedChart);
+              return (
+                <div className="h-80">
+  {renderedChart}
+</div>
+              );
+            } else {
+              console.log('⚠️ No chart data, showing empty state for view:', chartView);
+              return (
+                <div className="text-center text-white/60 py-8">
+                  <FaChartLine className="text-4xl mx-auto mb-2 opacity-50" />
+                  <p>No {chartView === 'daily' ? 'weight data for today' : chartView === 'weekly' ? 'weight data for this week' : 'weight data for this month'}</p>
+                  <p className="text-sm mt-2">Start logging your weight to see analytics</p>
+                </div>
+              );
+            }
+          })()}
+          
+          {/* Chart Summary */}
+          <div className="mt-4 p-3 rounded-lg border border-white/20">
+            <div className="text-white/70 text-sm mb-1">
+              {chartView === 'daily' && 'Today - Weight Entries'}
+              {chartView === 'weekly' && 'Current Week - Daily Breakdown'}
+              {chartView === 'monthly' && 'Current Month - Daily Breakdown'}
             </div>
-          ) : (
-            <div className="text-center text-white/60 py-8">
-              <FaChartLine className="text-4xl mx-auto mb-2 opacity-50" />
-              <p>No data yet. Start tracking your weight!</p>
+            <div className="text-white font-medium">
+              {(() => {
+                const chartData = getChartData(chartView);
+                if (chartData && chartData.length > 0) {
+                  // Count entries with actual weight data (value > 0)
+                  const actualEntries = chartData.filter(item => item.value > 0).length;
+                  return `Entries: ${actualEntries}`;
+                } else {
+                  return 'No entries available';
+                }
+              })()}
             </div>
-          )}
+          </div>
         </motion.div>
 
         {/* Statistics */}

@@ -11,10 +11,35 @@ A comprehensive health and fitness tracking API built with Node.js, Express, and
 - **Water Intake**: Monitor daily hydration goals
 - **Sleep Tracking**: Analyze sleep patterns and quality
 - **Diet Planning**: AI-generated personalized meal plans
-- **Symptom Checking**: AI-powered health symptom analysis
+- **Symptom Checking**: AI-powered health symptom analysis with natural language processing
 - **Mental Health**: Mood tracking and AI support
 - **Health Reports**: Generate comprehensive PDF reports
 - **Data Visualization**: Charts and analytics
+
+## 🧠 AI Symptom Checker
+
+The symptom checker now features an **AI-first approach** that prioritizes natural language input:
+
+### Primary Workflow: Text-Based Symptom Input
+- **Natural Language Processing**: Users describe symptoms in plain English
+- **AI Symptom Extraction**: Infermedica API automatically identifies and structures symptoms
+- **Direct Diagnosis**: Parsed symptoms are immediately used for AI-powered diagnosis
+- **Confidence Scoring**: Each identified symptom includes confidence levels and metadata
+
+### Fallback Method: Manual Symptom Selection
+- Traditional body area and symptom selection
+- Available when text input doesn't capture all symptoms
+- Maintains compatibility with existing workflows
+
+### Key Benefits
+- **Faster Diagnosis**: No need to manually search through symptom lists
+- **More Accurate**: AI captures context and relationships between symptoms
+- **Better User Experience**: Natural conversation-like interaction
+- **Comprehensive Coverage**: AI identifies symptoms users might not think to mention
+
+### API Endpoints
+- `POST /api/symptom-check/parse-text` - Parse symptoms from natural language
+- `POST /api/symptom-check/check` - Get diagnosis (accepts both text and structured symptoms)
 
 ##  Prerequisites
 

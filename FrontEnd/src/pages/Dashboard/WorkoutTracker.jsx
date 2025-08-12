@@ -1,6 +1,8 @@
 import { SignedIn, useUser, useAuth } from "@clerk/clerk-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useCallback } from "react";
+import AIRecommendationCard from "@/components/custom/AIRecommendationCard";
+import { useAIRecommendations } from "@/hooks/useAIRecommendations";
 import { 
   Dumbbell,
   Plus,
@@ -51,6 +53,7 @@ const API_BASE_URL = 'http://localhost:5000/api';
 const WorkoutTracker = () => {
   const { user } = useUser();
   const { getToken } = useAuth();
+  const { recommendations } = useAIRecommendations();
   const [workouts, setWorkouts] = useState([]);
   const [exerciseDatabase, setExerciseDatabase] = useState([]);
   const [loading, setLoading] = useState(false);

@@ -265,7 +265,7 @@ export default function CustomNavbar() {
     { name: 'Features', link: '/Features' },
     { name: 'About', link: '/About' },
     { name: 'Contact', link: '/Contact' },
-    { name: 'Dashboard', link: '/Dashboard'}
+    // { name: 'Dashboard', link: '/Dashboard'}
   ];
 
   return (

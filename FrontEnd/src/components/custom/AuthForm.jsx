@@ -68,14 +68,14 @@ const AuthForm = ({ type = "sign-in" }) => {
         {isSignIn ? (
           <SignIn
             signUpUrl="/Signup"
-            forceRedirectUrl="/Onboarding"
+            forceRedirectUrl="/onboarding"
             appearance={appearance}
             logo={logo3}
           />
         ) : (
           <SignUp
             signInUrl="/Login"
-            forceRedirectUrl="/Onboarding"
+            forceRedirectUrl="/onboarding"
             appearance={appearance}
             logo={logo3}
           />

@@ -109,6 +109,12 @@ const userSchema = new mongoose.Schema(
       min: 500,
       max: 5000,
     },
+    sleepGoal: {
+      type: Number,
+      default: 8, // Default 8 hours
+      min: 4,
+      max: 12,
+    },
     wantsMentalSupport: {
       type: Boolean,
       default: false,

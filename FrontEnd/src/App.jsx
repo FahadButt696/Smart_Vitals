@@ -21,12 +21,18 @@ import WaterTracker from './pages/Dashboard/WaterTracker';
 import SleepTracker from './pages/Dashboard/SleepTracker';
 import WeightTracker from './pages/Dashboard/WeightTracker';
 import WorkoutTracker from './pages/Dashboard/WorkoutTracker';
+import SymptomChecker from './pages/Dashboard/SymptomChecker';
+import AIAssistant from './pages/Dashboard/AIAssistant';
+import Analytics from './pages/Dashboard/Analytics';
+import Reports from './pages/Dashboard/Reports';
+import MentalHealth from './pages/Dashboard/MentalHealth';
+import MealPlanGenerator from './pages/Dashboard/MealPlanGenerator';
 
 function App() {
   const location = useLocation();
   
   // Pages where we don't want navbar and footer
-  const authPages = ['/Login', '/Signup','/Dashboard','/Onboarding'];
+  const authPages = ['/Login', '/Signup','/Dashboard','/onboarding'];
   const isAuthPage = authPages.includes(location.pathname) || location.pathname.startsWith('/Dashboard');
 
   return (
@@ -41,7 +47,7 @@ function App() {
         <Route path="/Contact" element={<Contact />} />
         <Route path="/Login" element={<Login />} />
         <Route path="/Signup" element={<Signup />} />
-        <Route path="/Onboarding" element={<Onboarding/>}/>
+        <Route path="/onboarding" element={<Onboarding/>}/>
         
         {/* Dashboard Routes - Nested within Dashboard component */}
         <Route path="/Dashboard" element={<Dashboard />}>
@@ -51,6 +57,12 @@ function App() {
           <Route path="sleep" element={<SleepTracker />} />
           <Route path="weight" element={<WeightTracker />} />
           <Route path="workout" element={<WorkoutTracker />} />
+          <Route path="symptom-checker" element={<SymptomChecker />} />
+          <Route path="ai-assistant" element={<AIAssistant />} />
+          <Route path="analytics" element={<Analytics />} />
+          <Route path="reports" element={<Reports />} />
+          <Route path="mental-health" element={<MentalHealth />} />
+          <Route path="meal-plan" element={<MealPlanGenerator />} />
         </Route>
       </Routes>
       {!isAuthPage && <Footer />}

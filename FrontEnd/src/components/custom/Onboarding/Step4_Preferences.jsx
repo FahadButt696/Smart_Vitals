@@ -117,11 +117,42 @@ const Step4_Preferences = () => {
           </div>
         </motion.div>
 
+        {/* Sleep Goal */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35 }}
+          className="space-y-3"
+        >
+          <label className="block text-white font-medium text-sm sm:text-base">Daily Sleep Goal</label>
+          <div className="relative">
+            <select 
+              {...register("sleepGoal")} 
+              className="w-full p-3 sm:p-4 rounded-xl bg-gradient-to-r from-cyan-500/20 to-purple-500/20 text-white border border-white/20 focus:border-cyan-400 focus:outline-none transition-all duration-200 appearance-none pr-10 text-sm sm:text-base"
+            >
+              <option value="6" className="bg-gray-800 text-white">6 hours</option>
+              <option value="6.5" className="bg-gray-800 text-white">6.5 hours</option>
+              <option value="7" className="bg-gray-800 text-white">7 hours</option>
+              <option value="7.5" className="bg-gray-800 text-white">7.5 hours</option>
+              <option value="8" selected className="bg-gray-800 text-white">8 hours (Recommended)</option>
+              <option value="8.5" className="bg-gray-800 text-white">8.5 hours</option>
+              <option value="9" className="bg-gray-800 text-white">9 hours</option>
+              <option value="9.5" className="bg-gray-800 text-white">9.5 hours</option>
+              <option value="10" className="bg-gray-800 text-white">10 hours</option>
+            </select>
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
+        </motion.div>
+
         {/* Mental Health Support */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
+          transition={{ delay: 0.45 }}
           className="space-y-3"
         >
           <label className="flex items-start gap-3 text-white cursor-pointer">
@@ -130,7 +161,7 @@ const Step4_Preferences = () => {
               {...register("wantsMentalSupport")}
               className="w-4 h-4 sm:w-5 sm:h-5 mt-1 rounded border-white/20 bg-white/10 text-cyan-400 focus:ring-cyan-400"
             />
-            <span className="font-medium text-sm sm:text-base leading-relaxed">I would like mental health support and wellness tips</span>
+            <span className="text-sm sm:text-base leading-relaxed">I would like mental health support and wellness tips</span>
           </label>
         </motion.div>
       </div>

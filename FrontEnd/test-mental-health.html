@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mental Health API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .response {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>Mental Health API Test</h1>
+    
+    <div class="test-section">
+        <h3>Test 1: Basic API Connection</h3>
+        <button onclick="testBasicConnection()">Test Connection</button>
+        <div id="basic-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 2: Send Message</h3>
+        <input type="text" id="test-message" placeholder="Enter a test message" value="I feel anxious today">
+        <button onclick="testSendMessage()">Send Message</button>
+        <div id="message-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 3: Chat History</h3>
+        <button onclick="testChatHistory()">Get Chat History</button>
+        <div id="history-result"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000';
+        const TEST_USER_ID = 'test123';
+
+        function showResult(elementId, content, isSuccess = true) {
+            const element = document.getElementById(elementId);
+            element.className = `response ${isSuccess ? 'success' : 'error'}`;
+            element.textContent = content;
+        }
+
+        async function testBasicConnection() {
+            try {
+                const response = await fetch(`${API_BASE}/api/mental-health/test`);
+                const data = await response.json();
+                showResult('basic-result', `✅ Success: ${JSON.stringify(data, null, 2)}`);
+            } catch (error) {
+                showResult('basic-result', `❌ Error: ${error.message}`, false);
+            }
+        }
+
+        async function testSendMessage() {
+            try {
+                const message = document.getElementById('test-message').value;
+                const response = await fetch(`${API_BASE}/api/mental-health/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        userId: TEST_USER_ID,
+                        message: message
+                    }),
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult('message-result', `✅ Success: ${JSON.stringify(data, null, 2)}`);
+                } else {
+                    const errorText = await response.text();
+                    showResult('message-result', `❌ Error (${response.status}): ${errorText}`, false);
+                }
+            } catch (error) {
+                showResult('message-result', `❌ Network Error: ${error.message}`, false);
+            }
+        }
+
+        async function testChatHistory() {
+            try {
+                const response = await fetch(`${API_BASE}/api/mental-health/chat/${TEST_USER_ID}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult('history-result', `✅ Success: ${JSON.stringify(data, null, 2)}`);
+                } else {
+                    const errorText = await response.text();
+                    showResult('history-result', `❌ Error (${response.status}): ${errorText}`, false);
+                }
+            } catch (error) {
+                showResult('history-result', `❌ Network Error: ${error.message}`, false);
+            }
+        }
+
+        // Test basic connection on page load
+        window.onload = function() {
+            testBasicConnection();
+        };
+    </script>
+</body>
+</html>

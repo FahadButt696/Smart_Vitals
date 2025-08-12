@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '@clerk/clerk-react';
 import { 
@@ -24,10 +24,13 @@ import {
   FaFilter
 } from 'react-icons/fa';
 import { BarChart, ProgressBar, LineChart, DoughnutChart } from '@/components/custom/ChartComponents';
+import AIRecommendationCard from "@/components/custom/AIRecommendationCard";
+import { useAIRecommendations } from "@/hooks/useAIRecommendations";
 import toast from 'react-hot-toast';
 
 const SleepTracker = () => {
   const { user } = useUser();
+  const { recommendations } = useAIRecommendations();
   const [sleepLogs, setSleepLogs] = useState([]);
   const [filteredLogs, setFilteredLogs] = useState([]);
   const [stats, setStats] = useState({
@@ -43,13 +46,12 @@ const SleepTracker = () => {
   const [editingLog, setEditingLog] = useState(null);
   const [deletingLog, setDeletingLog] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [activeGraphView, setActiveGraphView] = useState('daily'); // daily, weekly, monthly
+  const [activeGraphView, setActiveGraphView] = useState('daily');
   const [currentPage, setCurrentPage] = useState(1);
   const [logsPerPage] = useState(10);
-  const [filterType, setFilterType] = useState('all'); // all, today, week, month
+  const [filterType, setFilterType] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
 
-  // Form states
   const [sleepForm, setSleepForm] = useState({
     startTime: '',
     endTime: '',
@@ -65,19 +67,132 @@ const SleepTracker = () => {
     { value: 'restless', label: 'Restless', color: 'from-red-400 to-pink-500', icon: '😵' }
   ];
 
-  const sleepGoal = 8; // hours
+  const [sleepGoal, setSleepGoal] = useState(8);
+  const [isEditingGoal, setIsEditingGoal] = useState(false);
+  const [editingGoalValue, setEditingGoalValue] = useState(8);
+
+  // Calculate duration in hours between two timestamps
+  const calculateDuration = (startTime, endTime) => {
+    const start = new Date(startTime);
+    const end = new Date(endTime);
+    return (end - start) / (1000 * 60 * 60); // Convert milliseconds to hours
+  };
+
+  // Recalculate all stats based on current sleep logs
+  const recalculateStats = useCallback(() => {
+    const now = new Date();
+    const today = now.toISOString().split('T')[0];
+    
+    // Find today's sleep log (should only be one)
+    const todayLog = sleepLogs.find(log => log.date === today);
+    
+    // Calculate weekly stats
+    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const weeklyLogs = sleepLogs.filter(log => {
+      const logDate = new Date(log.date);
+      return logDate >= weekAgo && logDate <= now;
+    });
+    
+    const weeklyTotal = weeklyLogs.reduce((sum, log) => sum + (log.duration || 0), 0);
+    const weeklyAverage = weeklyLogs.length > 0 ? weeklyTotal / weeklyLogs.length : 0;
+    
+    // Calculate monthly stats
+    const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const monthlyLogs = sleepLogs.filter(log => {
+      const logDate = new Date(log.date);
+      return logDate >= monthAgo && logDate <= now;
+    });
+    
+    const monthlyTotal = monthlyLogs.reduce((sum, log) => sum + (log.duration || 0), 0);
+    const monthlyAverage = monthlyLogs.length > 0 ? monthlyTotal / monthlyLogs.length : 0;
+    
+    // Update stats
+    setStats(prev => ({
+      ...prev,
+      today: {
+        duration: todayLog?.duration || 0,
+        quality: todayLog?.quality || null,
+        startTime: todayLog?.startTime || null,
+        endTime: todayLog?.endTime || null
+      },
+      weekly: {
+        total: weeklyTotal,
+        average: weeklyAverage,
+        count: weeklyLogs.length
+      },
+      monthly: {
+        total: monthlyTotal,
+        average: monthlyAverage,
+        count: monthlyLogs.length
+      }
+    }));
+
+    // Update today's sleep
+    setTodaySleep(todayLog || null);
+  }, [sleepLogs]);
 
   useEffect(() => {
     if (user) {
+      fetchUserData();
       fetchSleepData();
-      fetchSleepStats();
-      fetchTodaySleep();
     }
   }, [user]);
 
   useEffect(() => {
+    if (sleepLogs.length > 0) {
+      recalculateStats();
+    }
+  }, [sleepLogs, recalculateStats]);
+
+  useEffect(() => {
     applyFilters();
   }, [sleepLogs, filterType]);
+
+  const fetchUserData = async () => {
+    if (!user) return;
+    
+    try {
+      const response = await fetch(`http://localhost:5000/api/user/profile?userId=${user.id}`);
+      const data = await response.json();
+      
+      if (response.ok && data.user) {
+        setSleepGoal(data.user.sleepGoal || 8);
+        setEditingGoalValue(data.user.sleepGoal || 8);
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
+
+  const updateSleepGoal = async () => {
+    if (!user) return;
+    
+    try {
+      const response = await fetch(`http://localhost:5000/api/user/sleepGoal`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          sleepGoal: editingGoalValue
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        setSleepGoal(editingGoalValue);
+        setIsEditingGoal(false);
+        toast.success('Sleep goal updated successfully!');
+      } else {
+        toast.error(data.error || 'Failed to update sleep goal');
+      }
+    } catch (error) {
+      console.error('Error updating sleep goal:', error);
+      toast.error('Failed to update sleep goal');
+    }
+  };
 
   const fetchSleepData = async () => {
     if (!user) return;
@@ -90,7 +205,6 @@ const SleepTracker = () => {
       if (response.ok) {
         setSleepLogs(data.logs || []);
       } else {
-        console.error('Error fetching sleep data:', data.error);
         toast.error('Failed to fetch sleep data');
       }
     } catch (error) {
@@ -98,61 +212,6 @@ const SleepTracker = () => {
       toast.error('Failed to connect to server');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchSleepStats = async () => {
-    if (!user) return;
-    
-    try {
-      const response = await fetch(`http://localhost:5000/api/sleep/stats?userId=${user.id}`);
-      const data = await response.json();
-      
-      if (response.ok) {
-        setStats(data.stats);
-      } else {
-        console.error('Error fetching sleep stats:', data.error);
-      }
-    } catch (error) {
-      console.error('Error fetching sleep stats:', error);
-    }
-  };
-
-  const fetchTodaySleep = async () => {
-    if (!user) return;
-    
-    try {
-      const today = new Date().toISOString().split('T')[0];
-      const response = await fetch(`http://localhost:5000/api/sleep?userId=${user.id}&startDate=${today}&endDate=${today}`);
-      const data = await response.json();
-      
-      if (response.ok && data.logs && data.logs.length > 0) {
-        setTodaySleep(data.logs[0]);
-        // Update stats with today's data
-        setStats(prev => ({
-          ...prev,
-          today: {
-            duration: data.logs[0].duration || 0,
-            quality: data.logs[0].quality || null,
-            startTime: data.logs[0].startTime || null,
-            endTime: data.logs[0].endTime || null
-          }
-        }));
-      } else {
-        setTodaySleep(null);
-        // Reset today's stats if no data
-        setStats(prev => ({
-          ...prev,
-          today: {
-            duration: 0,
-            quality: null,
-            startTime: null,
-            endTime: null
-          }
-        }));
-      }
-    } catch (error) {
-      console.error('Error fetching today\'s sleep:', error);
     }
   };
 
@@ -186,9 +245,38 @@ const SleepTracker = () => {
       toast.error('Please fill in all required fields');
       return;
     }
-
+  
     try {
       setAddingSleep(true);
+      
+      // Calculate the date from startTime
+      const sleepDate = new Date(sleepForm.startTime).toISOString().split('T')[0];
+      const today = new Date().toISOString().split('T')[0];
+      
+      // Check if a sleep log already exists for the selected date
+      const existingLog = sleepLogs.find(log => log.date === sleepDate);
+      if (existingLog) {
+        // Show professional error message
+        const dateDisplay = sleepDate === today ? 'today' : `on ${new Date(sleepDate).toLocaleDateString('en-US', { 
+          weekday: 'long', 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        })}`;
+        
+        toast.error(`Sleep already logged for ${dateDisplay}. You can only have one sleep entry per day.`, {
+          duration: 5000,
+          icon: '😴',
+          style: {
+            background: '#1f2937',
+            color: '#f3f4f6',
+            border: '1px solid #ef4444',
+          },
+        });
+        setAddingSleep(false);
+        return;
+      }
+  
       const response = await fetch('http://localhost:5000/api/sleep', {
         method: 'POST',
         headers: {
@@ -199,17 +287,16 @@ const SleepTracker = () => {
           startTime: sleepForm.startTime,
           endTime: sleepForm.endTime,
           quality: sleepForm.quality,
-          notes: sleepForm.notes
+          notes: sleepForm.notes,
+          date: sleepDate // Ensure date is included
         }),
       });
-
+  
       const data = await response.json();
-
+  
       if (response.ok) {
         toast.success('Sleep log added successfully!');
-        fetchSleepData();
-        fetchSleepStats();
-        fetchTodaySleep();
+        await fetchSleepData();
         setShowAddModal(false);
         resetForm();
       } else {
@@ -226,6 +313,29 @@ const SleepTracker = () => {
   const updateSleep = async () => {
     if (!editingLog || !sleepForm.startTime || !sleepForm.endTime) {
       toast.error('Please fill in all required fields');
+      return;
+    }
+
+    // Check for date conflicts before updating
+    const selectedDate = new Date(sleepForm.startTime).toISOString().split('T')[0];
+    const originalDate = new Date(editingLog.startTime).toISOString().split('T')[0];
+    const existingLog = sleepLogs.find(log => log.date === selectedDate && log._id !== editingLog._id);
+    
+    if (existingLog) {
+      toast.error(`Cannot update to ${new Date(selectedDate).toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      })}. Another sleep log already exists for that date.`, {
+        duration: 5000,
+        icon: '😴',
+        style: {
+          background: '#1f2937',
+          color: '#f3f4f6',
+          border: '1px solid #ef4444',
+        },
+      });
       return;
     }
 
@@ -247,9 +357,7 @@ const SleepTracker = () => {
 
       if (response.ok) {
         toast.success('Sleep log updated successfully!');
-        fetchSleepData();
-        fetchSleepStats();
-        fetchTodaySleep();
+        await fetchSleepData(); // Refresh all data
         setEditingLog(null);
         resetForm();
       } else {
@@ -271,9 +379,7 @@ const SleepTracker = () => {
 
       if (response.ok) {
         toast.success('Sleep log deleted successfully!');
-        fetchSleepData();
-        fetchSleepStats();
-        fetchTodaySleep();
+        await fetchSleepData(); // Refresh all data
         setDeletingLog(null);
       } else {
         toast.error(data.error || 'Failed to delete sleep log');
@@ -330,87 +436,104 @@ const SleepTracker = () => {
 
   const getChartData = () => {
     if (activeGraphView === 'daily') {
-      const dailyData = Object.entries(stats.dailyBreakdown || {}).map(([date, duration]) => ({
-        label: new Date(date).toLocaleDateString('en-US', { weekday: 'short' }),
-        value: duration
-      })).slice(-7);
+      const today = new Date().toISOString().split('T')[0];
+      const todayLogs = sleepLogs.filter(log => log.date === today);
       
-      // Fill missing days with 0 values
-      const last7Days = [];
-      for (let i = 6; i >= 0; i--) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
-        const existingData = dailyData.find(d => d.label === dayName);
-        last7Days.push(existingData || { label: dayName, value: 0 });
+      if (todayLogs.length > 0) {
+        // For daily view, show only the single sleep log for today
+        const log = todayLogs[0];
+        return [{
+          label: 'Today\'s Sleep',
+          value: log.duration || 0
+        }];
+      } else {
+        return [{ label: 'No sleep logged today', value: 0 }];
       }
-      
-      return last7Days;
     } else if (activeGraphView === 'weekly') {
-      // Group by week
-      const weeklyData = [];
-      const sortedLogs = sleepLogs.sort((a, b) => new Date(a.date) - new Date(b.date));
+      const today = new Date();
+      const currentWeekStart = new Date(today);
+      const dayOfWeek = today.getDay();
+      currentWeekStart.setDate(today.getDate() - dayOfWeek);
       
-      let currentWeek = [];
-      let currentWeekStart = null;
-      
-      sortedLogs.forEach(log => {
+      // Get all sleep logs for the current week
+      const weekLogs = sleepLogs.filter(log => {
         const logDate = new Date(log.date);
-        const weekStart = new Date(logDate);
-        weekStart.setDate(logDate.getDate() - logDate.getDay());
-        
-        if (!currentWeekStart || weekStart.getTime() !== currentWeekStart.getTime()) {
-          if (currentWeek.length > 0) {
-            const avgDuration = currentWeek.reduce((sum, l) => sum + (l.duration || 0), 0) / currentWeek.length;
-            weeklyData.push({
-              label: `Week ${currentWeekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`,
-              value: Math.round(avgDuration * 100) / 100
-            });
-          }
-          currentWeek = [log];
-          currentWeekStart = weekStart;
-        } else {
-          currentWeek.push(log);
-        }
+        return logDate >= currentWeekStart && logDate <= today;
       });
       
-      if (currentWeek.length > 0) {
-        const avgDuration = currentWeek.reduce((sum, l) => sum + (l.duration || 0), 0) / currentWeek.length;
+      // Group by date and calculate total duration per day
+      const dailyTotals = {};
+      weekLogs.forEach(log => {
+        const dayKey = new Date(log.date).toDateString();
+        if (!dailyTotals[dayKey]) {
+          dailyTotals[dayKey] = 0;
+        }
+        dailyTotals[dayKey] += log.duration || 0;
+      });
+      
+      // Create weekly data array with all 7 days
+      const weeklyData = [];
+      for (let i = 0; i < 7; i++) {
+        const currentDate = new Date(currentWeekStart);
+        currentDate.setDate(currentWeekStart.getDate() + i);
+        const dayKey = currentDate.toDateString();
+        
         weeklyData.push({
-          label: `Week ${currentWeekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`,
-          value: Math.round(avgDuration * 100) / 100
+          label: currentDate.toLocaleDateString('en-US', { weekday: 'short' }),
+          value: dailyTotals[dayKey] || 0
         });
       }
       
-      return weeklyData.slice(-4);
+      return weeklyData;
     } else {
-      // Monthly view - quality distribution
-      const qualityData = Object.entries(stats.qualityDistribution || {}).map(([quality, count]) => ({
-        label: quality.charAt(0).toUpperCase() + quality.slice(1),
-        value: count
-      }));
+      // Monthly view - only show days with actual data
+      const today = new Date();
+      const currentMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+      const currentMonthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
       
-      // If no quality data, show default distribution
-      if (qualityData.length === 0) {
-        return [
-          { label: 'Good', value: 0 },
-          { label: 'Excellent', value: 0 },
-          { label: 'Fair', value: 0 },
-          { label: 'Poor', value: 0 },
-          { label: 'Restless', value: 0 }
-        ];
+      // Get all sleep logs for the current month
+      const monthLogs = sleepLogs.filter(log => {
+        const logDate = new Date(log.date);
+        return logDate.getMonth() === today.getMonth() && logDate.getFullYear() === today.getFullYear();
+      });
+      
+      // Group by date and calculate total duration per day
+      const dailyTotals = {};
+      monthLogs.forEach(log => {
+        const day = new Date(log.date).getDate();
+        if (!dailyTotals[day]) {
+          dailyTotals[day] = 0;
+        }
+        dailyTotals[day] += log.duration || 0;
+      });
+      
+      // Convert to chart data format, only including days with data
+      const monthlyData = Object.entries(dailyTotals)
+        .filter(([day, duration]) => duration > 0)
+        .map(([day, duration]) => ({
+          label: day,
+          value: duration
+        }))
+        .sort((a, b) => parseInt(a.label) - parseInt(b.label));
+      
+      // If no data, return empty state
+      if (monthlyData.length === 0) {
+        return [{ label: 'No sleep data this month', value: 0 }];
       }
       
-      return qualityData;
+      return monthlyData;
     }
   };
 
   const getChartComponent = () => {
     const data = getChartData();
-    if (activeGraphView === 'monthly') {
-      return <DoughnutChart data={data} height={200} />;
+    
+    if (activeGraphView === 'daily') {
+      return <BarChart data={data} height={250} color="from-blue-400 to-cyan-400" />;
+    } else if (activeGraphView === 'weekly') {
+      return <BarChart data={data} height={250} color="from-green-400 to-emerald-400" />;
     } else {
-      return <BarChart data={data} height={200} />;
+      return <BarChart data={data} height={300} color="from-purple-400 to-pink-400" />;
     }
   };
 
@@ -447,15 +570,24 @@ const SleepTracker = () => {
             <FaBed className="text-cyan-400" />
             Today's Sleep
           </h3>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setShowAddModal(true)}
-            className="w-full sm:w-auto p-3 bg-gradient-to-r from-cyan-400 to-purple-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200 log-sleep-btn"
-          >
-            <FaPlus className="inline mr-2" />
-            Log Sleep
-          </motion.button>
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            {todaySleep ? (
+              <div className="flex items-center gap-2 text-green-400 text-sm font-medium">
+                <FaCheckCircle />
+                Sleep logged for today
+              </div>
+            ) : (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setShowAddModal(true)}
+                className="w-full sm:w-auto p-3 bg-gradient-to-r from-cyan-400 to-purple-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200 log-sleep-btn"
+              >
+                <FaPlus className="inline mr-2" />
+                Log Sleep
+              </motion.button>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
@@ -472,13 +604,20 @@ const SleepTracker = () => {
                 <div className="text-white/60 text-sm mobile-text">Duration</div>
               </div>
             </div>
-            <ProgressBar 
-              value={stats.today.duration} 
-              max={sleepGoal} 
-              color="from-blue-400 to-cyan-500" 
-              showLabel={true}
-              label={`${Math.round(progressPercentage)}% of ${sleepGoal}h goal`}
-            />
+            {todaySleep ? (
+              <ProgressBar 
+                value={stats.today.duration} 
+                max={sleepGoal} 
+                color="from-blue-400 to-cyan-500" 
+                showLabel={true}
+                label={`${Math.round(progressPercentage)}% of ${sleepGoal}h goal`}
+              />
+            ) : (
+              <div className="text-center py-2">
+                <p className="text-white/60 text-sm">No sleep logged today</p>
+                <p className="text-cyan-400 text-xs mt-1">Click "Log Sleep" to get started</p>
+              </div>
+            )}
           </div>
 
           {/* Quality Card */}
@@ -591,16 +730,53 @@ const SleepTracker = () => {
               </div>
             </div>
             
-            {getChartData().length > 0 ? (
-              <div className="h-48 sm:h-56 md:h-64 w-full chart-container">
-                {getChartComponent()}
+            {(() => {
+              const chartData = getChartData();
+              const hasRealData = chartData.some(item => item.value > 0);
+              
+              if (hasRealData) {
+                return getChartComponent();
+              } else {
+                return (
+                  <div className="text-center text-white/60 py-8">
+                    <FaChartBar className="text-4xl mx-auto mb-2 opacity-50" />
+                    <p>No {activeGraphView === 'daily' ? 'sleep data for today' : activeGraphView === 'weekly' ? 'sleep data for this week' : 'sleep data for this month'}</p>
+                    <p className="text-sm mt-2">Start logging your sleep to see analytics</p>
+                  </div>
+                );
+              }
+            })()}
+            
+            {/* Chart Summary */}
+            <div className="mt-4 p-3 rounded-lg border border-white/20">
+              <div className="text-white/70 text-sm mb-1">
+                {activeGraphView === 'daily' && 'Today - Sleep Duration'}
+                {activeGraphView === 'weekly' && 'Current Week - Daily Breakdown'}
+                {activeGraphView === 'monthly' && 'Current Month - Sleep Days'}
               </div>
-            ) : (
-              <div className="text-center text-white/60 py-8">
-                <FaChartBar className="text-4xl mx-auto mb-2 opacity-50" />
-                <p>No sleep data available for charts</p>
+              <div className="text-white font-medium">
+                {(() => {
+                  const chartData = getChartData();
+                  const hasRealData = chartData.some(item => item.value > 0);
+                  if (hasRealData) {
+                    if (activeGraphView === 'daily') {
+                      const todayLog = chartData[0];
+                      return `Duration: ${formatDuration(todayLog.value)}`;
+                    } else if (activeGraphView === 'weekly') {
+                      const total = chartData.reduce((sum, item) => sum + (item.value || 0), 0);
+                      const daysWithData = chartData.filter(item => item.value > 0).length;
+                      return `Total: ${formatDuration(total)} (${daysWithData}/7 days logged)`;
+                    } else {
+                      const total = chartData.reduce((sum, item) => sum + (item.value || 0), 0);
+                      const count = chartData.length;
+                      return `Total: ${formatDuration(total)} (${count} sleep days)`;
+                    }
+                  } else {
+                    return 'No sleep data available';
+                  }
+                })()}
               </div>
-            )}
+            </div>
           </div>
         </motion.div>
 
@@ -657,15 +833,46 @@ const SleepTracker = () => {
 
           {/* Sleep Goals */}
           <div className="backdrop-blur-xl border border-white/20 rounded-2xl p-6">
-            <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-              <FaBed className="text-green-400" />
-              Sleep Goals
-            </h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <FaBed className="text-green-400" />
+                Sleep Goals
+              </h3>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => {
+                  if (isEditingGoal) {
+                    updateSleepGoal();
+                  } else {
+                    setIsEditingGoal(true);
+                  }
+                }}
+                className="p-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all duration-200"
+              >
+                {isEditingGoal ? <FaSave className="text-sm" /> : <FaEdit className="text-sm" />}
+              </motion.button>
+            </div>
             <div className="space-y-4">
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-white/70">Daily Goal</span>
-                  <span className="text-white font-medium">{sleepGoal}h</span>
+                  {isEditingGoal ? (
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        min="4"
+                        max="12"
+                        step="0.5"
+                        value={editingGoalValue}
+                        onChange={(e) => setEditingGoalValue(parseFloat(e.target.value))}
+                        className="w-16 p-1 bg-white/10 border border-white/20 rounded text-white text-center text-sm"
+                      />
+                      <span className="text-white font-medium">h</span>
+                    </div>
+                  ) : (
+                    <span className="text-white font-medium">{sleepGoal}h</span>
+                  )}
                 </div>
                 <ProgressBar 
                   value={stats.weekly.average} 
@@ -689,6 +896,21 @@ const SleepTracker = () => {
                   </div>
                 )}
               </div>
+              {isEditingGoal && (
+                <div className="flex items-center justify-center gap-2">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      setIsEditingGoal(false);
+                      setEditingGoalValue(sleepGoal);
+                    }}
+                    className="px-3 py-1 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all duration-200 text-sm"
+                  >
+                    Cancel
+                  </motion.button>
+                </div>
+              )}
             </div>
           </div>
         </motion.div>
@@ -918,6 +1140,33 @@ const SleepTracker = () => {
               </div>
 
               <div className="space-y-4">
+                {/* Date Validation Warning */}
+                {(() => {
+                  if (sleepForm.startTime) {
+                    const selectedDate = new Date(sleepForm.startTime).toISOString().split('T')[0];
+                    const existingLog = sleepLogs.find(log => log.date === selectedDate);
+                    if (existingLog) {
+                      return (
+                        <div className="p-3 bg-red-400/20 border border-red-400/30 rounded-xl">
+                          <div className="flex items-center gap-2 text-red-400">
+                            <FaExclamationTriangle />
+                            <span className="font-medium">Sleep Already Logged</span>
+                          </div>
+                          <p className="text-red-300 text-sm mt-1">
+                            You already have a sleep log for {new Date(selectedDate).toLocaleDateString('en-US', { 
+                              weekday: 'long', 
+                              year: 'numeric', 
+                              month: 'long', 
+                              day: 'numeric' 
+                            })}. Please choose a different date or edit your existing entry.
+                          </p>
+                        </div>
+                      );
+                    }
+                  }
+                  return null;
+                })()}
+                
                 <div>
                   <label className="block text-white font-medium mb-2">Start Time (Bedtime)</label>
                   <input
@@ -987,7 +1236,13 @@ const SleepTracker = () => {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={addSleep}
-                    disabled={addingSleep || !sleepForm.startTime || !sleepForm.endTime}
+                    disabled={addingSleep || !sleepForm.startTime || !sleepForm.endTime || (() => {
+                      if (sleepForm.startTime) {
+                        const selectedDate = new Date(sleepForm.startTime).toISOString().split('T')[0];
+                        return sleepLogs.some(log => log.date === selectedDate);
+                      }
+                      return false;
+                    })()}
                     className="flex-1 p-3 bg-gradient-to-r from-cyan-400 to-purple-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {addingSleep ? 'Adding...' : 'Log Sleep'}
@@ -1035,6 +1290,34 @@ const SleepTracker = () => {
               </div>
 
               <div className="space-y-4">
+                {/* Date Validation Warning for Edit */}
+                {(() => {
+                  if (sleepForm.startTime && editingLog) {
+                    const selectedDate = new Date(sleepForm.startTime).toISOString().split('T')[0];
+                    const originalDate = new Date(editingLog.startTime).toISOString().split('T')[0];
+                    const existingLog = sleepLogs.find(log => log.date === selectedDate && log._id !== editingLog._id);
+                    if (existingLog) {
+                      return (
+                        <div className="p-3 bg-red-400/20 border border-red-400/30 rounded-xl">
+                          <div className="flex items-center gap-2 text-red-400">
+                            <FaExclamationTriangle />
+                            <span className="font-medium">Date Conflict</span>
+                          </div>
+                          <p className="text-red-300 text-sm mt-1">
+                            You already have a sleep log for {new Date(selectedDate).toLocaleDateString('en-US', { 
+                              weekday: 'long', 
+                              year: 'numeric', 
+                              month: 'long', 
+                              day: 'numeric' 
+                            })}. Please choose a different date or edit the existing entry for that date.
+                          </p>
+                        </div>
+                      );
+                    }
+                  }
+                  return null;
+                })()}
+                
                 <div>
                   <label className="block text-white font-medium mb-2">Start Time (Bedtime)</label>
                   <input
@@ -1104,7 +1387,13 @@ const SleepTracker = () => {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={updateSleep}
-                    disabled={!sleepForm.startTime || !sleepForm.endTime}
+                    disabled={!sleepForm.startTime || !sleepForm.endTime || (() => {
+                      if (sleepForm.startTime && editingLog) {
+                        const selectedDate = new Date(sleepForm.startTime).toISOString().split('T')[0];
+                        return sleepLogs.some(log => log.date === selectedDate && log._id !== editingLog._id);
+                      }
+                      return false;
+                    })()}
                     className="flex-1 p-3 bg-gradient-to-r from-cyan-400 to-purple-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <FaSave className="inline mr-2" />

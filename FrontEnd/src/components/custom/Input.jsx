@@ -8,6 +8,8 @@ export const InputWithLabel = ({
   type = 'text',
   value,
   onChange,
+  disabled = false,
+  className = '',
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const shouldFloat = isFocused || value;
@@ -25,7 +27,8 @@ export const InputWithLabel = ({
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         required
-        className="w-full pl-12 pr-4 pt-5 pb-2 text-white bg-gradient-to-br from-[#0f172a] to-[#1e293b] border border-cyan-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-transparent"
+        disabled={disabled}
+        className={`w-full pl-12 pr-4 pt-5 pb-2 text-white bg-gradient-to-br from-[#0f172a] to-[#1e293b] border border-cyan-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-transparent ${className}`}
         placeholder={label}
       />
       <label

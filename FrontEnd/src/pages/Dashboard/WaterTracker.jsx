@@ -24,10 +24,13 @@ import {
   FaBed
 } from 'react-icons/fa';
 import { BarChart, ProgressBar, LineChart, DoughnutChart } from '@/components/custom/ChartComponents';
+import AIRecommendationCard from "@/components/custom/AIRecommendationCard";
+import { useAIRecommendations } from "@/hooks/useAIRecommendations";
 import toast from 'react-hot-toast';
 
 const WaterTracker = () => {
   const { user } = useUser();
+  const { recommendations } = useAIRecommendations();
   const [waterLogs, setWaterLogs] = useState([]);
   const [filteredLogs, setFilteredLogs] = useState([]);
   const [todayTotal, setTodayTotal] = useState(0);
@@ -322,84 +325,147 @@ const WaterTracker = () => {
     applyFilters();
   }, [filterType, customDateRange, waterLogs]);
 
+  // Debug: Monitor waterLogs changes
+  useEffect(() => {
+    console.log("💧 WaterLogs updated:", {
+      count: waterLogs.length,
+      sample: waterLogs.slice(0, 2),
+      activeGraphView
+    });
+  }, [waterLogs, activeGraphView]);
+
   // Chart data generation functions
   const generateDailyChartData = () => {
     const today = new Date();
-    const last7Days = [];
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const todayEnd = new Date(todayStart);
+    todayEnd.setDate(todayStart.getDate() + 1);
     
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
-      
-      const dayLogs = waterLogs.filter(log => {
-        const logDate = new Date(log.timestamp);
-        return logDate.toDateString() === date.toDateString();
-      });
-      
-      const totalAmount = dayLogs.reduce((sum, log) => sum + log.amount, 0);
-      
-      last7Days.push({
-        label: date.toLocaleDateString('en-US', { weekday: 'short' }),
-        value: totalAmount
-      });
-    }
+    // Get hourly breakdown for today only
+    const hourlyData = Array(24).fill(0);
     
-    return last7Days;
+    const todayLogs = waterLogs.filter(log => {
+      const logDate = new Date(log.timestamp);
+      return logDate >= todayStart && logDate < todayEnd;
+    });
+    
+    todayLogs.forEach(log => {
+      const hour = new Date(log.timestamp).getHours();
+      hourlyData[hour] += log.amount;
+    });
+    
+    return hourlyData.map((amount, hour) => ({
+      label: `${hour}:00`,
+      value: amount || 0
+    }));
   };
 
   const generateWeeklyChartData = () => {
-    const weeks = [];
     const today = new Date();
     
-    for (let i = 3; i >= 0; i--) {
-      const weekStart = new Date(today);
-      weekStart.setDate(today.getDate() - (7 * i));
-      weekStart.setDate(weekStart.getDate() - weekStart.getDay()); // Start of week (Sunday)
+    // Calculate the start of the current week (Sunday)
+    const currentWeekStart = new Date(today);
+    const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
+    currentWeekStart.setDate(today.getDate() - dayOfWeek);
+    
+    // Calculate the end of the current week (Saturday)
+    const currentWeekEnd = new Date(currentWeekStart);
+    currentWeekEnd.setDate(currentWeekStart.getDate() + 6);
+    
+    const days = [];
+    
+    // Generate data for each day of the current week
+    for (let i = 0; i < 7; i++) {
+      const currentDate = new Date(currentWeekStart);
+      currentDate.setDate(currentWeekStart.getDate() + i);
       
-      const weekEnd = new Date(weekStart);
-      weekEnd.setDate(weekStart.getDate() + 6); // End of week (Saturday)
-      
-      const weekLogs = waterLogs.filter(log => {
+      const dayLogs = waterLogs.filter(log => {
         const logDate = new Date(log.timestamp);
-        return logDate >= weekStart && logDate <= weekEnd;
+        return logDate.toDateString() === currentDate.toDateString();
       });
       
-      const totalAmount = weekLogs.reduce((sum, log) => sum + log.amount, 0);
+      const totalAmount = dayLogs.reduce((sum, log) => sum + (log.amount || 0), 0);
       
-      // Create a more descriptive label
-      const weekLabel = `${weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${weekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
-      
-      weeks.push({
-        label: weekLabel,
-        value: totalAmount
+      days.push({
+        label: currentDate.toLocaleDateString('en-US', { weekday: 'short' }),
+        value: totalAmount || 0
       });
     }
     
-    return weeks;
+    return days;
   };
 
   const generateMonthlyChartData = () => {
-    const months = [];
     const today = new Date();
+    const currentMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+    const currentMonthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
     
-    for (let i = 5; i >= 0; i--) {
-      const month = new Date(today.getFullYear(), today.getMonth() - i, 1);
-      const monthEnd = new Date(month.getFullYear(), month.getMonth() + 1, 0);
+    // Check if we have any water logs at all
+    if (waterLogs.length === 0) {
+      console.log('⚠️ No water logs available for monthly chart');
+      return [];
+    }
+    
+    console.log('📅 Monthly Chart Debug:', {
+      today: today.toDateString(),
+      currentMonthStart: currentMonthStart.toDateString(),
+      currentMonthEnd: currentMonthEnd.toDateString(),
+      daysInMonth: currentMonthEnd.getDate(),
+      totalWaterLogs: waterLogs.length,
+      waterLogsSample: waterLogs.slice(0, 3), // Show first 3 logs for debugging
+      firstLogDate: waterLogs[0] ? new Date(waterLogs[0].timestamp).toDateString() : 'No logs',
+      lastLogDate: waterLogs[waterLogs.length - 1] ? new Date(waterLogs[waterLogs.length - 1].timestamp).toDateString() : 'No logs'
+    });
+    
+    const days = [];
+    
+    // Get the number of days in the current month
+    const daysInCurrentMonth = currentMonthEnd.getDate();
+    
+    for (let i = 1; i <= daysInCurrentMonth; i++) {
+      const currentDate = new Date(currentMonthStart.getFullYear(), currentMonthStart.getMonth(), i);
       
-      const monthLogs = waterLogs.filter(log => {
+      const dayLogs = waterLogs.filter(log => {
         const logDate = new Date(log.timestamp);
-        return logDate >= month && logDate <= monthEnd;
+        const isSameDay = logDate.toDateString() === currentDate.toDateString();
+        
+        // Debug logging for first few days
+        if (i <= 3) {
+          console.log(`🔍 Day ${i} filtering:`, {
+            currentDate: currentDate.toDateString(),
+            logDate: logDate.toDateString(),
+            isSameDay,
+            logAmount: log.amount
+          });
+        }
+        
+        return isSameDay;
       });
       
-      const totalAmount = monthLogs.reduce((sum, log) => sum + log.amount, 0);
+      const totalAmount = dayLogs.reduce((sum, log) => sum + (log.amount || 0), 0);
       
-      months.push({
-        label: month.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }),
-        value: totalAmount
+      // Create better labels for the monthly view
+      const dayLabel = `${i}${getDaySuffix(i)}`;
+      
+      days.push({
+        label: dayLabel,
+        value: totalAmount || 0
       });
     }
     
-    return months;
+    console.log('📊 Monthly Chart Data:', days);
+    return days;
+  };
+
+  // Helper function to add ordinal suffix to day numbers
+  const getDaySuffix = (day) => {
+    if (day >= 11 && day <= 13) return 'th';
+    switch (day % 10) {
+      case 1: return 'st';
+      case 2: return 'nd';
+      case 3: return 'rd';
+      default: return 'th';
+    }
   };
 
   const generateHourlyDistributionData = () => {
@@ -432,13 +498,13 @@ const WaterTracker = () => {
   const getChartComponent = () => {
     switch (activeGraphView) {
       case 'daily':
-        return <BarChart data={getChartData()} height={200} color="from-blue-400 to-cyan-400" />;
+        return <LineChart data={getChartData()} height={200} color="from-blue-400 to-cyan-400" />;
       case 'weekly':
-        return <LineChart data={getChartData()} height={200} color="from-green-400 to-emerald-400" />;
+        return <BarChart data={getChartData()} height={200} color="from-green-400 to-emerald-400" />;
       case 'monthly':
-        return <DoughnutChart data={getChartData()} height={200} />;
+        return <BarChart data={getChartData()} height={300} color="from-purple-400 to-pink-400" />;
       default:
-        return <BarChart data={getChartData()} height={200} color="from-blue-400 to-cyan-400" />;
+        return <LineChart data={getChartData()} height={200} color="from-blue-400 to-cyan-400" />;
     }
   };
 
@@ -613,13 +679,39 @@ const WaterTracker = () => {
         </motion.button>
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* AI Recommendations */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.1 }}
+          className="backdrop-blur-xl border border-white/20 rounded-2xl p-6"
+        >
+          <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <FaTint className="text-blue-400" />
+            AI Hydration Tips
+          </h3>
+          {recommendations?.hydration ? (
+            <AIRecommendationCard
+              title="Hydration"
+              recommendation={recommendations.hydration}
+              feature="hydration"
+              userId={user?.id}
+            />
+          ) : (
+            <div className="text-center py-4">
+              <p className="text-white/60 mb-2">No AI recommendations available yet.</p>
+              <p className="text-white/40 text-sm">Complete your onboarding to get personalized AI recommendations.</p>
+            </div>
+          )}
+        </motion.div>
+
         {/* Enhanced Charts Section */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
-          className="backdrop-blur-xl border border-white/20 rounded-2xl p-6"
+          className="lg:col-span-2 backdrop-blur-xl border border-white/20 rounded-2xl p-6"
         >
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-bold text-white flex items-center gap-2">
@@ -672,22 +764,22 @@ const WaterTracker = () => {
           </div>
           
           {getChartData().length > 0 ? (
-            <div className="h-64">
+            <div className={`h-${activeGraphView === 'monthly' ? '80' : '64'}`}>
               {getChartComponent()}
             </div>
           ) : (
             <div className="text-center text-white/60 py-8">
               <FaChartBar className="text-4xl mx-auto mb-2 opacity-50" />
-              <p>No data yet. Start tracking your water intake!</p>
+              <p>No data available for {activeGraphView === 'daily' ? 'today' : activeGraphView === 'weekly' ? 'this week' : 'this month'}. Start tracking your water intake!</p>
             </div>
           )}
           
           {/* Chart Summary */}
           <div className="mt-4 p-3 rounded-lg border border-white/20">
             <div className="text-white/70 text-sm mb-1">
-              {activeGraphView === 'daily' && 'Last 7 Days'}
-              {activeGraphView === 'weekly' && 'Last 4 Weeks'}
-              {activeGraphView === 'monthly' && 'Last 6 Months'}
+              {activeGraphView === 'daily' && 'Today - Hourly Breakdown'}
+              {activeGraphView === 'weekly' && 'Current Week - Daily Breakdown'}
+              {activeGraphView === 'monthly' && 'Current Month - Daily Breakdown'}
             </div>
             <div className="text-white font-medium">
               Total: {getChartData().reduce((sum, item) => sum + item.value, 0)}ml

@@ -1,12 +1,14 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { InputWithLabel } from './Input';
 import { TextAreaWithLabel } from './Textarea';
 import { FaUser, FaEnvelope, FaCommentDots } from 'react-icons/fa';
 import { Contact } from '@/assets/Assets';
+import { useUser } from '@clerk/clerk-react';
 
 export default function ContactPage() {
+  const { user, isLoaded } = useUser();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -14,12 +16,24 @@ export default function ContactPage() {
   });
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Auto-populate email and name if user is authenticated
+  useEffect(() => {
+    if (isLoaded && user) {
+      setFormData(prev => ({
+        ...prev,
+        email: user.primaryEmailAddress?.emailAddress || '',
+        name: user.fullName || user.firstName || ''
+      }));
+    }
+  }, [isLoaded, user]);
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const { name, email, message } = formData;
 
@@ -28,11 +42,32 @@ export default function ContactPage() {
       return;
     }
 
-    setTimeout(() => {
-      setSubmitted(true);
-      setFormData({ name: '', email: '', message: '' });
+    try {
       setError('');
-    }, 500);
+      setIsLoading(true);
+      
+      const response = await fetch('http://localhost:5000/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, message }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSubmitted(true);
+        setFormData({ name: '', email: '', message: '' });
+      } else {
+        setError(data.message || 'Failed to send message. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error sending contact form:', error);
+      setError('Network error. Please check your connection and try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -57,6 +92,11 @@ export default function ContactPage() {
           Got questions, ideas, or just want to chat? We’d love to hear from
           you. Fill the form below and we’ll get back to you in no time.
         </p>
+        {isLoaded && !user && (
+          <p className="text-sm text-cyan-400/80 mt-2">
+            💡 Sign in to auto-fill your contact information for a faster experience!
+          </p>
+        )}
       </motion.div>
 
       {/* Content */}
@@ -92,7 +132,15 @@ export default function ContactPage() {
             value={formData.name}
             onChange={handleChange}
             icon={<FaUser />}
+            disabled={isLoaded && user}
+            className={isLoaded && user ? "opacity-75 cursor-not-allowed" : ""}
           />
+          {isLoaded && user && (
+            <div className="text-cyan-400 text-sm flex items-center gap-2">
+              <FaUser />
+              <span>Using your authenticated name: {user.fullName || user.firstName}</span>
+            </div>
+          )}
           <InputWithLabel
             label="Email"
             name="email"
@@ -100,7 +148,15 @@ export default function ContactPage() {
             onChange={handleChange}
             icon={<FaEnvelope />}
             type="email"
+            disabled={isLoaded && user}
+            className={isLoaded && user ? "opacity-75 cursor-not-allowed" : ""}
           />
+          {isLoaded && user && (
+            <div className="text-cyan-400 text-sm flex items-center gap-2">
+              <FaEnvelope />
+              <span>Using your authenticated email: {user.primaryEmailAddress?.emailAddress}</span>
+            </div>
+          )}
           <TextAreaWithLabel
             label="Message"
             name="message"
@@ -112,9 +168,12 @@ export default function ContactPage() {
                      <motion.button
              whileTap={{ scale: 0.97 }}
              whileHover={{ scale: 1.02 }}
-             className="bg-gradient-to-r from-cyan-400 to-purple-400 hover:from-cyan-500 hover:to-purple-500 transition-all duration-200 text-white font-semibold py-3 rounded-md shadow-lg w-full"
+             disabled={isLoading}
+             className={`bg-gradient-to-r from-cyan-400 to-purple-400 hover:from-cyan-500 hover:to-purple-500 transition-all duration-200 text-white font-semibold py-3 rounded-md shadow-lg w-full ${
+               isLoading ? 'opacity-50 cursor-not-allowed' : ''
+             }`}
            >
-             Send Message
+             {isLoading ? 'Sending...' : 'Send Message'}
            </motion.button>
 
           {/* Error Display */}
