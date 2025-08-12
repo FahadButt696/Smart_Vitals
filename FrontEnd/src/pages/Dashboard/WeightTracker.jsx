@@ -1151,6 +1151,32 @@ const WeightTracker = () => {
         </motion.div>
       </div>
 
+      {/* AI Weight Recommendations */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.35 }}
+        className="backdrop-blur-xl border border-white/20 rounded-2xl p-6 mt-8"
+      >
+        <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+          <FaWeight className="text-purple-400" />
+          AI Weight Management Tips
+        </h3>
+        {recommendations?.weightProgress ? (
+          <AIRecommendationCard
+            title="Weight Management"
+            recommendation={recommendations.weightProgress}
+            feature="weightProgress"
+            userId={user?.id}
+          />
+        ) : (
+          <div className="text-center py-4">
+            <p className="text-white/60 mb-2">No AI recommendations available yet.</p>
+            <p className="text-white/40 text-sm">Complete your onboarding to get personalized AI recommendations.</p>
+          </div>
+        )}
+      </motion.div>
+
       {/* Recent Weight Logs */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}

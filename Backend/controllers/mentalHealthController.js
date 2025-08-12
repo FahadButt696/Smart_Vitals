@@ -197,13 +197,13 @@ export const sendMessage = async (req, res) => {
     } catch (aiError) {
       console.error("AI Generation Error:", aiError);
       
-      // Enhanced error logging
-      if (aiError.message) {
-        console.error("AI Error Message:", aiError.message);
-      }
-      if (aiError.stack) {
-        console.error("AI Error Stack:", aiError.stack);
-      }
+      // Instead of immediately using fallback, let the frontend handle it
+      res.status(500).json({ 
+        error: "AI service error",
+        message: aiError.message || 'Failed to generate response',
+        shouldUseFallback: true
+      });
+
       
       // Use enhanced fallback response
       const fallbackResponse = generateFallbackResponse(sanitizedMessage);

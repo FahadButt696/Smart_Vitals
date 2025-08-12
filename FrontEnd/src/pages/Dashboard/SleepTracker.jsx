@@ -913,6 +913,27 @@ const SleepTracker = () => {
               )}
             </div>
           </div>
+
+          {/* AI Sleep Recommendations */}
+          <div className="backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+            <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+              <FaBed className="text-cyan-400" />
+              AI Sleep Tips
+            </h3>
+            {recommendations?.sleepTracker ? (
+              <AIRecommendationCard
+                title="Sleep & Recovery"
+                recommendation={recommendations.sleepTracker}
+                feature="sleepTracker"
+                userId={user?.id}
+              />
+            ) : (
+              <div className="text-center py-4">
+                <p className="text-white/60 mb-2 text-sm">No AI recommendations available yet.</p>
+                <p className="text-white/40 text-xs">Complete your onboarding to get personalized AI recommendations.</p>
+              </div>
+            )}
+          </div>
         </motion.div>
       </div>
 
@@ -1111,7 +1132,7 @@ const SleepTracker = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 modal-backdrop"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4 modal-backdrop"
             onClick={() => {
               setShowAddModal(false);
               resetForm();
@@ -1122,10 +1143,10 @@ const SleepTracker = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-gradient-to-br from-gray-900/95 to-black/95 backdrop-blur-xl border border-white/20 rounded-2xl p-6 w-full max-w-md"
+              className="bg-gradient-to-br from-gray-900/95 to-black/95 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6 w-full max-w-sm sm:max-w-md lg:max-w-lg max-h-[90vh] overflow-y-auto"
             >
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-white">Log Sleep</h3>
+              <div className="flex items-center justify-between mb-4 sm:mb-6">
+                <h3 className="text-lg sm:text-xl font-bold text-white">Log Sleep</h3>
                 <motion.button
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
@@ -1139,7 +1160,7 @@ const SleepTracker = () => {
                 </motion.button>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {/* Date Validation Warning */}
                 {(() => {
                   if (sleepForm.startTime) {
@@ -1150,9 +1171,9 @@ const SleepTracker = () => {
                         <div className="p-3 bg-red-400/20 border border-red-400/30 rounded-xl">
                           <div className="flex items-center gap-2 text-red-400">
                             <FaExclamationTriangle />
-                            <span className="font-medium">Sleep Already Logged</span>
+                            <span className="font-medium text-sm sm:text-base">Sleep Already Logged</span>
                           </div>
-                          <p className="text-red-300 text-sm mt-1">
+                          <p className="text-red-300 text-xs sm:text-sm mt-1">
                             You already have a sleep log for {new Date(selectedDate).toLocaleDateString('en-US', { 
                               weekday: 'long', 
                               year: 'numeric', 
@@ -1168,59 +1189,59 @@ const SleepTracker = () => {
                 })()}
                 
                 <div>
-                  <label className="block text-white font-medium mb-2">Start Time (Bedtime)</label>
+                  <label className="block text-white font-medium mb-2 text-sm sm:text-base">Start Time (Bedtime)</label>
                   <input
                     type="datetime-local"
                     value={sleepForm.startTime}
                     onChange={(e) => setSleepForm(prev => ({ ...prev, startTime: e.target.value }))}
-                    className="w-full p-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-cyan-400 transition-colors"
+                    className="w-full p-2 sm:p-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-cyan-400 transition-colors text-sm sm:text-base"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-white font-medium mb-2">End Time (Wake Time)</label>
+                  <label className="block text-white font-medium mb-2 text-sm sm:text-base">End Time (Wake Time)</label>
                   <input
                     type="datetime-local"
                     value={sleepForm.endTime}
                     onChange={(e) => setSleepForm(prev => ({ ...prev, endTime: e.target.value }))}
-                    className="w-full p-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-cyan-400 transition-colors"
+                    className="w-full p-2 sm:p-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-cyan-400 transition-colors text-sm sm:text-base"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-white font-medium mb-2">Sleep Quality</label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <label className="block text-white font-medium mb-2 text-sm sm:text-base">Sleep Quality</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {qualityOptions.map((option) => (
                       <motion.button
                         key={option.value}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => setSleepForm(prev => ({ ...prev, quality: option.value }))}
-                        className={`p-3 rounded-xl border transition-all duration-200 ${
+                        className={`p-2 sm:p-3 rounded-xl border transition-all duration-200 ${
                           sleepForm.quality === option.value
                             ? `bg-gradient-to-r ${option.color} border-white/30 text-white`
                             : 'bg-white/10 border-white/20 text-white/70 hover:bg-white/20'
                         }`}
                       >
-                        <div className="text-lg mb-1">{option.icon}</div>
-                        <div className="text-sm font-medium">{option.label}</div>
+                        <div className="text-base sm:text-lg mb-1">{option.icon}</div>
+                        <div className="text-xs sm:text-sm font-medium">{option.label}</div>
                       </motion.button>
                     ))}
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-white font-medium mb-2">Notes (Optional)</label>
+                  <label className="block text-white font-medium mb-2 text-sm sm:text-base">Notes (Optional)</label>
                   <textarea
                     value={sleepForm.notes}
                     onChange={(e) => setSleepForm(prev => ({ ...prev, notes: e.target.value }))}
                     placeholder="How was your sleep? Any dreams, disturbances, etc."
-                    rows={3}
-                    className="w-full p-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-cyan-400 transition-colors resize-none"
+                    rows={2}
+                    className="w-full p-2 sm:p-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-cyan-400 transition-colors resize-none text-sm sm:text-base"
                   />
                 </div>
 
-                <div className="flex gap-3 pt-4">
+                <div className="flex gap-2 sm:gap-3 pt-3 sm:pt-4">
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -1228,7 +1249,7 @@ const SleepTracker = () => {
                       setShowAddModal(false);
                       resetForm();
                     }}
-                    className="flex-1 p-3 bg-white/10 text-white rounded-xl font-medium hover:bg-white/20 transition-all duration-200"
+                    className="flex-1 p-2 sm:p-3 bg-white/10 text-white rounded-xl font-medium hover:bg-white/20 transition-all duration-200 text-sm sm:text-base"
                   >
                     Cancel
                   </motion.button>
@@ -1243,7 +1264,7 @@ const SleepTracker = () => {
                       }
                       return false;
                     })()}
-                    className="flex-1 p-3 bg-gradient-to-r from-cyan-400 to-purple-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 p-2 sm:p-3 bg-gradient-to-r from-cyan-400 to-purple-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
                   >
                     {addingSleep ? 'Adding...' : 'Log Sleep'}
                   </motion.button>
@@ -1261,7 +1282,7 @@ const SleepTracker = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 modal-backdrop"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4 modal-backdrop"
             onClick={() => {
               setEditingLog(null);
               resetForm();
@@ -1272,10 +1293,10 @@ const SleepTracker = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-gradient-to-br from-gray-900/95 to-black/95 backdrop-blur-xl border border-white/20 rounded-2xl p-6 w-full max-w-md"
+              className="bg-gradient-to-br from-gray-900/95 to-black/95 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6 w-full max-w-sm sm:max-w-md lg:max-w-lg max-h-[90vh] overflow-y-auto"
             >
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-white">Edit Sleep</h3>
+              <div className="flex items-center justify-between mb-4 sm:mb-6">
+                <h3 className="text-lg sm:text-xl font-bold text-white">Edit Sleep</h3>
                 <motion.button
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
@@ -1413,7 +1434,7 @@ const SleepTracker = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 modal-backdrop"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4 modal-backdrop"
             onClick={() => setDeletingLog(null)}
           >
             <motion.div
@@ -1421,22 +1442,22 @@ const SleepTracker = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-gradient-to-br from-gray-900/95 to-black/95 backdrop-blur-xl border border-white/20 rounded-2xl p-6 w-full max-w-sm"
+              className="bg-gradient-to-br from-gray-900/95 to-black/95 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6 w-full max-w-xs sm:max-w-sm"
             >
               <div className="text-center">
-                <div className="p-3 bg-red-400/20 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                  <FaExclamationTriangle className="text-red-400 text-2xl" />
+                <div className="p-3 bg-red-400/20 rounded-full w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 flex items-center justify-center">
+                  <FaExclamationTriangle className="text-red-400 text-xl sm:text-2xl" />
                 </div>
-                <h3 className="text-lg font-bold text-white mb-2">Delete Sleep Log</h3>
-                <p className="text-white/70 mb-6">
+                <h3 className="text-base sm:text-lg font-bold text-white mb-2">Delete Sleep Log</h3>
+                <p className="text-white/70 mb-4 sm:mb-6 text-sm sm:text-base">
                   Are you sure you want to delete this sleep log? This action cannot be undone.
                 </p>
-                <div className="flex gap-3">
+                <div className="flex gap-2 sm:gap-3">
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setDeletingLog(null)}
-                    className="flex-1 p-3 bg-white/10 text-white rounded-xl font-medium hover:bg-white/20 transition-all duration-200"
+                    className="flex-1 p-2 sm:p-3 bg-white/10 text-white rounded-xl font-medium hover:bg-white/20 transition-all duration-200 text-sm sm:text-base"
                   >
                     Cancel
                   </motion.button>
@@ -1444,7 +1465,7 @@ const SleepTracker = () => {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => deleteSleep(deletingLog._id)}
-                    className="flex-1 p-3 bg-gradient-to-r from-red-400 to-pink-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
+                    className="flex-1 p-2 sm:p-3 bg-gradient-to-r from-red-400 to-pink-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200 text-sm sm:text-base"
                   >
                     Delete
                   </motion.button>

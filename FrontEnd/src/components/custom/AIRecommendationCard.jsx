@@ -84,12 +84,7 @@ const AIRecommendationCard = ({
           {recommendation}
         </p>
         
-        <div className="flex items-center justify-between pt-2 border-t border-white/10">
-          <div className="flex items-center gap-2 text-xs text-white/60">
-            <span>Click to learn more</span>
-          </div>
-          <ArrowRight className="w-4 h-4 text-cyan-400 group-hover:translate-x-1 transition-transform duration-300" />
-        </div>
+       
       </div>
     </motion.div>
   );

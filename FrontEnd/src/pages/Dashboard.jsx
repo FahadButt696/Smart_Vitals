@@ -527,7 +527,7 @@ const DashboardOverview = () => {
           Quick Access to Features
         </h3>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
           {featureCards.map((feature, index) => (
             <motion.div
               key={feature.title}
@@ -536,22 +536,19 @@ const DashboardOverview = () => {
               transition={{ delay: index * 0.1 }}
               whileHover={{ scale: 1.02, y: -5 }}
               onClick={() => handleNavigation(feature.route)}
-              className="backdrop-blur-xl border border-white/20 rounded-2xl p-6 cursor-pointer hover:shadow-xl transition-all duration-300 group feature-card"
+              className="backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6 cursor-pointer hover:shadow-xl transition-all duration-300 group feature-card"
             >
               <div className="flex items-start justify-between mb-4">
-                <div className={`p-3 rounded-xl bg-gradient-to-r ${feature.color} group-hover:scale-110 transition-transform duration-300`}>
-                  <feature.icon className="text-white text-xl" />
+                <div className={`p-2 sm:p-3 rounded-xl bg-gradient-to-r ${feature.color} group-hover:scale-110 transition-transform duration-300`}>
+                  <feature.icon className="text-white text-lg sm:text-xl" />
                 </div>
-                <ArrowRight className="text-white/40 group-hover:text-white group-hover:translate-x-1 transition-all duration-300" />
+                <ArrowRight className="text-white/40 group-hover:text-white group-hover:translate-x-1 transition-all duration-300 ml-3 sm:ml-auto mt-2" />
               </div>
               
-              <h4 className="text-white font-semibold text-lg mb-2">{feature.title}</h4>
-              <p className="text-white/70 text-sm mb-4">{feature.description}</p>
+              <h4 className="text-white font-semibold text-base sm:text-lg mb-2">{feature.title}</h4>
+              {/* <p className="text-white/70 text-xs sm:text-sm mb-3 sm:mb-4">{feature.description}</p> */}
               
-              <div className="flex items-center justify-between">
-                <span className="text-white/60 text-xs">{feature.stats}</span>
-                <div className="text-white/40 text-xs">Click to open</div>
-              </div>
+                            
             </motion.div>
           ))}
         </div>

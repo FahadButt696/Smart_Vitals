@@ -148,3 +148,4 @@ FrontEnd/src/
 - Lucide React (for icons)
 - Tailwind CSS (for styling)
 - Clerk (for authentication)
+

@@ -593,4 +593,178 @@ textarea:focus {
   to {
     box-shadow: 0 0 30px rgba(6, 182, 212, 0.6);
   }
+}
+
+/* Modal responsiveness improvements */
+.modal-backdrop {
+  padding: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .modal-backdrop {
+    padding: 1rem;
+  }
+}
+
+/* Ensure modals don't overflow on small screens */
+.modal-content {
+  max-height: 90vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Better form input sizing on mobile */
+@media (max-width: 640px) {
+  input[type="datetime-local"],
+  textarea,
+  select {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+  
+  .modal-content {
+    margin: 0.5rem;
+    max-width: calc(100vw - 1rem);
+  }
+}
+
+/* Quality option grid improvements */
+.quality-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .quality-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+}
+
+/* Button sizing improvements */
+.btn-responsive {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+@media (min-width: 640px) {
+  .btn-responsive {
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+  }
+}
+
+/* Dashboard responsive improvements */
+@media (max-width: 768px) {
+  .dashboard-title {
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+  
+  .dashboard-subtitle {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+  
+  .feature-card-title {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+  
+  .feature-card-description {
+    font-size: 0.75rem;
+    line-height: 1.125rem;
+  }
+  
+  .stats-value {
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+  
+  .stats-label {
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+  
+  .chart-title {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+  
+  .ai-recommendation-title {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+  
+  .ai-recommendation-content {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+}
+
+/* Ensure text doesn't overflow on small screens */
+.text-overflow-safe {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Better spacing for mobile */
+@media (max-width: 640px) {
+  .mobile-spacing {
+    margin-bottom: 1rem;
+  }
+  
+  .mobile-padding {
+    padding: 1rem;
+  }
+  
+  .mobile-gap {
+    gap: 0.75rem;
+  }
+}
+
+/* Improved grid responsiveness */
+@media (max-width: 640px) {
+  .responsive-grid-1 {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .responsive-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1025px) {
+  .responsive-grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Better chart responsiveness */
+.chart-responsive {
+  min-height: 200px;
+  max-height: 400px;
+}
+
+@media (max-width: 640px) {
+  .chart-responsive {
+    min-height: 150px;
+    max-height: 300px;
+  }
+}
+
+/* Improved AI recommendation card responsiveness */
+.ai-recommendation-mobile {
+  padding: 1rem;
+  margin: 0.5rem;
+}
+
+@media (min-width: 641px) {
+  .ai-recommendation-mobile {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
 } 

@@ -219,6 +219,27 @@ const MentalHealth = () => {
           </div>
         </div>
 
+        {/* AI Mental Health Recommendations */}
+        <div className="backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+          <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+            <Brain className="text-cyan-400" />
+            AI Mental Health Tips
+          </h3>
+          {recommendations?.mentalHealthChatbot ? (
+            <AIRecommendationCard
+              title="Mental Health"
+              recommendation={recommendations.mentalHealthChatbot}
+              feature="mentalHealthChatbot"
+              userId={user?.id}
+            />
+          ) : (
+            <div className="text-center py-4">
+              <p className="text-white/60 mb-2">No AI recommendations available yet.</p>
+              <p className="text-white/40 text-sm">Complete your onboarding to get personalized AI recommendations.</p>
+            </div>
+          )}
+        </div>
+
         {/* Quick Actions */}
         <div className="backdrop-blur-xl border border-white/20 rounded-2xl p-6">
           <h3 className="text-xl font-bold text-white mb-6">Quick Actions</h3>

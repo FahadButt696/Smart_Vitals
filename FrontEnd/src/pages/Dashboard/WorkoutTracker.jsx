@@ -1282,6 +1282,27 @@ const WorkoutTracker = () => {
                   </button>
                 </div>
               )}
+
+              {/* AI Workout Recommendations */}
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                <h3 className="text-white text-xl font-semibold mb-4 flex items-center gap-2">
+                  <Dumbbell className="text-cyan-400" />
+                  AI Workout Tips
+                </h3>
+                {recommendations?.workoutTracker ? (
+                  <AIRecommendationCard
+                    title="Workout & Fitness"
+                    recommendation={recommendations.workoutTracker}
+                    feature="workoutTracker"
+                    userId={user?.id}
+                  />
+                ) : (
+                  <div className="text-center py-4">
+                    <p className="text-white/60 mb-2">No AI recommendations available yet.</p>
+                    <p className="text-white/40 text-sm">Complete your onboarding to get personalized AI recommendations.</p>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
