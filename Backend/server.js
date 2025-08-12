@@ -40,6 +40,10 @@ if (!process.env.CONN_STRING) {
 
 connectDB();
 
+// Import and start cron jobs
+import './cron/aiRecommendationCron.js';
+console.log('🚀 AI recommendation cron job started (runs every 3 days)');
+
 const app = express();
 
 // Middleware

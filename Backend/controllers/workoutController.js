@@ -34,42 +34,225 @@ export const getExerciseDatabase = async (req, res) => {
   try {
     const { category, muscle, equipment, search } = req.query;
     
+    // Use the correct Wger API endpoint with proper parameters
     let url = 'https://wger.de/api/v2/exercise/';
     const params = new URLSearchParams();
+    
+    // Add default limit and language
+    params.append('limit', '50');
+    params.append('language', 'en');
     
     if (category) params.append('category', category);
     if (muscle) params.append('muscles', muscle);
     if (equipment) params.append('equipment', equipment);
     if (search) params.append('search', search);
     
-    const response = await axios.get(`${url}?${params.toString()}`);
+    console.log('Fetching exercises from Wger API:', url + '?' + params.toString());
     
-    // Transform the data to match our needs
-    const exercises = response.data.results.map(exercise => ({
-      exerciseId: exercise.id.toString(),
-      name: exercise.name,
-      category: exercise.category,
-      description: exercise.description,
-      targetMuscle: exercise.muscles?.[0] || 'General',
-      equipment: exercise.equipment?.[0] || 'Bodyweight',
-      source: 'wger',
-      imageUrl: exercise.images?.[0]?.image || null
-    }));
+    const response = await axios.get(`${url}?${params.toString()}`, {
+      timeout: 15000, // 15 second timeout
+      headers: {
+        'User-Agent': 'SmartVitals/1.0',
+        'Accept': 'application/json'
+      }
+    });
+    
+    console.log('Wger API response status:', response.status);
+    console.log('Wger API response data count:', response.data?.results?.length || 0);
+    
+    if (!response.data || !response.data.results) {
+      throw new Error('Invalid response format from Wger API');
+    }
+    
+    // Debug: Log first few exercises to understand structure
+    console.log('Sample exercise data:', JSON.stringify(response.data.results[0], null, 2));
+    console.log('Sample exercise keys:', Object.keys(response.data.results[0] || {}));
+    
+    // Transform the data to match our needs with better error handling
+    const exercises = response.data.results
+      .filter(exercise => {
+        // More lenient filtering - just check if exercise exists and has basic data
+        if (!exercise) return false;
+        
+        // Check for name in different possible fields
+        const hasName = exercise.name || exercise.name_en || exercise.name_de;
+        if (!hasName || !hasName.trim()) {
+          console.log('Filtering out exercise without name:', exercise);
+          return false;
+        }
+        
+        return true;
+      })
+      .map(exercise => {
+        // Handle different possible data structures for Wger API
+        const exerciseId = exercise.id?.toString() || exercise.uuid || `wger_${Date.now()}_${Math.random()}`;
+        
+        // Try different name fields
+        const name = exercise.name?.trim() || exercise.name_en?.trim() || exercise.name_de?.trim() || 'Unnamed Exercise';
+        
+        // Handle category - Wger uses category IDs, we'll map them
+        let category = 'strength';
+        if (exercise.category) {
+          // Map Wger category IDs to our categories
+          const categoryMap = {
+            10: 'strength',    // Abs
+            8: 'strength',     // Arms
+            12: 'strength',    // Back
+            14: 'strength',    // Chest
+            11: 'strength',    // Legs
+            13: 'strength',    // Shoulders
+            15: 'cardio',      // Cardio
+            16: 'flexibility'  // Stretching
+          };
+          category = categoryMap[exercise.category] || 'strength';
+        }
+        
+        // Handle description - try multiple language fields
+        const description = exercise.description?.trim() || 
+                          exercise.description_en?.trim() || 
+                          exercise.description_de?.trim() || 
+                          'Exercise from Wger database';
+        
+        // Handle muscles - Wger returns muscle IDs, we'll map them
+        let targetMuscle = 'General';
+        if (exercise.muscles && Array.isArray(exercise.muscles) && exercise.muscles.length > 0) {
+          const muscleMap = {
+            1: 'Biceps brachii',
+            2: 'Anterior deltoid',
+            3: 'Serratus anterior',
+            4: 'Pectoralis major',
+            5: 'Triceps brachii',
+            6: 'Rectus abdominis',
+            7: 'Gastrocnemius',
+            8: 'Trapezius',
+            9: 'Gluteus maximus',
+            10: 'Quadriceps femoris'
+          };
+          const muscleId = exercise.muscles[0];
+          targetMuscle = muscleMap[muscleId] || 'General';
+        }
+        
+        // Handle equipment - Wger returns equipment IDs, we'll map them
+        let equipment = 'Bodyweight';
+        if (exercise.equipment && Array.isArray(exercise.equipment) && exercise.equipment.length > 0) {
+          const equipmentMap = {
+            1: 'Barbell',
+            2: 'SZ-Bar',
+            3: 'Dumbbell',
+            4: 'Gym mat',
+            5: 'Swiss Ball',
+            6: 'Pull-up bar',
+            7: 'None (bodyweight exercise)',
+            8: 'Bench',
+            9: 'Incline bench',
+            10: 'Kettlebell'
+          };
+          const equipmentId = exercise.equipment[0];
+          equipment = equipmentMap[equipmentId] || 'Bodyweight';
+        }
+        
+        return {
+          exerciseId,
+          name,
+          category,
+          description,
+          targetMuscle,
+          equipment,
+          source: 'wger',
+          imageUrl: exercise.images?.[0]?.image || null
+        };
+      });
+    
+    console.log(`Successfully processed ${exercises.length} exercises from Wger API`);
+    if (exercises.length === 0) {
+      console.log('No exercises processed. Raw data sample:', JSON.stringify(response.data.results.slice(0, 2), null, 2));
+    }
     
     res.json({
       success: true,
       exercises,
       pagination: {
-        count: response.data.count,
+        count: response.data.count || exercises.length,
         next: response.data.next,
         previous: response.data.previous
       }
     });
   } catch (error) {
     console.error('Error fetching exercises from Wger API:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to fetch exercises from database',
+    
+    // Provide fallback exercises if API fails
+    const fallbackExercises = [
+      {
+        exerciseId: 'fallback_1',
+        name: 'Push-ups',
+        category: 'strength',
+        description: 'Classic bodyweight exercise for chest, shoulders, and triceps',
+        targetMuscle: 'Chest',
+        equipment: 'Bodyweight',
+        source: 'fallback',
+        imageUrl: null
+      },
+      {
+        exerciseId: 'fallback_2',
+        name: 'Squats',
+        category: 'strength',
+        description: 'Fundamental lower body exercise',
+        targetMuscle: 'Legs',
+        equipment: 'Bodyweight',
+        source: 'fallback',
+        imageUrl: null
+      },
+      {
+        exerciseId: 'fallback_3',
+        name: 'Plank',
+        category: 'strength',
+        description: 'Core strengthening exercise',
+        targetMuscle: 'Core',
+        equipment: 'Bodyweight',
+        source: 'fallback',
+        imageUrl: null
+      },
+      {
+        exerciseId: 'fallback_4',
+        name: 'Pull-ups',
+        category: 'strength',
+        description: 'Upper body pulling exercise for back and biceps',
+        targetMuscle: 'Back',
+        equipment: 'Bodyweight',
+        source: 'fallback',
+        imageUrl: null
+      },
+      {
+        exerciseId: 'fallback_5',
+        name: 'Lunges',
+        category: 'strength',
+        description: 'Unilateral leg exercise for balance and strength',
+        targetMuscle: 'Legs',
+        equipment: 'Bodyweight',
+        source: 'fallback',
+        imageUrl: null
+      },
+      {
+        exerciseId: 'fallback_6',
+        name: 'Burpees',
+        category: 'cardio',
+        description: 'Full body conditioning exercise',
+        targetMuscle: 'Full Body',
+        equipment: 'Bodyweight',
+        source: 'fallback',
+        imageUrl: null
+      }
+    ];
+    
+    res.json({
+      success: true,
+      exercises: fallbackExercises,
+      pagination: {
+        count: fallbackExercises.length,
+        next: null,
+        previous: null
+      },
+      message: 'Using fallback exercises due to API error',
       error: error.message
     });
   }

@@ -154,6 +154,8 @@ const WorkoutTracker = () => {
   const fetchExerciseDatabase = async (filters = {}) => {
     try {
       setLoading(true);
+      setError(null); // Clear previous errors
+      
       const token = await getToken();
       const params = new URLSearchParams(filters);
       const response = await fetch(`${API_BASE_URL}/workout/exercises/database?${params}`, {
@@ -165,13 +167,18 @@ const WorkoutTracker = () => {
       const data = await response.json();
       
       if (data.success) {
+        console.log(`Fetched ${data.exercises?.length || 0} exercises from database`);
         setExerciseDatabase(data.exercises || []);
+        
+        if (data.message) {
+          console.log('Database message:', data.message);
+        }
       } else {
         setError(data.message || 'Failed to fetch exercises');
       }
     } catch (err) {
-      setError('Failed to fetch exercises');
       console.error('Error fetching exercises:', err);
+      setError('Failed to fetch exercises. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -409,11 +416,25 @@ const WorkoutTracker = () => {
       return;
     }
 
-    // Check if all exercises have names
+    // Check if all exercises have names and clean them up
     const exercisesWithNames = workoutForm.exercises.filter(ex => ex.name && ex.name.trim());
     if (exercisesWithNames.length !== workoutForm.exercises.length) {
-      setError('All exercises must have names');
-      return;
+      // Try to fix exercises without names
+      const fixedExercises = workoutForm.exercises.map((ex, index) => {
+        if (!ex.name || !ex.name.trim()) {
+          return {
+            ...ex,
+            name: ex.name || `Exercise ${index + 1}`,
+            category: ex.category || 'strength',
+            targetMuscle: ex.targetMuscle || 'General',
+            equipment: ex.equipment || 'Bodyweight'
+          };
+        }
+        return ex;
+      });
+      
+      setWorkoutForm(prev => ({ ...prev, exercises: fixedExercises }));
+      console.log('Fixed exercises without names:', fixedExercises);
     }
 
     try {
@@ -481,17 +502,25 @@ const WorkoutTracker = () => {
 
   // Add exercise from database
   const addExerciseFromDatabase = (exercise) => {
+    // Ensure exercise has a valid name
+    if (!exercise.name || exercise.name.trim() === '') {
+      setError('Exercise name is required. Please select a valid exercise.');
+      return;
+    }
+
     const newExercise = {
-      exerciseId: exercise.exerciseId,
-      name: exercise.name,
-      category: exercise.category,
-      targetMuscle: exercise.targetMuscle,
-      equipment: exercise.equipment,
-      description: exercise.description,
+      exerciseId: exercise.exerciseId || `wger_${Date.now()}`,
+      name: exercise.name.trim(),
+      category: exercise.category || 'strength',
+      targetMuscle: exercise.targetMuscle || 'General',
+      equipment: exercise.equipment || 'Bodyweight',
+      description: exercise.description || 'Exercise from Wger database',
       source: 'wger',
-      imageUrl: exercise.imageUrl,
+      imageUrl: exercise.imageUrl || null,
       sets: [{ reps: 0, weight: { value: 0, unit: 'kg' }, duration: 0, restTime: 60, notes: '' }]
     };
+    
+    console.log('Adding exercise from database:', newExercise);
     addExerciseToWorkout(newExercise);
     setShowDatabaseModal(false);
   };
@@ -1381,12 +1410,63 @@ const WorkoutTracker = () => {
             <div className="space-y-6">
               <div className="flex justify-between items-center">
                 <h3 className="text-white text-xl font-semibold">Exercise Database</h3>
-                <button
-                  onClick={() => fetchExerciseDatabase()}
-                  className="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg transition-colors"
-                >
-                  Refresh Exercises
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => fetchExerciseDatabase()}
+                    className="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg transition-colors"
+                  >
+                    Refresh Exercises
+                  </button>
+                  <button
+                    onClick={async () => {
+                      try {
+                        const response = await fetch(`${API_BASE_URL}/workout/exercises/test`);
+                        const data = await response.json();
+                        console.log('Wger API Basic Test:', data);
+                        if (data.success) {
+                          alert('Wger API basic test successful! Check console for details.');
+                        } else {
+                          alert('Wger API basic test failed. Check console for details.');
+                        }
+                      } catch (err) {
+                        console.error('Basic test failed:', err);
+                        alert('Basic test failed. Check console for details.');
+                      }
+                    }}
+                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                    title="Basic Wger API test"
+                  >
+                    Basic Test
+                  </button>
+                  <button
+                    onClick={async () => {
+                      try {
+                        const response = await fetch(`${API_BASE_URL}/workout/exercises/debug`);
+                        const data = await response.json();
+                        console.log('Wger API Debug:', data);
+                        if (data.success) {
+                          alert('Wger API debug test successful! Check console for details.');
+                        } else {
+                          alert('Wger API debug test failed. Check console for details.');
+                        }
+                      } catch (err) {
+                        console.error('Debug test failed:', err);
+                        alert('Debug test failed. Check console for details.');
+                      }
+                    }}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                    title="Detailed Wger API test"
+                  >
+                    Debug Test
+                  </button>
+                  <button
+                    onClick={() => setShowExerciseModal(true)}
+                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                    title="Create custom exercise"
+                  >
+                    + Custom
+                  </button>
+                </div>
               </div>
 
               {loading ? (

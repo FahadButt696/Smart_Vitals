@@ -6,11 +6,14 @@ import axios from "axios";
 // Reuse or import your AI recommendation generation function
 async function generateAndSaveForUser(user) {
   try {
-    // Check if recommendations already exist
+    // Check if recommendations already exist and are recent (less than 3 days old)
     const existingRec = await AiRecommendation.findOne({ userId: user.clerkId });
-    if (existingRec) {
-      console.log(`AI recommendations already exist for user ${user.clerkId}, skipping generation`);
-      return;
+    if (existingRec && existingRec.lastUpdated) {
+      const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+      if (existingRec.lastUpdated > threeDaysAgo) {
+        console.log(`AI recommendations are recent for user ${user.clerkId}, skipping generation`);
+        return;
+      }
     }
     
     console.log(`Generating AI recommendations for user ${user.clerkId}...`);
@@ -97,14 +100,14 @@ Make the advice friendly, brief, and actionable.
 `;
 }
 
-// Schedule cron job: Runs 3rd day 
+// Schedule cron job: Runs every 3rd day at midnight
 cron.schedule("0 0 */3 * *", async () => {
-    console.log("Running AI recommendations update job every 3 days...");
-  
-    // ... rest of the code remains the same
+  console.log("🕐 Running AI recommendations update job every 3 days...");
+  console.log(`📅 Current time: ${new Date().toISOString()}`);
 
   try {
     const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+    console.log(`🔍 Looking for users with recommendations older than: ${threeDaysAgo.toISOString()}`);
 
     // Find users who either:
     // 1. Have no AI recommendations yet
@@ -128,12 +131,35 @@ cron.schedule("0 0 */3 * *", async () => {
       },
     ]);
 
-    console.log(`Found ${usersToUpdate.length} users to update AI recommendations for.`);
+    console.log(`✅ Found ${usersToUpdate.length} users to update AI recommendations for.`);
+
+    if (usersToUpdate.length === 0) {
+      console.log("📝 No users need recommendations updated at this time.");
+      return;
+    }
+
+    let successCount = 0;
+    let errorCount = 0;
 
     for (const user of usersToUpdate) {
-      await generateAndSaveForUser(user);
+      try {
+        await generateAndSaveForUser(user);
+        successCount++;
+        console.log(`✅ Successfully updated recommendations for user: ${user.clerkId}`);
+      } catch (error) {
+        errorCount++;
+        console.error(`❌ Failed to update recommendations for user ${user.clerkId}:`, error.message);
+      }
     }
+
+    console.log(`🎯 Cron job completed: ${successCount} successful, ${errorCount} failed`);
+    
   } catch (error) {
-    console.error("Error running AI recommendations update job:", error);
+    console.error("💥 Critical error running AI recommendations update job:", error);
+    console.error("Stack trace:", error.stack);
   }
 });
+
+// Log when cron job is scheduled
+console.log("⏰ AI recommendations cron job scheduled to run every 3 days at midnight");
+console.log("📋 Next run: Every 3rd day at 00:00");

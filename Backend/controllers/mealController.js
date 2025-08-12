@@ -136,76 +136,31 @@ export const saveMeal = async (req, res) => {
  */
 export const addManualMeal = async (req, res) => {
   try {
-    const { userId, mealType, foodName, servingSize, quantity, group } = req.body;
+    const { userId, mealType, foodName, servingSize, quantity, group, calories } = req.body;
 
-    if (!userId || !mealType || !foodName || !servingSize || !quantity) {
+    if (!userId || !mealType || !foodName || !servingSize || !quantity || !calories) {
       return res.status(400).json({ 
-        error: "Missing required fields: userId, mealType, foodName, servingSize, quantity" 
+        error: "Missing required fields: userId, mealType, foodName, servingSize, quantity, calories" 
       });
     }
 
-    // Check if API key is configured
-    if (!process.env.CALORIEMAMA_API_KEY) {
-      return res.status(500).json({
-        error: "CalorieMama API key not configured. Please add CALORIEMAMA_API_KEY to your .env file."
-      });
-    }
-
-    // Search for food using CalorieMama API
-    const searchResponse = await axios.get(
-      `https://api-2445582032290.production.gw.apicast.io/v1/food/search?user_key=${process.env.CALORIEMAMA_API_KEY}&q=${encodeURIComponent(foodName)}`
-    );
-
-    const foods = searchResponse.data?.foods || [];
-    if (!foods.length) {
-      return res.status(404).json({ error: "No foods found matching your search" });
-    }
-
-    // Find the best match or use the first result
-    const selectedFood = foods.find(food => 
-      food.name.toLowerCase().includes(foodName.toLowerCase()) ||
-      foodName.toLowerCase().includes(food.name.toLowerCase())
-    ) || foods[0];
-
-    // Get detailed nutrition for the selected food
-    const nutritionResponse = await axios.get(
-      `https://api-2445582032290.production.gw.apicast.io/v1/food/${selectedFood.food_id}?user_key=${process.env.CALORIEMAMA_API_KEY}`
-    );
-
-    const foodDetails = nutritionResponse.data;
-    const servingSizes = foodDetails.serving_sizes || [];
-    
-    // Find the matching serving size
-    const selectedServing = servingSizes.find(serving => 
-      serving.unit.toLowerCase().includes(servingSize.toLowerCase()) ||
-      servingSize.toLowerCase().includes(serving.unit.toLowerCase())
-    ) || servingSizes[0];
-
-    if (!selectedServing) {
-      return res.status(400).json({ error: "Invalid serving size" });
-    }
-
-    // Calculate nutrition based on quantity and serving size
-    const nutrients = foodDetails.nutrition || {};
-    const calculatedNutrition = {};
-
-    for (let key in nutrients) {
-      if (typeof nutrients[key] === "number") {
-        calculatedNutrition[key] = nutrients[key] * quantity * (selectedServing.serving_weight || 1);
-      } else {
-        calculatedNutrition[key] = nutrients[key];
-      }
-    }
+    // Use only the calories provided by user - no API calls
+    const calculatedNutrition = {
+      calories: parseFloat(calories),
+      protein: 0,
+      totalCarbs: 0,
+      totalFat: 0
+    };
 
     // Create meal item
     const mealItem = {
-      name: selectedFood.name,
-      group: group || selectedFood.group || "Other",
-      foodId: selectedFood.food_id,
-      score: selectedFood.score || 100,
+      name: foodName,
+      group: group || "Manual Entry",
+      foodId: `manual_${Date.now()}_${Math.random()}`,
+      score: 100,
       servingSize: {
-        unit: selectedServing.unit,
-        servingWeight: selectedServing.serving_weight || 1
+        unit: servingSize,
+        servingWeight: 1
       },
       quantity: quantity,
       nutrients: calculatedNutrition
@@ -223,16 +178,7 @@ export const addManualMeal = async (req, res) => {
     res.status(201).json({ success: true, meal });
   } catch (err) {
     console.error("Error adding manual meal:", err.message);
-    
-    if (err.response?.status === 401) {
-      res.status(401).json({ error: "Invalid CalorieMama API key" });
-    } else if (err.response?.status === 429) {
-      res.status(429).json({ error: "API rate limit exceeded" });
-    } else if (err.response?.status === 404) {
-      res.status(404).json({ error: "Food not found" });
-    } else {
-      res.status(500).json({ error: "Failed to add manual meal", details: err.message });
-    }
+    res.status(500).json({ error: "Failed to add manual meal", details: err.message });
   }
 };
 

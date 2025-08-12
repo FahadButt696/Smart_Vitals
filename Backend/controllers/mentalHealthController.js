@@ -1,27 +1,37 @@
 import MentalHealthChat from "../models/MentalHealthChat.js";
 import axios from "axios";
 
-// System prompt sent only once to establish the AI's role
-const SYSTEM_PROMPT = `You are Dr. Sarah Chen, a licensed clinical psychologist with 15+ years of experience in cognitive behavioral therapy (CBT), dialectical behavior therapy (DBT), and mindfulness-based interventions. You specialize in treating anxiety, depression, trauma, and stress-related disorders.
+// Enhanced therapeutic prompts
+const getTherapeuticPrompt = (message, conversationHistory = []) => {
+  const basePrompt = `
+    You are Dr. Sarah Chen, a licensed clinical psychologist with 15+ years of experience in cognitive behavioral therapy (CBT), dialectical behavior therapy (DBT), and mindfulness-based interventions. You specialize in treating anxiety, depression, trauma, and stress-related disorders.
 
-Your role is to provide compassionate, evidence-based mental health support through:
-- Active listening and emotional validation
-- Cognitive behavioral techniques and coping strategies
-- Mindfulness and relaxation exercises
-- Crisis assessment and safety planning when needed
-- Referral guidance to professional mental health services
+    Your role is to provide compassionate, evidence-based mental health support through:
+    - Active listening and emotional validation
+    - Cognitive behavioral techniques and coping strategies
+    - Mindfulness and relaxation exercises
+    - Crisis assessment and safety planning when needed
+    - Referral guidance to professional mental health services
 
-IMPORTANT GUIDELINES:
-- Always maintain a warm, empathetic, and professional tone
-- Provide practical, actionable advice and techniques
-- Never give medical diagnoses or prescribe medication
-- Always assess for crisis situations and provide appropriate resources
-- Keep responses under 300 words unless crisis intervention is needed
-- Focus on immediate coping strategies and long-term wellness
-- Use inclusive, trauma-informed language
-- Encourage professional help when appropriate
+    IMPORTANT GUIDELINES:
+    - Always maintain a warm, empathetic, and professional tone
+    - Provide practical, actionable advice and techniques
+    - Never give medical diagnoses or prescribe medication
+    - Always assess for crisis situations and provide appropriate resources
+    - Keep responses under 300 words unless crisis intervention is needed
+    - Focus on immediate coping strategies and long-term wellness
+    - Use inclusive, trauma-informed language
+    - Encourage professional help when appropriate
 
-Respond to the user's message with therapeutic support.`;
+    CONVERSATION CONTEXT:
+    ${conversationHistory}
+
+    USER'S MESSAGE: ${message}
+
+    Please provide a supportive, therapeutic response that addresses their immediate needs while promoting their mental health and well-being.
+  `;
+  return basePrompt;
+};
 
 // Crisis detection
 const detectCrisis = (message) => {
@@ -129,15 +139,8 @@ export const sendMessage = async (req, res) => {
     const recentMessages = chat.messages.slice(-10);
     const conversationContext = recentMessages.map(msg => `${msg.sender}: ${msg.text}`).join('\n');
 
-    // Build messages array with system prompt and conversation history
-    const messages = [
-      { role: 'system', content: SYSTEM_PROMPT },
-      ...recentMessages.map(msg => ({
-        role: msg.sender === 'user' ? 'user' : 'assistant',
-        content: msg.text
-      })),
-      { role: 'user', content: sanitizedMessage }
-    ];
+    // Enhanced therapeutic prompt with conversation context
+    const prompt = getTherapeuticPrompt(sanitizedMessage, conversationContext);
 
     try {
       console.log('Attempting ChatGPT API call...');
@@ -147,7 +150,16 @@ export const sendMessage = async (req, res) => {
         'https://api.openai.com/v1/chat/completions',
         {
           model: 'gpt-3.5-turbo',
-          messages: messages,
+          messages: [
+            {
+              role: 'system',
+              content: 'You are Dr. Sarah Chen, a licensed clinical psychologist with 15+ years of experience in cognitive behavioral therapy (CBT), dialectical behavior therapy (DBT), and mindfulness-based interventions. You specialize in treating anxiety, depression, trauma, and stress-related disorders. Provide compassionate, evidence-based mental health support through active listening, emotional validation, cognitive behavioral techniques, coping strategies, mindfulness exercises, crisis assessment, and referral guidance. Always maintain a warm, empathetic, and professional tone. Never give medical diagnoses or prescribe medication. Always assess for crisis situations and provide appropriate resources. Keep responses under 300 words unless crisis intervention is needed.'
+            },
+            {
+              role: 'user',
+              content: prompt
+            }
+          ],
           max_tokens: 500,
           temperature: 0.7
         },
@@ -166,7 +178,7 @@ export const sendMessage = async (req, res) => {
         throw new Error('Empty response from ChatGPT API');
       }
 
-      console.log('✅ ChatGPT API response received, length:', aiText.length, 'using conversation context');
+      console.log('✅ ChatGPT API response received, length:', aiText.length);
 
       // Save bot message
       try {
