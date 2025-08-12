@@ -129,7 +129,16 @@ const WorkoutTracker = () => {
       const data = await response.json();
       
       if (data.success) {
-        setWorkouts(data.workouts || []);
+        // Ensure workout names and exercise names are properly set
+        const processedWorkouts = (data.workouts || []).map(workout => ({
+          ...workout,
+          workoutName: workout.workoutName || 'Unnamed Workout',
+          exercises: (workout.exercises || []).map(exercise => ({
+            ...exercise,
+            name: exercise.name || 'Unnamed Exercise'
+          }))
+        }));
+        setWorkouts(processedWorkouts);
       } else {
         setError(data.message || 'Failed to fetch workouts');
       }
@@ -339,7 +348,17 @@ const WorkoutTracker = () => {
       const data = await response.json();
 
       if (data.success) {
-        setWorkouts(prev => prev.map(w => w._id === currentWorkout._id ? data.workout : w));
+        // Ensure the updated workout has proper names
+        const updatedWorkout = {
+          ...data.workout,
+          workoutName: data.workout.workoutName || 'Unnamed Workout',
+          exercises: (data.workout.exercises || []).map(exercise => ({
+            ...exercise,
+            name: exercise.name || 'Unnamed Exercise'
+          }))
+        };
+        
+        setWorkouts(prev => prev.map(w => w._id === currentWorkout._id ? updatedWorkout : w));
         setShowCreateModal(false);
         setCurrentWorkout(null);
         setWorkoutForm({
@@ -355,6 +374,9 @@ const WorkoutTracker = () => {
           templateName: ''
         });
         setActiveTab('workouts');
+        
+        // Refresh stats after updating workout
+        fetchWorkoutStats();
       } else {
         setError(data.message || 'Failed to update workout');
       }
@@ -415,7 +437,17 @@ const WorkoutTracker = () => {
       const data = await response.json();
 
       if (data.success) {
-        setWorkouts(prev => [data.workout, ...prev]);
+        // Ensure the new workout has proper names
+        const newWorkout = {
+          ...data.workout,
+          workoutName: data.workout.workoutName || 'Unnamed Workout',
+          exercises: (data.workout.exercises || []).map(exercise => ({
+            ...exercise,
+            name: exercise.name || 'Unnamed Exercise'
+          }))
+        };
+        
+        setWorkouts(prev => [newWorkout, ...prev]);
         setShowCreateModal(false);
         setWorkoutForm({
           workoutName: '',
@@ -425,6 +457,9 @@ const WorkoutTracker = () => {
           location: 'Gym',
           exercises: []
         });
+        
+        // Refresh stats after creating workout
+        fetchWorkoutStats();
       } else {
         setError(data.message || 'Failed to create workout');
       }
@@ -551,6 +586,7 @@ const WorkoutTracker = () => {
       });
       
       if (response.ok) {
+        // Refresh workouts after starting
         fetchWorkouts();
       }
     } catch (err) {
@@ -572,7 +608,11 @@ const WorkoutTracker = () => {
       });
       
       if (response.ok) {
-        fetchWorkouts();
+        // Refresh both workouts and stats after completion
+        await Promise.all([
+          fetchWorkouts(),
+          fetchWorkoutStats()
+        ]);
       }
     } catch (err) {
       console.error('Error completing workout:', err);
@@ -595,6 +635,8 @@ const WorkoutTracker = () => {
       
       if (response.ok) {
         setWorkouts(prev => prev.filter(w => w._id !== workoutId));
+        // Refresh stats after deleting workout
+        fetchWorkoutStats();
       }
     } catch (err) {
       console.error('Error deleting workout:', err);
@@ -714,6 +756,16 @@ const WorkoutTracker = () => {
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
                 <div className="flex items-center space-x-4">
                   <h3 className="text-white text-xl font-semibold">Your Workouts</h3>
+                  <button
+                    onClick={() => {
+                      fetchWorkouts();
+                      fetchWorkoutStats();
+                    }}
+                    className="p-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg transition-colors"
+                    title="Refresh Data"
+                  >
+                    <Loader2 className="text-sm" />
+                  </button>
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => setViewMode('grid')}
@@ -923,6 +975,12 @@ const WorkoutTracker = () => {
                                 {workout.exercises?.length || 0} exercises
                               </span>
                             </div>
+                            {workout.exercises && workout.exercises.length > 0 && (
+                              <div className="text-white/60 text-xs">
+                                {workout.exercises.slice(0, 2).map(ex => ex.name).join(', ')}
+                                {workout.exercises.length > 2 && ` +${workout.exercises.length - 2} more`}
+                              </div>
+                            )}
                             {workout.location && (
                               <div className="flex items-center space-x-2 text-white/70">
                                 <MapPin className="text-sm" />
@@ -1008,6 +1066,12 @@ const WorkoutTracker = () => {
                                 <Weight className="text-sm" />
                                 <span>{workout.exercises?.length || 0} exercises</span>
                               </div>
+                              {workout.exercises && workout.exercises.length > 0 && (
+                                <div className="text-white/50 text-xs ml-6">
+                                  {workout.exercises.slice(0, 3).map(ex => ex.name).join(', ')}
+                                  {workout.exercises.length > 3 && ` +${workout.exercises.length - 3} more`}
+                                </div>
+                              )}
                               {workout.totalCaloriesBurned > 0 && (
                                 <div className="flex items-center space-x-2">
                                   <Flame className="text-sm" />
@@ -1144,6 +1208,12 @@ const WorkoutTracker = () => {
                             {template.exercises?.length || 0} exercises
                           </span>
                         </div>
+                        {template.exercises && template.exercises.length > 0 && (
+                          <div className="text-white/60 text-xs">
+                            {template.exercises.slice(0, 2).map(ex => ex.name).join(', ')}
+                            {template.exercises.length > 2 && ` +${template.exercises.length - 2} more`}
+                          </div>
+                        )}
                         {template.location && (
                           <div className="flex items-center space-x-2 text-white/70">
                             <MapPin className="text-sm" />

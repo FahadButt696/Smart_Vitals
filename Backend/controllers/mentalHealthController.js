@@ -1,37 +1,27 @@
 import MentalHealthChat from "../models/MentalHealthChat.js";
 import axios from "axios";
 
-// Enhanced therapeutic prompts
-const getTherapeuticPrompt = (message, conversationHistory = []) => {
-  const basePrompt = `
-    You are Dr. Sarah Chen, a licensed clinical psychologist with 15+ years of experience in cognitive behavioral therapy (CBT), dialectical behavior therapy (DBT), and mindfulness-based interventions. You specialize in treating anxiety, depression, trauma, and stress-related disorders.
+// System prompt sent only once to establish the AI's role
+const SYSTEM_PROMPT = `You are Dr. Sarah Chen, a licensed clinical psychologist with 15+ years of experience in cognitive behavioral therapy (CBT), dialectical behavior therapy (DBT), and mindfulness-based interventions. You specialize in treating anxiety, depression, trauma, and stress-related disorders.
 
-    Your role is to provide compassionate, evidence-based mental health support through:
-    - Active listening and emotional validation
-    - Cognitive behavioral techniques and coping strategies
-    - Mindfulness and relaxation exercises
-    - Crisis assessment and safety planning when needed
-    - Referral guidance to professional mental health services
+Your role is to provide compassionate, evidence-based mental health support through:
+- Active listening and emotional validation
+- Cognitive behavioral techniques and coping strategies
+- Mindfulness and relaxation exercises
+- Crisis assessment and safety planning when needed
+- Referral guidance to professional mental health services
 
-    IMPORTANT GUIDELINES:
-    - Always maintain a warm, empathetic, and professional tone
-    - Provide practical, actionable advice and techniques
-    - Never give medical diagnoses or prescribe medication
-    - Always assess for crisis situations and provide appropriate resources
-    - Keep responses under 300 words unless crisis intervention is needed
-    - Focus on immediate coping strategies and long-term wellness
-    - Use inclusive, trauma-informed language
-    - Encourage professional help when appropriate
+IMPORTANT GUIDELINES:
+- Always maintain a warm, empathetic, and professional tone
+- Provide practical, actionable advice and techniques
+- Never give medical diagnoses or prescribe medication
+- Always assess for crisis situations and provide appropriate resources
+- Keep responses under 300 words unless crisis intervention is needed
+- Focus on immediate coping strategies and long-term wellness
+- Use inclusive, trauma-informed language
+- Encourage professional help when appropriate
 
-    CONVERSATION CONTEXT:
-    ${conversationHistory}
-
-    USER'S MESSAGE: ${message}
-
-    Please provide a supportive, therapeutic response that addresses their immediate needs while promoting their mental health and well-being.
-  `;
-  return basePrompt;
-};
+Respond to the user's message with therapeutic support.`;
 
 // Crisis detection
 const detectCrisis = (message) => {
@@ -74,15 +64,15 @@ export const sendMessage = async (req, res) => {
     if (!userId) return res.status(400).json({ error: "UserId is required" });
     if (!message) return res.status(400).json({ error: "Message is required" });
 
-    // Check if Gemini API key is available
-    if (!process.env.GEMINI_API_KEY) {
-      console.log('GEMINI_API_KEY not found, using fallback responses');
+    // Check if ChatGPT API key is available
+    if (!process.env.GPT_KEY) {
+      console.log('OPENAI_API_KEY not found, using fallback responses');
       const fallbackResponse = generateFallbackResponse(message);
       return res.json({ 
         reply: fallbackResponse,
         isCrisis: false,
         isFallback: true,
-        reason: 'No Gemini API key configured'
+        reason: 'No ChatGPT API key configured'
       });
     }
 
@@ -139,41 +129,44 @@ export const sendMessage = async (req, res) => {
     const recentMessages = chat.messages.slice(-10);
     const conversationContext = recentMessages.map(msg => `${msg.sender}: ${msg.text}`).join('\n');
 
-    // Enhanced therapeutic prompt with conversation context
-    const prompt = getTherapeuticPrompt(sanitizedMessage, conversationContext);
+    // Build messages array with system prompt and conversation history
+    const messages = [
+      { role: 'system', content: SYSTEM_PROMPT },
+      ...recentMessages.map(msg => ({
+        role: msg.sender === 'user' ? 'user' : 'assistant',
+        content: msg.text
+      })),
+      { role: 'user', content: sanitizedMessage }
+    ];
 
     try {
-      console.log('Attempting Gemini API call...');
+      console.log('Attempting ChatGPT API call...');
       
-      // Use the same Gemini API configuration as AI recommendations
+      // Use ChatGPT API (OpenAI) - Free Tier
       const response = await axios.post(
-        `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=${process.env.GEMINI_API_KEY}`,
+        'https://api.openai.com/v1/chat/completions',
         {
-          contents: [{
-            parts: [{
-              text: prompt
-            }]
-          }],
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 500,
-          }
+          model: 'gpt-3.5-turbo',
+          messages: messages,
+          max_tokens: 500,
+          temperature: 0.7
         },
         {
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${process.env.GPT_KEY}`
           },
         }
       );
 
       // Handle response
-      const aiText = response.data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+      const aiText = response.data.choices?.[0]?.message?.content || "";
       
       if (!aiText || aiText.trim().length === 0) {
-        throw new Error('Empty response from Gemini API');
+        throw new Error('Empty response from ChatGPT API');
       }
 
-      console.log('✅ Gemini API response received, length:', aiText.length);
+      console.log('✅ ChatGPT API response received, length:', aiText.length, 'using conversation context');
 
       // Save bot message
       try {
@@ -189,23 +182,15 @@ export const sendMessage = async (req, res) => {
         reply: aiText,
         isCrisis: false,
         messageId: chat.messages[chat.messages.length - 1]?._id,
-        modelUsed: 'gemini-1.5-pro'
+        modelUsed: 'gpt-3.5-turbo (free tier)'
       });
       
       return; // Exit successfully
 
     } catch (aiError) {
-      console.error("AI Generation Error:", aiError);
+      console.error("ChatGPT API Error:", aiError);
       
-      // Instead of immediately using fallback, let the frontend handle it
-      res.status(500).json({ 
-        error: "AI service error",
-        message: aiError.message || 'Failed to generate response',
-        shouldUseFallback: true
-      });
-
-      
-      // Use enhanced fallback response
+      // Use enhanced fallback response when ChatGPT API fails
       const fallbackResponse = generateFallbackResponse(sanitizedMessage);
       
       try {
@@ -217,11 +202,12 @@ export const sendMessage = async (req, res) => {
         console.log("Database save failed:", dbError.message);
       }
 
+      // Send fallback response instead of error
       res.json({ 
         reply: fallbackResponse,
         isCrisis: false,
         isFallback: true,
-        reason: `AI service error: ${aiError.message || 'Unknown error'}`
+        reason: `ChatGPT API error: ${aiError.message || 'Unknown error'}`
       });
     }
 
