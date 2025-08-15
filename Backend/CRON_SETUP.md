@@ -116,3 +116,4 @@ cron.schedule("0 */6 * * *", async () => { ... });
 - API keys stored in environment variables
 - Database operations use proper authentication
 - No user data exposed in logs
+

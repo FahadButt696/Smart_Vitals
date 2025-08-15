@@ -1,97 +1,55 @@
-import cron from "node-cron";
-import AiRecommendation from "../models/AiRecommendation.js";
-import User from "../models/User.js";
-import axios from "axios";
+import axios from 'axios';
+import dotenv from 'dotenv';
 
-// Reuse or import your AI recommendation generation function
-async function generateAndSaveForUser(user) {
-  try {
-    // Check if recommendations already exist and are recent (less than 3 days old)
-    const existingRec = await AiRecommendation.findOne({ userId: user.clerkId });
-    if (existingRec && existingRec.lastUpdated) {
-      const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
-      if (existingRec.lastUpdated > threeDaysAgo) {
-        console.log(`AI recommendations are recent for user ${user.clerkId}, skipping generation`);
-        return;
-      }
-    }
-    
-    console.log(`Generating AI recommendations for user ${user.clerkId}...`);
-    const prompt = buildGeminiPrompt(user);
+dotenv.config();
 
-    const response = await axios.post(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=${process.env.GEMINI_API_KEY}`,
-      {
-        contents: [{
-          parts: [{
-            text: prompt
-          }]
-        }],
-        generationConfig: {
-          temperature: 0.8,
-          maxOutputTokens: 2000,
-        }
-      },
-      {
-        headers: {
-          "Content-Type": "application/json"
-        },
-      }
-    );
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const BASE_URL = 'http://localhost:5000';
 
-    const aiText = response.data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+// Test user data
+const testUser = {
+  age: 28,
+  gender: "Male",
+  height: { value: 175, unit: "cm" },
+  weight: { value: 70, unit: "kg" },
+  goal: "Build Muscle",
+  targetWeight: 75,
+  activityLevel: "Moderate",
+  dietaryPreference: "Balanced",
+  medicalConditions: "None",
+  allergies: "None",
+  medications: "None",
+  workoutDaysPerWeek: 4,
+  workoutPreferences: ["Strength Training", "Cardio"],
+  mealPlanType: "High Protein",
+  waterIntakeGoal: 2500,
+  wantsMentalSupport: true
+};
 
-    let recommendations = {};
-    try {
-      recommendations = JSON.parse(aiText);
-      
-      // Validate that each category has an array with 4 recommendations
-      const categories = ['mealLog', 'workoutTracker', 'sleepTracker', 'mentalHealthChatbot', 'hydration', 'weightProgress', 'symptomChecker', 'generalTips'];
-      for (const category of categories) {
-        if (!Array.isArray(recommendations[category]) || recommendations[category].length < 4) {
-          console.log(`⚠️ Category ${category} doesn't have 4 recommendations, using fallback`);
-          recommendations[category] = createFallbackRecommendations(user)[category];
-        }
-      }
-    } catch (err) {
-      console.error("Failed to parse AI response as JSON:", err);
-      recommendations = createFallbackRecommendations(user);
-    }
-
-    await AiRecommendation.findOneAndUpdate(
-      { userId: user.clerkId },
-      { recommendations, lastUpdated: new Date() },
-      { upsert: true }
-    );
-
-    console.log(`AI recommendations updated for user ${user.clerkId}`);
-  } catch (error) {
-    console.error(`Failed to update AI recommendations for user ${user.clerkId}`, error.response?.data || error.message);
-  }
-}
-
-// Helper function to build the Gemini prompt (same as controller)
-function buildGeminiPrompt(user) {
-  return `
+// Test the enhanced prompt
+async function testEnhancedPrompt() {
+  console.log('🧪 Testing Enhanced AI Recommendation Prompt...\n');
+  
+  const prompt = `
 You are a knowledgeable, empathetic health and fitness expert assistant. Based on the detailed user profile below, generate 4 unique, actionable, and personalized recommendations for each category listed.
 
 User Profile:
-- Age: ${user.age}
-- Gender: ${user.gender}
-- Height: ${user.height.value} ${user.height.unit}
-- Weight: ${user.weight.value} ${user.weight.unit}
-- Goal: ${user.goal}
-- Target Weight: ${user.targetWeight}
-- Activity Level: ${user.activityLevel}
-- Dietary Preference: ${user.dietaryPreference}
-- Medical Conditions: ${user.medicalConditions || "None"}
-- Allergies: ${user.allergies || "None"}
-- Medications: ${user.medications || "None"}
-- Workout Days Per Week: ${user.workoutDaysPerWeek}
-- Workout Preferences: ${user.workoutPreferences.length > 0 ? user.workoutPreferences.join(", ") : "None"}
-- Meal Plan Type: ${user.mealPlanType}
-- Water Intake Goal: ${user.waterIntakeGoal} ml
-- Wants Mental Support: ${user.wantsMentalSupport ? "Yes" : "No"}
+- Age: ${testUser.age}
+- Gender: ${testUser.gender}
+- Height: ${testUser.height.value} ${testUser.height.unit}
+- Weight: ${testUser.weight.value} ${testUser.weight.unit}
+- Goal: ${testUser.goal}
+- Target Weight: ${testUser.targetWeight}
+- Activity Level: ${testUser.activityLevel}
+- Dietary Preference: ${testUser.dietaryPreference}
+- Medical Conditions: ${testUser.medicalConditions || "None"}
+- Allergies: ${testUser.allergies || "None"}
+- Medications: ${testUser.medications || "None"}
+- Workout Days Per Week: ${testUser.workoutDaysPerWeek}
+- Workout Preferences: ${testUser.workoutPreferences.length > 0 ? testUser.workoutPreferences.join(", ") : "None"}
+- Meal Plan Type: ${testUser.mealPlanType}
+- Water Intake Goal: ${testUser.waterIntakeGoal} ml
+- Wants Mental Support: ${testUser.wantsMentalSupport ? "Yes" : "No"}
 
 Please respond ONLY in JSON format with these keys exactly. Each category should contain an array of 4 unique recommendations:
 {
@@ -152,9 +110,100 @@ Make each recommendation:
 - Different from other recommendations in the same category
 - Brief but informative (1-2 sentences each)
 `;
+
+  try {
+    console.log('📝 Sending enhanced prompt to Gemini API...');
+    
+    const response = await axios.post(
+      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        contents: [{
+          parts: [{
+            text: prompt
+          }]
+        }],
+        generationConfig: {
+          temperature: 0.8,
+          maxOutputTokens: 2000,
+        }
+      },
+      {
+        headers: {
+          "Content-Type": "application/json"
+        },
+      }
+    );
+
+    const aiText = response.data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    console.log('✅ Gemini API response received successfully!');
+    console.log('📄 Response length:', aiText.length, 'characters');
+    
+    try {
+      const recommendations = JSON.parse(aiText);
+      console.log('✅ Successfully parsed AI response as JSON');
+      
+      // Validate structure
+      const categories = ['mealLog', 'workoutTracker', 'sleepTracker', 'mentalHealthChatbot', 'hydration', 'weightProgress', 'symptomChecker', 'generalTips'];
+      let isValid = true;
+      
+      for (const category of categories) {
+        if (!Array.isArray(recommendations[category])) {
+          console.log(`❌ Category ${category} is not an array`);
+          isValid = false;
+        } else if (recommendations[category].length < 4) {
+          console.log(`❌ Category ${category} has only ${recommendations[category].length} recommendations (expected 4)`);
+          isValid = false;
+        } else {
+          console.log(`✅ Category ${category}: ${recommendations[category].length} recommendations`);
+        }
+      }
+      
+      if (isValid) {
+        console.log('\n🎉 All categories have 4 recommendations!');
+        
+        // Display sample recommendations
+        console.log('\n📋 Sample Recommendations:');
+        console.log('🍽️  Meal Log:', recommendations.mealLog[0]);
+        console.log('💪 Workout:', recommendations.workoutTracker[0]);
+        console.log('😴 Sleep:', recommendations.sleepTracker[0]);
+        console.log('🧠 Mental Health:', recommendations.mentalHealthChatbot[0]);
+      } else {
+        console.log('\n⚠️  Some categories are missing recommendations');
+      }
+      
+    } catch (parseError) {
+      console.error('❌ Failed to parse AI response as JSON:', parseError.message);
+      console.log('📄 Raw response preview:', aiText.substring(0, 200) + '...');
+    }
+    
+  } catch (apiError) {
+    console.error('❌ Gemini API failed:', apiError.response?.data || apiError.message);
+  }
 }
 
-// Fallback recommendations when Gemini API fails - now with 4 per category
+// Test fallback recommendations
+function testFallbackRecommendations() {
+  console.log('\n🧪 Testing Fallback Recommendations...\n');
+  
+  const fallbackRecs = createFallbackRecommendations(testUser);
+  
+  const categories = ['mealLog', 'workoutTracker', 'sleepTracker', 'mentalHealthChatbot', 'hydration', 'weightProgress', 'symptomChecker', 'generalTips'];
+  
+  for (const category of categories) {
+    if (Array.isArray(fallbackRecs[category]) && fallbackRecs[category].length === 4) {
+      console.log(`✅ ${category}: ${fallbackRecs[category].length} fallback recommendations`);
+    } else {
+      console.log(`❌ ${category}: Invalid fallback structure`);
+    }
+  }
+  
+  console.log('\n📋 Sample Fallback Recommendations:');
+  console.log('🍽️  Meal Log:', fallbackRecs.mealLog[0]);
+  console.log('💪 Workout:', fallbackRecs.workoutTracker[0]);
+  console.log('😴 Sleep:', fallbackRecs.sleepTracker[0]);
+}
+
+// Fallback recommendations function (copied from controller)
 function createFallbackRecommendations(user) {
   const goal = user.goal.toLowerCase();
   const activityLevel = user.activityLevel.toLowerCase();
@@ -212,66 +261,20 @@ function createFallbackRecommendations(user) {
   };
 }
 
-// Schedule cron job: Runs every 3rd day at midnight
-cron.schedule("0 0 */3 * *", async () => {
-  console.log("🕐 Running AI recommendations update job every 3 days...");
-  console.log(`📅 Current time: ${new Date().toISOString()}`);
-
-  try {
-    const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
-    console.log(`🔍 Looking for users with recommendations older than: ${threeDaysAgo.toISOString()}`);
-
-    // Find users who either:
-    // 1. Have no AI recommendations yet
-    // 2. Have AI recommendations last updated more than 3 days ago
-    const usersToUpdate = await User.aggregate([
-      {
-        $lookup: {
-          from: "airecommendations",
-          localField: "clerkId",
-          foreignField: "userId",
-          as: "aiRec",
-        },
-      },
-      {
-        $match: {
-          $or: [
-            { "aiRec": { $size: 0 } },
-            { "aiRec.lastUpdated": { $lte: threeDaysAgo } }
-          ]
-        },
-      },
-    ]);
-
-    console.log(`✅ Found ${usersToUpdate.length} users to update AI recommendations for.`);
-
-    if (usersToUpdate.length === 0) {
-      console.log("📝 No users need recommendations updated at this time.");
-      return;
-    }
-
-    let successCount = 0;
-    let errorCount = 0;
-
-    for (const user of usersToUpdate) {
-      try {
-        await generateAndSaveForUser(user);
-        successCount++;
-        console.log(`✅ Successfully updated recommendations for user: ${user.clerkId}`);
-      } catch (error) {
-        errorCount++;
-        console.error(`❌ Failed to update recommendations for user ${user.clerkId}:`, error.message);
-      }
-    }
-
-    console.log(`🎯 Cron job completed: ${successCount} successful, ${errorCount} failed`);
-    
-  } catch (error) {
-    console.error("💥 Critical error running AI recommendations update job:", error);
-    console.error("Stack trace:", error.stack);
+// Run tests
+async function runTests() {
+  console.log('🚀 Starting Enhanced AI Recommendations Test Suite...\n');
+  
+  if (!GEMINI_API_KEY) {
+    console.log('❌ GEMINI_API_KEY not found in environment variables');
+    console.log('💡 Please add your Gemini API key to .env file');
+    return;
   }
-});
+  
+  await testEnhancedPrompt();
+  testFallbackRecommendations();
+  
+  console.log('\n✨ Test suite completed!');
+}
 
-// Log when cron job is scheduled
-console.log("⏰ AI recommendations cron job scheduled to run every 3 days at midnight");
-console.log("📋 Next run: Every 3rd day at 00:00");
+runTests().catch(console.error);

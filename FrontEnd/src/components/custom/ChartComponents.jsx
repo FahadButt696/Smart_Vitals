@@ -386,7 +386,7 @@ export const MetricCard = ({ title, value, change, icon: Icon, color = "from-cya
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
       whileHover={{ scale: 1.02 }}
-      className="bg-white/5 rounded-xl p-4 border border-white/10 hover:border-cyan-400/30 transition-all duration-300"
+      className="chart-component bg-white/5 rounded-xl p-4 border border-white/10 hover:border-cyan-400/30 transition-all duration-300"
     >
       <div className="flex items-center justify-between mb-3">
         <div className={`p-2 rounded-lg bg-gradient-to-r ${color}`}>
@@ -433,7 +433,7 @@ export const MiniMetricCard = ({ title, value, change, icon: Icon, color = "from
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
       whileHover={{ scale: 1.02 }}
-      className={`bg-white/5 rounded-xl ${sizeClasses[size]} border border-white/10 hover:border-cyan-400/30 transition-all duration-300`}
+      className={`chart-component bg-white/5 rounded-xl ${sizeClasses[size]} border border-white/10 hover:border-cyan-400/30 transition-all duration-300`}
     >
       <div className="flex items-center justify-between mb-3">
         <div className={`p-2 rounded-lg bg-gradient-to-r ${color}`}>

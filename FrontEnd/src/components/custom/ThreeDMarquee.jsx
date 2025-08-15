@@ -117,7 +117,7 @@ export function ThreeDMarqueeDemoSecond() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 250, damping: 15 }}
-            className="rounded-md border border-cyan-400/30 bg-gradient-to-r from-cyan-400 to-purple-400 px-6 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:from-cyan-500 hover:to-purple-500 hover:shadow-lg hover:shadow-cyan-500/25 focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-black focus:outline-none cursor-pointer backdrop-blur-sm"
+            className="three-d-marquee-btn rounded-md border border-cyan-400/30 bg-gradient-to-r from-cyan-400 to-purple-400 px-6 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:from-cyan-500 hover:to-purple-500 hover:shadow-lg hover:shadow-cyan-500/25 focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-black focus:outline-none cursor-pointer backdrop-blur-sm"
           >
             Join Smart Vitals
           </motion.button>
@@ -128,7 +128,7 @@ export function ThreeDMarqueeDemoSecond() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 250, damping: 15 }}
-            className="rounded-md border border-white/30 bg-white/10 px-6 py-2.5 text-sm font-medium text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 hover:border-white/50 hover:shadow-lg hover:shadow-white/25 focus:ring-2 focus:ring-white/20 focus:ring-offset-2 focus:ring-offset-black focus:outline-none cursor-pointer"
+            className="three-d-marquee-btn rounded-md border border-white/30 bg-white/10 px-6 py-2.5 text-sm font-medium text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 hover:border-white/50 hover:shadow-lg hover:shadow-white/25 focus:ring-2 focus:ring-white/20 focus:ring-offset-2 focus:ring-offset-black focus:outline-none cursor-pointer"
           >
             Explore Benefits
           </motion.button>

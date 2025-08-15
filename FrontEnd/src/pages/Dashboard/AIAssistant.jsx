@@ -129,7 +129,7 @@ const AIAssistant = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="p-4 bg-white/5 rounded-xl border border-white/10 hover:border-cyan-400/30 transition-all duration-200"
+              className="ai-assistant-card p-4 bg-white/5 rounded-xl border border-white/10 hover:border-cyan-400/30 transition-all duration-200"
             >
               <div className={`w-12 h-12 bg-gradient-to-r ${insight.color} rounded-xl flex items-center justify-center mb-3`}>
                 <insight.icon className="text-white text-xl" />
@@ -145,11 +145,11 @@ const AIAssistant = () => {
       <div className="backdrop-blur-xl border border-white/20 rounded-2xl p-6">
         <h3 className="text-xl font-bold text-white mb-6">Quick Actions</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <button className="p-4 bg-white/5 rounded-xl border border-white/10 hover:border-cyan-400/30 transition-all duration-200 text-left">
+          <button className="ai-assistant-btn p-4 bg-white/5 rounded-xl border border-white/10 hover:border-cyan-400/30 transition-all duration-200 text-left">
             <h4 className="text-white font-semibold mb-2">Generate Health Report</h4>
             <p className="text-white/60 text-sm">Get a comprehensive overview of your health status</p>
           </button>
-          <button className="p-4 bg-white/5 rounded-xl border border-white/10 hover:border-cyan-400/30 transition-all duration-200 text-left">
+          <button className="ai-assistant-btn p-4 bg-white/5 rounded-xl border border-white/10 hover:border-cyan-400/30 transition-all duration-200 text-left">
             <h4 className="text-white font-semibold mb-2">Nutrition Advice</h4>
             <p className="text-white/60 text-sm">Get personalized nutrition recommendations</p>
           </button>

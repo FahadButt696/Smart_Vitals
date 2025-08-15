@@ -100,7 +100,7 @@ const GlobalSidebar = () => {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         onClick={handleToggle}
-        className={`fixed top-4 z-50 p-2 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-xl text-white shadow-lg backdrop-blur-sm transition-all duration-300 sidebar-toggle ${
+        className={`sidebar-toggle-btn fixed top-4 z-50 p-2 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-xl text-white shadow-lg backdrop-blur-sm transition-all duration-300 sidebar-toggle ${
           sidebarOpen ? 'left-[14.5rem]' : 'left-4'
         }`}
         style={{ zIndex: 9999 }}
@@ -126,7 +126,7 @@ const GlobalSidebar = () => {
             <h1 className="w-50 text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent mb-4 text-left">
               Smart Vitals
             </h1>
-            <div className="flex items-center gap-3 p-4 bg-white/10 rounded-xl backdrop-blur-sm border border-cyan-400/20">
+            <div className="sidebar-user-profile flex items-center gap-3 p-4 bg-white/10 rounded-xl backdrop-blur-sm border border-cyan-400/20">
               <div className="w-10 h-10 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full flex items-center justify-center">
                 <Heart className="text-white" />
               </div>
@@ -145,7 +145,7 @@ const GlobalSidebar = () => {
                 whileHover={{ x: 5, scale: 1.02 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleNavigation(item.route)}
-                className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all duration-200 sidebar-item ${
+                className={`sidebar-nav-item global-sidebar-btn w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all duration-200 sidebar-item ${
                   activeSection === item.id
                     ? 'bg-gradient-to-r from-cyan-400/20 to-purple-400/20 border border-cyan-400/30 text-white shadow-lg'
                     : 'text-white/70 hover:text-white hover:bg-white/10 border border-transparent hover:border-cyan-400/20'
@@ -168,7 +168,7 @@ const GlobalSidebar = () => {
                 await signOut();
                 navigate('/');
               }}
-              className="w-full flex items-center gap-3 p-3 rounded-xl text-red-400 hover:text-red-300 hover:bg-red-400/10 transition-all duration-200 border border-transparent hover:border-red-400/20"
+              className="sidebar-signout-btn global-sidebar-btn w-full flex items-center gap-3 p-3 rounded-xl text-red-400 hover:text-red-300 hover:bg-red-400/10 transition-all duration-200 border border-transparent hover:border-red-400/20"
             >
               <LogOut className="text-lg flex-shrink-0" />
               <span className="font-medium">Sign Out</span>

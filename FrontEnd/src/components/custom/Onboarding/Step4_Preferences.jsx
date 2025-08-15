@@ -78,7 +78,7 @@ const Step4_Preferences = () => {
                 key={option.value}
                 type="button"
                 onClick={() => togglePreference(option.value)}
-                className={`p-3 sm:p-4 rounded-xl border-2 transition-all duration-200 ${
+                className={`onboarding-btn p-3 sm:p-4 rounded-xl border-2 transition-all duration-200 ${
                   selectedPreferences.includes(option.value)
                     ? 'border-cyan-400 bg-cyan-400/20 text-cyan-400'
                     : 'border-white/20 bg-white/5 text-white hover:border-white/40 hover:bg-white/10'

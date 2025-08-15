@@ -189,11 +189,11 @@
   
   /* Button styles matching onboarding page */
   .btn-primary {
-    @apply bg-gradient-to-r from-cyan-400 to-purple-400 text-white shadow-lg hover:from-cyan-500 hover:to-purple-500 transition-all duration-200;
+    @apply bg-gradient-to-r from-cyan-400 to-purple-400 text-white shadow-lg transition-all duration-200;
   }
   
   .btn-secondary {
-    @apply bg-white/10 text-white border border-white/20 hover:bg-white/20 backdrop-blur-sm transition-all duration-200;
+    @apply bg-white/10 text-white border border-white/20 backdrop-blur-sm transition-all duration-200;
   }
   
   /* Global button overrides for all buttons */

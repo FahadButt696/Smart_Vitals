@@ -1,0 +1,73 @@
+/* 
+ * HOVER FIXES - TEMPORARILY COMMENTED OUT
+ * Uncomment specific rules as needed for testing
+ */
+
+/*
+* {
+  transition: none !important;
+}
+
+button,
+.btn,
+.card,
+.clickable,
+.hover\:cursor-pointer,
+.feature-card,
+.health-stat-card,
+.ai-recommendation,
+.weight-card,
+.log-weight-btn,
+.edit-weight-btn,
+.delete-weight-btn,
+.chart-container {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid #06b6d4 !important;
+  outline-offset: 2px !important;
+}
+
+* {
+  animation: none !important;
+}
+
+@keyframes float {
+  0%, 100% { 
+    transform: translateY(0px) rotate(0deg); 
+  }
+  50% { 
+    transform: translateY(-20px) rotate(5deg); 
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(6, 182, 212, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.8);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.onboarding-bg-effect::before,
+.onboarding-bg-effect::after,
+.weight-card.loading,
+.loading-spinner,
+.pulse-glow {
+  animation: inherit !important;
+}
+*/

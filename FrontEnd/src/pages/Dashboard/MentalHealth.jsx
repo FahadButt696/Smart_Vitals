@@ -169,7 +169,7 @@ const MentalHealth = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-4 bg-red-500/10 rounded-xl border border-red-400/20 text-center hover:border-red-400/40 transition-all duration-200"
+                  className="mental-health-card p-4 bg-red-500/10 rounded-xl border border-red-400/20 text-center hover:border-red-400/40 transition-all duration-200"
                 >
                   <div className="text-red-300 font-medium text-sm mb-2">{resource.title}</div>
                   <div className="text-red-400 font-bold text-2xl mb-2">{resource.number}</div>
@@ -204,7 +204,7 @@ const MentalHealth = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="p-4 bg-white/5 rounded-xl border border-white/10 hover:border-purple-400/30 transition-all duration-200"
+                className="mental-health-card p-4 bg-white/5 rounded-xl border border-white/10 hover:border-purple-400/30 transition-all duration-200"
               >
                 <div className="flex items-center justify-between mb-3">
                   <div className={`w-12 h-12 bg-gradient-to-r ${insight.color} rounded-xl flex items-center justify-center`}>
@@ -250,7 +250,7 @@ const MentalHealth = () => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={action.action}
-                className="p-4 bg-white/5 rounded-xl border border-white/10 hover:border-purple-400/30 transition-all duration-200 text-left group"
+                className="mental-health-btn p-4 bg-white/5 rounded-xl border border-white/10 hover:border-purple-400/30 transition-all duration-200 text-left group"
               >
                 <div className="w-12 h-12 bg-gradient-to-r from-purple-400/20 to-cyan-400/20 rounded-xl flex items-center justify-center mb-3 group-hover:from-purple-400/30 group-hover:to-cyan-400/30 transition-all duration-200">
                   <action.icon className="text-purple-400 text-xl" />

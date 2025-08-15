@@ -52,16 +52,18 @@ export default function Stepper({
   };
 
   return (
-    <div
-      className="flex min-h-full flex-1 flex-col items-center justify-center p-4"
-      {...rest}
-    >
-      <div
-        className={`mx-auto w-full bg-white/5 backdrop-blur-xl shadow-lg rounded-xl ${stepCircleContainerClassName}`}
-      >
-        <div
-          className={`${stepContainerClassName} flex w-full items-center px-4 py-6`}
-        >
+    <div className={`stepper-container relative w-full max-w-2xl mx-auto ${containerClassName}`}>
+      <div className="relative">
+        {/* Progress bar */}
+        <div className="absolute top-0 left-0 w-full h-1 bg-gray-700 rounded-full">
+          <div
+            className="h-full bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full transition-all duration-500 ease-out"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+
+        {/* Step indicators */}
+        <div className="flex justify-between items-center mb-8 pt-4">
           {stepsArray.map((_, index) => {
             const stepNumber = index + 1;
             const isNotLastStep = index < totalSteps - 1;
@@ -110,7 +112,7 @@ export default function Stepper({
               {currentStep !== 1 && (
                 <button
                   onClick={handleBack}
-                  className={`rounded px-3 py-2 transition text-gray-300 hover:text-white border border-transparent hover:border-white`}
+                  className={`stepper-back-btn rounded px-3 py-2 transition text-gray-300 hover:text-white border border-transparent hover:border-white`}
                   {...backButtonProps}
                 >
                   {backButtonText}

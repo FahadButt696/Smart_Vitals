@@ -187,15 +187,15 @@ const Reports = () => {
       <div className="backdrop-blur-xl border border-white/20 rounded-2xl p-6">
         <h3 className="text-xl font-bold text-white mb-6">Quick Actions</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <button className="p-4 bg-white/5 rounded-xl border border-white/10 hover:border-cyan-400/30 transition-all duration-200 text-left">
+          <button className="reports-btn p-4 bg-white/5 rounded-xl border border-white/10 hover:border-cyan-400/30 transition-all duration-200 text-left">
             <h4 className="text-white font-semibold mb-2">Schedule Reports</h4>
             <p className="text-white/60 text-sm">Set up automatic report generation</p>
           </button>
-          <button className="p-4 bg-white/5 rounded-xl border border-white/10 hover:border-cyan-400/30 transition-all duration-200 text-left">
+          <button className="reports-btn p-4 bg-white/5 rounded-xl border border-white/10 hover:border-cyan-400/30 transition-all duration-200 text-left">
             <h4 className="text-white font-semibold mb-2">Share with Doctor</h4>
             <p className="text-white/60 text-sm">Send reports to healthcare providers</p>
           </button>
-          <button className="p-4 bg-white/5 rounded-xl border border-white/10 hover:border-cyan-400/30 transition-all duration-200 text-left">
+          <button className="reports-btn p-4 bg-white/5 rounded-xl border border-white/10 hover:border-cyan-400/30 transition-all duration-200 text-left">
             <h4 className="text-white font-semibold mb-2">Archive Reports</h4>
             <p className="text-white/60 text-sm">Organize and store old reports</p>
           </button>

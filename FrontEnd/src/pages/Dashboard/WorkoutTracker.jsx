@@ -968,7 +968,7 @@ const WorkoutTracker = () => {
                           key={workout._id}
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 hover:border-cyan-400/50 transition-all hover:shadow-lg hover:shadow-cyan-400/20 group"
+                          className="workout-tracker-card bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 hover:border-cyan-400/50 transition-all hover:shadow-lg hover:shadow-cyan-400/20 group"
                         >
                           <div className="flex items-start justify-between mb-4">
                             <div className="flex items-center space-x-3">

@@ -44,6 +44,7 @@ import {
 import DashboardLayout from "@/components/custom/DashboardLayout";
 import { BarChart, ProgressBar, DoughnutChart, TrendIndicator, LineChart, MetricCard } from "@/components/custom/ChartComponents";
 import AIRecommendationCard from "@/components/custom/AIRecommendationCard";
+import MultipleAIRecommendations from "@/components/custom/MultipleAIRecommendations";
 import { useAIRecommendations } from "@/hooks/useAIRecommendations";
 
 // Dashboard Overview Component
@@ -51,7 +52,7 @@ const DashboardOverview = () => {
   const { user } = useUser();
   const { getToken } = useAuth();
   const navigate = useNavigate();
-  const { recommendations, isLoading: aiLoading } = useAIRecommendations();
+  const { recommendations, isLoading: aiLoading, refreshRecommendations } = useAIRecommendations();
   
   // Real-time stats state
   const [todayStats, setTodayStats] = useState({
@@ -399,7 +400,7 @@ const DashboardOverview = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:shadow-lg transition-all duration-300 group health-stat-card"
+            className="dashboard-health-stat-card backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:shadow-lg transition-all duration-300 group health-stat-card"
           >
             <div className="flex items-center justify-between mb-4">
               <div className={`p-3 rounded-xl bg-gradient-to-r ${stat.color} group-hover:scale-110 transition-transform duration-300`}>
@@ -536,7 +537,7 @@ const DashboardOverview = () => {
               transition={{ delay: index * 0.1 }}
               whileHover={{ scale: 1.02, y: -5 }}
               onClick={() => handleNavigation(feature.route)}
-              className="backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6 cursor-pointer hover:shadow-xl transition-all duration-300 group feature-card"
+              className="dashboard-feature-card backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6 cursor-pointer hover:shadow-xl transition-all duration-300 group feature-card"
             >
               <div className="flex items-start justify-between mb-4">
                 <div className={`p-2 sm:p-3 rounded-xl bg-gradient-to-r ${feature.color} group-hover:scale-110 transition-transform duration-300`}>
@@ -601,63 +602,70 @@ const DashboardOverview = () => {
             </div>
           ) : recommendations ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {recommendations.mealLog && (
-                <AIRecommendationCard
-                  title="Meal & Nutrition"
-                  recommendation={recommendations.mealLog}
-                  feature="mealLog"
-                  userId={user?.id}
-                />
-              )}
-              {recommendations.workoutTracker && (
-                <AIRecommendationCard
-                  title="Workout & Fitness"
-                  recommendation={recommendations.workoutTracker}
-                  feature="workoutTracker"
-                  userId={user?.id}
-                />
-              )}
-              {recommendations.sleepTracker && (
-                <AIRecommendationCard
-                  title="Sleep & Recovery"
-                  recommendation={recommendations.sleepTracker}
-                  feature="sleepTracker"
-                  userId={user?.id}
-                />
-              )}
-              {recommendations.hydration && (
-                <AIRecommendationCard
-                  title="Hydration"
-                  recommendation={recommendations.hydration}
-                  feature="hydration"
-                  userId={user?.id}
-                />
-              )}
-              {recommendations.weightProgress && (
-                <AIRecommendationCard
-                  title="Weight Management"
-                  recommendation={recommendations.weightProgress}
-                  feature="weightProgress"
-                  userId={user?.id}
-                />
-              )}
-              {recommendations.mentalHealthChatbot && (
-                <AIRecommendationCard
-                  title="Mental Health"
-                  recommendation={recommendations.mentalHealthChatbot}
-                  feature="mentalHealthChatbot"
-                  userId={user?.id}
-                />
-              )}
-              {recommendations.generalTips && (
-                <AIRecommendationCard
-                  title="General Health"
-                  recommendation={recommendations.generalTips}
-                  feature="generalTips"
-                  userId={user?.id}
-                />
-              )}
-            </div>
+                {recommendations.mealLog && recommendations.mealLog.length > 0 && (
+                  <MultipleAIRecommendations
+                    title="Meal & Nutrition"
+                    recommendations={recommendations.mealLog}
+                    feature="mealLog"
+                    userId={user?.id}
+                    onRefresh={refreshRecommendations}
+                  />
+                )}
+                {recommendations.workoutTracker && recommendations.workoutTracker.length > 0 && (
+                  <MultipleAIRecommendations
+                    title="Workout & Fitness"
+                    recommendations={recommendations.workoutTracker}
+                    feature="workoutTracker"
+                    userId={user?.id}
+                    onRefresh={refreshRecommendations}
+                  />
+                )}
+                {recommendations.sleepTracker && recommendations.sleepTracker.length > 0 && (
+                  <MultipleAIRecommendations
+                    title="Sleep & Recovery"
+                    recommendations={recommendations.sleepTracker}
+                    feature="sleepTracker"
+                    userId={user?.id}
+                    onRefresh={refreshRecommendations}
+                  />
+                )}
+                {recommendations.hydration && recommendations.hydration.length > 0 && (
+                  <MultipleAIRecommendations
+                    title="Hydration"
+                    recommendations={recommendations.hydration}
+                    feature="hydration"
+                    userId={user?.id}
+                    onRefresh={refreshRecommendations}
+                  />
+                )}
+                {recommendations.weightProgress && recommendations.weightProgress.length > 0 && (
+                  <MultipleAIRecommendations
+                    title="Weight Management"
+                    recommendations={recommendations.weightProgress}
+                    feature="weightProgress"
+                    userId={user?.id}
+                    onRefresh={refreshRecommendations}
+                  />
+                )}
+                {recommendations.mentalHealthChatbot && recommendations.mentalHealthChatbot.length > 0 && (
+                  <MultipleAIRecommendations
+                    title="Mental Health"
+                    recommendations={recommendations.mentalHealthChatbot}
+                    feature="mentalHealthChatbot"
+                    userId={user?.id}
+                    onRefresh={refreshRecommendations}
+                  />
+                )}
+                {recommendations.generalTips && recommendations.generalTips.length > 0 && (
+                  <MultipleAIRecommendations
+                    title="General Health"
+                    recommendations={recommendations.generalTips}
+                    feature="generalTips"
+                    userId={user?.id}
+                    onRefresh={refreshRecommendations}
+                  />
+                )}
+              </div>
           ) : (
             <div className="text-center py-8">
               <p className="text-white/60 mb-4">No AI recommendations available yet.</p>

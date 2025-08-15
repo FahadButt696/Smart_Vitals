@@ -508,14 +508,14 @@ const SymptomChecker = () => {
                   <button
                     type="button"
                     onClick={() => setSymptomText("I have a fever of 101°F, sore throat, and difficulty swallowing for the past 2 days.")}
-                    className="text-left p-2 bg-white/5 rounded-lg border border-white/10 hover:border-cyan-400/30 hover:bg-white/10 transition-all duration-200"
+                    className="symptom-checker-btn text-left p-2 bg-white/5 rounded-lg border border-white/10 hover:border-cyan-400/30 hover:bg-white/10 transition-all duration-200"
                   >
                     <p className="text-white/70 text-xs">"I have a fever of 101°F, sore throat, and difficulty swallowing for the past 2 days."</p>
                   </button>
                   <button
                     type="button"
                     onClick={() => setSymptomText("Experiencing chest pain, shortness of breath, and left arm numbness since this morning.")}
-                    className="text-left p-2 bg-white/5 rounded-lg border border-white/10 hover:border-cyan-400/30 hover:bg-white/10 transition-all duration-200"
+                    className="symptom-checker-btn text-left p-2 bg-white/5 rounded-lg border border-white/10 hover:border-cyan-400/30 hover:bg-white/10 transition-all duration-200"
                   >
                     <p className="text-white/70 text-xs">"Experiencing chest pain, shortness of breath, and left arm numbness since this morning."</p>
                   </button>
