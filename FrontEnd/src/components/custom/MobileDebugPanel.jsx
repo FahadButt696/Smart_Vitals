@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Smartphone, Wifi, AlertTriangle, CheckCircle, RefreshCw } from 'lucide-react';
-import { mobileApiClient, testMobileConnectivity, mobileHealthCheck } from '@/utils/mobileApiUtils';
+import { mobileApiClient, testMobileConnectivity, mobileHealthCheck, getNetworkStatus, isOnline } from '@/utils/mobileApiUtils';
 
 const MobileDebugPanel = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -12,24 +12,83 @@ const MobileDebugPanel = () => {
     connection: null,
     apiHealth: null,
     connectivityTest: null,
-    lastTest: null
+    lastTest: null,
+    error: null
   });
   const [isTesting, setIsTesting] = useState(false);
 
+  // Safe mobile detection with fallbacks
+  const detectMobile = () => {
+    try {
+      if (typeof window === 'undefined' || typeof navigator === 'undefined') {
+        return false;
+      }
+      
+      const userAgent = navigator.userAgent || '';
+      const platform = navigator.platform || '';
+      
+      const isMobileUA = /Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+      const isMobilePlatform = /Android|iPhone|iPad|iPod/i.test(platform);
+      const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      const isSmallScreen = window.innerWidth <= 768;
+      
+      return isMobileUA || isMobilePlatform || (hasTouch && isSmallScreen);
+    } catch (error) {
+      console.warn('Mobile detection failed:', error);
+      return false;
+    }
+  };
+
+  // Safe network information with fallbacks
+  const getSafeNetworkInfo = () => {
+    try {
+      if ('connection' in navigator && navigator.connection) {
+        return {
+          effectiveType: navigator.connection.effectiveType || 'unknown',
+          downlink: navigator.connection.downlink || 0,
+          rtt: navigator.connection.rtt || 0,
+          online: navigator.onLine
+        };
+      }
+      
+      return {
+        effectiveType: 'unknown',
+        downlink: 0,
+        rtt: 0,
+        online: navigator.onLine
+      };
+    } catch (error) {
+      console.warn('Network info detection failed:', error);
+      return {
+        effectiveType: 'unknown',
+        downlink: 0,
+        rtt: 0,
+        online: true
+      };
+    }
+  };
+
   useEffect(() => {
-    // Only show on mobile devices
-    const isMobile = /Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    setDebugInfo(prev => ({
-      ...prev,
-      mobile: isMobile,
-      userAgent: navigator.userAgent,
-      platform: navigator.platform,
-      connection: navigator.connection ? {
-        effectiveType: navigator.connection.effectiveType,
-        downlink: navigator.connection.downlink,
-        rtt: navigator.connection.rtt
-      } : null
-    }));
+    try {
+      const isMobile = detectMobile();
+      const networkInfo = getSafeNetworkInfo();
+      
+      setDebugInfo(prev => ({
+        ...prev,
+        mobile: isMobile,
+        userAgent: navigator.userAgent || 'Unknown',
+        platform: navigator.platform || 'Unknown',
+        connection: networkInfo,
+        error: null
+      }));
+    } catch (error) {
+      console.error('Failed to initialize mobile debug panel:', error);
+      setDebugInfo(prev => ({
+        ...prev,
+        error: error.message,
+        mobile: false
+      }));
+    }
   }, []);
 
   const runTests = async () => {
@@ -45,7 +104,8 @@ const MobileDebugPanel = () => {
         ...prev,
         apiHealth: healthResult,
         connectivityTest: connectivityResult,
-        lastTest: new Date().toISOString()
+        lastTest: new Date().toISOString(),
+        error: null
       }));
     } catch (error) {
       console.error('Mobile debug tests failed:', error);
@@ -53,7 +113,8 @@ const MobileDebugPanel = () => {
         ...prev,
         apiHealth: { error: error.message },
         connectivityTest: { error: error.message },
-        lastTest: new Date().toISOString()
+        lastTest: new Date().toISOString(),
+        error: error.message
       }));
     } finally {
       setIsTesting(false);
@@ -97,6 +158,16 @@ const MobileDebugPanel = () => {
               </button>
             </div>
 
+            {/* Error Display */}
+            {debugInfo.error && (
+              <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-3 mb-4">
+                <div className="flex items-center gap-2 text-red-400">
+                  <AlertTriangle className="w-4 h-4" />
+                  <span className="text-xs">Error: {debugInfo.error}</span>
+                </div>
+              </div>
+            )}
+
             {/* Device Info */}
             <div className="space-y-3 mb-4">
               <div className="bg-white/10 rounded-lg p-3">
@@ -105,6 +176,7 @@ const MobileDebugPanel = () => {
                   <p><span className="text-gray-400">Platform:</span> {debugInfo.platform}</p>
                   <p><span className="text-gray-400">Connection:</span> {debugInfo.connection?.effectiveType || 'Unknown'}</p>
                   <p><span className="text-gray-400">Speed:</span> {debugInfo.connection?.downlink || 'Unknown'} Mbps</p>
+                  <p><span className="text-gray-400">Online:</span> {debugInfo.connection?.online ? 'Yes' : 'No'}</p>
                 </div>
               </div>
 

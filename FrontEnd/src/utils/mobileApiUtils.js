@@ -1,11 +1,76 @@
 // Mobile-specific API utilities
 import { mobileFetch, mobileFetchWithRetry } from '@/config/api.js';
 
+// Safe mobile detection with fallbacks
+const detectMobile = () => {
+  try {
+    // Check if we're in a browser environment
+    if (typeof window === 'undefined' || typeof navigator === 'undefined') {
+      return false;
+    }
+    
+    // Multiple detection methods for better compatibility
+    const userAgent = navigator.userAgent || '';
+    const platform = navigator.platform || '';
+    
+    // Primary detection
+    const isMobileUA = /Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+    
+    // Fallback detection
+    const isMobilePlatform = /Android|iPhone|iPad|iPod/i.test(platform);
+    
+    // Touch detection (most reliable for mobile)
+    const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    
+    // Screen size detection
+    const isSmallScreen = window.innerWidth <= 768;
+    
+    return isMobileUA || isMobilePlatform || (hasTouch && isSmallScreen);
+  } catch (error) {
+    console.warn('Mobile detection failed, defaulting to desktop:', error);
+    return false;
+  }
+};
+
+// Safe network information with fallbacks
+const getNetworkInfo = () => {
+  try {
+    // Check if Network Information API is available
+    if ('connection' in navigator && navigator.connection) {
+      return {
+        effectiveType: navigator.connection.effectiveType || 'unknown',
+        downlink: navigator.connection.downlink || 0,
+        rtt: navigator.connection.rtt || 0,
+        online: navigator.onLine
+      };
+    }
+    
+    // Fallback to basic online status
+    return {
+      effectiveType: 'unknown',
+      downlink: 0,
+      rtt: 0,
+      online: navigator.onLine
+    };
+  } catch (error) {
+    console.warn('Network info detection failed:', error);
+    return {
+      effectiveType: 'unknown',
+      downlink: 0,
+      rtt: 0,
+      online: true // Assume online if we can't detect
+    };
+  }
+};
+
 // Mobile API wrapper with better error handling
 export class MobileApiClient {
   constructor(baseUrl) {
     this.baseUrl = baseUrl;
-    this.isMobile = /Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    this.isMobile = detectMobile();
+    this.networkInfo = getNetworkInfo();
+    this.retryCount = 0;
+    this.maxRetries = 3;
   }
 
   // Generic API call with mobile optimization
@@ -33,8 +98,9 @@ export class MobileApiClient {
         console.log(`📱 Mobile API error details:`, {
           endpoint,
           error: error.message,
-          userAgent: navigator.userAgent,
-          timestamp: new Date().toISOString()
+          userAgent: navigator.userAgent || 'Unknown',
+          timestamp: new Date().toISOString(),
+          networkInfo: this.networkInfo
         });
       }
       
@@ -114,10 +180,37 @@ export class MobileApiClient {
       throw error;
     }
   }
+
+  // Get current network status
+  getNetworkStatus() {
+    return this.networkInfo;
+  }
+
+  // Check if device is online
+  isOnline() {
+    return this.networkInfo.online;
+  }
 }
 
-// Create default instance
-export const mobileApiClient = new MobileApiClient(import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000');
+// Create default instance with error handling
+let mobileApiClient;
+try {
+  mobileApiClient = new MobileApiClient(import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000');
+} catch (error) {
+  console.error('Failed to create MobileApiClient:', error);
+  // Fallback to basic client
+  mobileApiClient = {
+    isMobile: false,
+    get: async () => { throw new Error('Mobile API client not available'); },
+    post: async () => { throw new Error('Mobile API client not available'); },
+    put: async () => { throw new Error('Mobile API client not available'); },
+    delete: async () => { throw new Error('Mobile API client not available'); },
+    mobileHealthCheck: async () => { throw new Error('Mobile API client not available'); },
+    testMobileConnectivity: async () => { throw new Error('Mobile API client not available'); },
+    getNetworkStatus: () => ({ online: true, effectiveType: 'unknown' }),
+    isOnline: () => true
+  };
+}
 
 // Export individual methods for convenience
 export const {
@@ -126,5 +219,9 @@ export const {
   put: mobilePut,
   delete: mobileDelete,
   mobileHealthCheck,
-  testMobileConnectivity
+  testMobileConnectivity,
+  getNetworkStatus,
+  isOnline
 } = mobileApiClient;
+
+export { mobileApiClient };

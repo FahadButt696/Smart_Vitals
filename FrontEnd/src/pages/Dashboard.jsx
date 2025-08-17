@@ -47,6 +47,7 @@ import AIRecommendationCard from "@/components/custom/AIRecommendationCard";
 import MultipleAIRecommendations from "@/components/custom/MultipleAIRecommendations";
 import { useAIRecommendations } from "@/hooks/useAIRecommendations";
 import MobileDebugPanel from "@/components/custom/MobileDebugPanel";
+import ErrorBoundary from "@/components/custom/ErrorBoundary";
 
 // Dashboard Overview Component
 const DashboardOverview = () => {
@@ -765,17 +766,19 @@ const Dashboard = () => {
 
   return (
     <SignedIn>
-      <DashboardLayout title={getRouteTitle()} subtitle={getRouteSubtitle()}>
-        {/* Render the overview content for the main dashboard route */}
-        {(location.pathname === '/Dashboard' || location.pathname === '/Dashboard/') && (
-          <DashboardOverview />
-        )}
-        
-        {/* Render nested routes */}
-        <div>
-          <Outlet />
-        </div>
-      </DashboardLayout>
+      <ErrorBoundary>
+        <DashboardLayout title={getRouteTitle()} subtitle={getRouteSubtitle()}>
+          {/* Render the overview content for the main dashboard route */}
+          {(location.pathname === '/Dashboard' || location.pathname === '/Dashboard/') && (
+            <DashboardOverview />
+          )}
+          
+          {/* Render nested routes */}
+          <div>
+            <Outlet />
+          </div>
+        </DashboardLayout>
+      </ErrorBoundary>
     </SignedIn>
   );
 };

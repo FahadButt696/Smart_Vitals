@@ -1,17 +1,46 @@
 // API Configuration
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
-// Mobile detection
-const isMobile = /Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-// Mobile-specific API configuration
-const MOBILE_CONFIG = {
-  timeout: 30000, // 30 seconds for mobile (longer than desktop)
-  retryAttempts: 3,
-  retryDelay: 1000
+// Safe mobile detection with fallbacks
+const detectMobile = () => {
+  try {
+    // Check if we're in a browser environment
+    if (typeof window === 'undefined' || typeof navigator === 'undefined') {
+      return false;
+    }
+    
+    const userAgent = navigator.userAgent || '';
+    const platform = navigator.platform || '';
+    
+    // Primary detection
+    const isMobileUA = /Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+    
+    // Fallback detection
+    const isMobilePlatform = /Android|iPhone|iPad|iPod/i.test(platform);
+    
+    // Touch detection (most reliable for mobile)
+    const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    
+    // Screen size detection
+    const isSmallScreen = window.innerWidth <= 768;
+    
+    return isMobileUA || isMobilePlatform || (hasTouch && isSmallScreen);
+  } catch (error) {
+    console.warn('Mobile detection failed, defaulting to desktop:', error);
+    return false;
+  }
 };
 
-// Helper function for mobile-optimized fetch
+const isMobile = detectMobile();
+
+// Mobile-specific API configuration with fallbacks
+const MOBILE_CONFIG = {
+  timeout: isMobile ? 30000 : 15000, // 30 seconds for mobile, 15 for desktop
+  retryAttempts: isMobile ? 3 : 1,
+  retryDelay: isMobile ? 1000 : 0
+};
+
+// Helper function for mobile-optimized fetch with better error handling
 export const mobileFetch = async (url, options = {}) => {
   const config = {
     ...options,
@@ -19,15 +48,23 @@ export const mobileFetch = async (url, options = {}) => {
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
-      'User-Agent': navigator.userAgent,
       ...options.headers
     }
   };
 
-  // Add mobile-specific headers
-  if (isMobile) {
-    config.headers['X-Mobile-Client'] = 'true';
-    config.headers['X-Device-Type'] = 'mobile';
+  // Add mobile-specific headers safely
+  try {
+    if (isMobile) {
+      config.headers['X-Mobile-Client'] = 'true';
+      config.headers['X-Device-Type'] = 'mobile';
+      
+      // Only add User-Agent if available
+      if (navigator.userAgent) {
+        config.headers['User-Agent'] = navigator.userAgent;
+      }
+    }
+  } catch (error) {
+    console.warn('Failed to add mobile headers:', error);
   }
 
   try {
@@ -54,14 +91,18 @@ export const mobileFetch = async (url, options = {}) => {
   }
 };
 
-// Retry wrapper for mobile
+// Retry wrapper for mobile with better error handling
 export const mobileFetchWithRetry = async (url, options = {}, retryCount = 0) => {
   try {
     return await mobileFetch(url, options);
   } catch (error) {
     if (retryCount < MOBILE_CONFIG.retryAttempts) {
       console.log(`🔄 Mobile API retry ${retryCount + 1}/${MOBILE_CONFIG.retryAttempts} for ${url}`);
-      await new Promise(resolve => setTimeout(resolve, MOBILE_CONFIG.retryDelay));
+      
+      // Exponential backoff for retries
+      const delay = MOBILE_CONFIG.retryDelay * Math.pow(2, retryCount);
+      await new Promise(resolve => setTimeout(resolve, delay));
+      
       return mobileFetchWithRetry(url, options, retryCount + 1);
     }
     throw error;
