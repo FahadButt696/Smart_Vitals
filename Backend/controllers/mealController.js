@@ -1,30 +1,22 @@
 import axios from "axios";
 import FormData from "form-data";
 import Meal from "../models/Meal.js";
-import multer from "multer";
-import path from "path";
-import fs from "fs";
-
-// Create /uploads if not exists
-const uploadDir = path.join(process.cwd(), "uploads");
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir);
-}
-
-// Configure multer to save to /uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname.replace(/\s+/g, "_"));
-  }
-});
-const upload = multer({ storage });
+import { uploadImage, deleteImage } from "../utils/cloudinaryUtils.js";
 
 /**
  * Phase 1: Detect food from image (no DB save yet)
  */
 export const detectFoodFromImage = async (req, res) => {
   try {
+    console.log('🔍 detectFoodFromImage called');
+    console.log('📁 File received:', req.file ? {
+      fieldname: req.file.fieldname,
+      originalname: req.file.originalname,
+      mimetype: req.file.mimetype,
+      size: req.file.size,
+      buffer: req.file.buffer ? 'Buffer present' : 'No buffer'
+    } : 'No file');
+
     if (!req.file) return res.status(400).json({ error: "No image uploaded" });
 
     // Check if API key is configured
@@ -34,37 +26,66 @@ export const detectFoodFromImage = async (req, res) => {
       });
     }
 
-    // Prepare file for CalorieMama
+    console.log('☁️ Uploading to Cloudinary...');
+    // Upload image to Cloudinary first
+    const cloudinaryResult = await uploadImage(req.file.buffer, req.file.mimetype, 'smart-vitals/meals');
+    console.log('✅ Cloudinary upload successful:', cloudinaryResult);
+    
+    // Prepare file for CalorieMama using the uploaded image URL
     const formData = new FormData();
-    formData.append("media", fs.createReadStream(req.file.path));
+    
+    // Download the image from Cloudinary for CalorieMama API
+    const imageResponse = await axios.get(cloudinaryResult.url, { responseType: 'stream' });
+    formData.append("media", imageResponse.data);
 
+    console.log('🔍 Calling CalorieMama API...');
     const apiRes = await axios.post(
       `https://api-2445582032290.production.gw.apicast.io/v1/foodrecognition/full?user_key=${process.env.CALORIEMAMA_API_KEY}`,
       formData,
       { headers: formData.getHeaders() }
     );
 
+    console.log('📊 CalorieMama API Response Structure:', JSON.stringify(apiRes.data, null, 2));
+
     const items = apiRes.data.results[0]?.items || [];
     if (!items.length) return res.status(404).json({ error: "No food detected" });
 
+    // Process and normalize nutrition data from CalorieMama API
+    const processedItems = items.map(item => {
+      console.log('🍎 Processing item:', item.name, 'Raw nutrition:', item.nutrition);
+      
+      // Normalize nutrition data to ensure consistent structure
+      const normalizedNutrition = {
+        calories: item.nutrition?.calories || 0,
+        protein: item.nutrition?.protein || item.nutrition?.protein_g || 0,
+        carbs: item.nutrition?.totalCarbs || item.nutrition?.carbohydrates || item.nutrition?.carbs || 0,
+        fat: item.nutrition?.totalFat || item.nutrition?.fat || item.nutrition?.total_fat || 0,
+        fiber: item.nutrition?.fiber || 0,
+        sugar: item.nutrition?.sugar || 0,
+        sodium: item.nutrition?.sodium || 0,
+        cholesterol: item.nutrition?.cholesterol || 0
+      };
+      
+      console.log('✅ Normalized nutrition:', normalizedNutrition);
+      
+      return {
+        ...item,
+        nutrition: normalizedNutrition
+      };
+    });
+
+    console.log('🍽️ Food detection successful, items found:', processedItems.length);
     res.json({
       success: true,
-      imagePath: `/uploads/${req.file.filename}`, // Send image URL so frontend can display
-      items
+      imageData: cloudinaryResult, // Send Cloudinary data
+      items: processedItems
     });
   } catch (err) {
-    console.error("Error detecting food:", err.message);
-    
-    // Provide more specific error messages
-    if (err.response?.status === 401) {
-      res.status(401).json({ error: "Invalid CalorieMama API key" });
-    } else if (err.response?.status === 429) {
-      res.status(429).json({ error: "API rate limit exceeded" });
-    } else if (err.code === 'ENOENT') {
-      res.status(500).json({ error: "Upload directory not found" });
-    } else {
-      res.status(500).json({ error: "Failed to detect food", details: err.message });
-    }
+    console.error("❌ Error detecting food:", err.message);
+    res.status(500).json({ 
+      error: "Failed to process image", 
+      details: err.message 
+    });
   }
 };
 
@@ -73,7 +94,7 @@ export const detectFoodFromImage = async (req, res) => {
  */
 export const saveMeal = async (req, res) => {
   try {
-    const { userId, mealType, mealItems, imagePath } = req.body;
+    const { userId, mealType, mealItems, imageData } = req.body;
 
     if (!mealItems || !Array.isArray(mealItems) || !mealItems.length) {
       return res.status(400).json({ error: "Meal must contain at least one item" });
@@ -115,15 +136,24 @@ export const saveMeal = async (req, res) => {
       }
     });
 
+    console.log('🍽️ Calculated total nutrition:', totalNutrition);
+    console.log('📊 Individual meal items nutrition:', calculatedItems.map(item => ({
+      name: item.name,
+      nutrients: item.nutrients,
+      calculatedNutrition: item.calculatedNutrition
+    })));
+
     const meal = new Meal({
       userId,
       mealType: mealType || "snack",
       mealItems: calculatedItems,
       totalNutrition,
-      imagePath // Save image path from detect step
+      imagePath: imageData?.url || null, // Save Cloudinary URL
+      imagePublicId: imageData?.publicId || null // Save Cloudinary public ID for future deletion
     });
 
     await meal.save();
+    console.log('💾 Meal saved with totalNutrition:', meal.totalNutrition);
     res.status(201).json({ success: true, meal });
   } catch (err) {
     console.error("Error saving meal:", err.message);
@@ -226,9 +256,8 @@ export const deleteMeal = async (req, res) => {
     if (!deleted) return res.status(404).json({ error: "Meal not found" });
 
     // Remove image from uploads
-    if (deleted.imagePath) {
-      const imgPath = path.join(process.cwd(), deleted.imagePath);
-      if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
+    if (deleted.imagePublicId) {
+      await deleteImage(deleted.imagePublicId);
     }
 
     res.json({ success: true, message: "Meal deleted" });
@@ -284,6 +313,3 @@ export const getMealByFoodId = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch meal" });
   }
 };
-
-// Export multer middleware
-export const mealImageUpload = upload.single("mealImage");

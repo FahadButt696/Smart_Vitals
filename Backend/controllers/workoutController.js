@@ -409,14 +409,29 @@ export const createWorkout = async (req, res) => {
       
       // Process exercises for calorie and volume calculations
       for (let exercise of workoutData.exercises) {
+        console.log('🏋️ Processing exercise:', exercise.name);
+        
         if (!exercise.estimatedCalories && exercise.sets && exercise.sets.length > 0) {
           // Get user weight from profile or use default
           const userWeight = req.body.userWeight || 70; // Default 70kg
           
           // Calculate total duration for this exercise
           const totalDuration = exercise.sets.reduce((total, set) => {
-            return total + (set.duration || 0);
+            // For strength exercises, estimate duration based on reps and rest time
+            let setDuration = 0;
+            if (set.duration) {
+              setDuration = set.duration;
+            } else if (set.reps && set.weight) {
+              // Estimate: 2 seconds per rep + rest time
+              setDuration = (set.reps * 2) + (set.restTime || 60);
+            } else if (set.reps) {
+              // Just reps, estimate 1.5 seconds per rep
+              setDuration = set.reps * 1.5;
+            }
+            return total + setDuration;
           }, 0);
+          
+          console.log(`⏱️ Exercise duration calculated: ${totalDuration} seconds`);
           
           if (totalDuration > 0) {
             // Determine MET value based on exercise type
@@ -431,6 +446,7 @@ export const createWorkout = async (req, res) => {
             else if (exercise.category === 'strength') metValue = MET_VALUES.strength_moderate;
             
             exercise.estimatedCalories = calculateCalories(metValue, userWeight, totalDuration / 60);
+            console.log(`🔥 Calories calculated: ${exercise.estimatedCalories} (MET: ${metValue}, Weight: ${userWeight}kg, Duration: ${(totalDuration / 60).toFixed(1)}min)`);
           }
           
           // Calculate total volume for strength exercises
@@ -440,6 +456,7 @@ export const createWorkout = async (req, res) => {
               const reps = set.reps || 0;
               return total + (weight * reps);
             }, 0);
+            console.log(`💪 Volume calculated: ${exercise.totalVolume} (weight × reps)`);
           }
           
           exercise.totalDuration = totalDuration;
@@ -642,7 +659,10 @@ export const getWorkoutStats = async (req, res) => {
       timestamp: { $gte: startDate }
     });
     
-    // Calculate statistics
+    console.log('📊 Found workouts for stats:', workouts.length);
+    console.log('📅 Date range:', startDate.toISOString(), 'to', new Date().toISOString());
+    
+    // Calculate statistics with better field mapping
     const stats = {
       totalWorkouts: workouts.length,
       totalDuration: workouts.reduce((sum, w) => sum + (w.actualDuration || 0), 0),
@@ -654,6 +674,18 @@ export const getWorkoutStats = async (req, res) => {
       workoutsByWeek: {},
       personalRecords: workouts.filter(w => w.isPersonalRecord).length
     };
+    
+    // Log some workout data for debugging
+    workouts.forEach((workout, index) => {
+      console.log(`🏋️ Workout ${index + 1}:`, {
+        id: workout._id,
+        type: workout.workoutType,
+        actualDuration: workout.actualDuration,
+        totalCaloriesBurned: workout.totalCaloriesBurned,
+        totalVolume: workout.totalVolume,
+        status: workout.status
+      });
+    });
     
     if (stats.totalWorkouts > 0) {
       stats.avgDuration = Math.round(stats.totalDuration / stats.totalWorkouts);
@@ -671,6 +703,8 @@ export const getWorkoutStats = async (req, res) => {
       const week = `${workout.timestamp.getFullYear()}-W${Math.ceil((workout.timestamp.getDate()) / 7)}`;
       stats.workoutsByWeek[week] = (stats.workoutsByWeek[week] || 0) + 1;
     });
+    
+    console.log('📈 Calculated stats:', stats);
     
     res.json({
       success: true,
@@ -757,18 +791,8 @@ export const completeWorkout = async (req, res) => {
       });
     }
     
-    const workout = await Workout.findByIdAndUpdate(
-      workoutId,
-      { 
-        status: 'completed',
-        endTime: new Date(),
-        difficultyRating,
-        satisfactionRating,
-        notes
-      },
-      { new: true }
-    );
-    
+    // Get the workout first to calculate analytics
+    const workout = await Workout.findById(workoutId);
     if (!workout) {
       return res.status(404).json({
         success: false,
@@ -776,10 +800,58 @@ export const completeWorkout = async (req, res) => {
       });
     }
     
+    // Calculate actual duration if start time exists
+    let actualDuration = 0;
+    if (workout.startTime) {
+      const endTime = new Date();
+      actualDuration = Math.round((endTime - workout.startTime) / (1000 * 60)); // Convert to minutes
+    }
+    
+    // Calculate total calories burned across all exercises
+    const totalCaloriesBurned = workout.exercises.reduce((sum, exercise) => {
+      return sum + (exercise.estimatedCalories || 0);
+    }, 0);
+    
+    // Calculate total volume (weight × reps × sets) for strength exercises
+    const totalVolume = workout.exercises.reduce((sum, exercise) => {
+      if (exercise.sets && exercise.sets.length > 0) {
+        const exerciseVolume = exercise.sets.reduce((setSum, set) => {
+          const weight = set.weight?.value || 0;
+          const reps = set.reps || 0;
+          return setSum + (weight * reps);
+        }, 0);
+        return sum + exerciseVolume;
+      }
+      return sum;
+    }, 0);
+    
+    // Update workout with calculated analytics
+    const updatedWorkout = await Workout.findByIdAndUpdate(
+      workoutId,
+      { 
+        status: 'completed',
+        endTime: new Date(),
+        actualDuration,
+        totalCaloriesBurned,
+        totalVolume,
+        difficultyRating,
+        satisfactionRating,
+        notes
+      },
+      { new: true }
+    );
+    
+    console.log('✅ Workout completed with analytics:', {
+      workoutId,
+      actualDuration,
+      totalCaloriesBurned,
+      totalVolume
+    });
+    
     res.json({
       success: true,
       message: 'Workout completed successfully',
-      workout
+      workout: updatedWorkout
     });
   } catch (error) {
     console.error('Error completing workout:', error);

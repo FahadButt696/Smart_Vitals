@@ -26,7 +26,8 @@ import {
   Target,
   Bot,
   Waves,
-  Leaf
+  Leaf,
+  Flame
 } from "lucide-react";
 
 const GlobalSidebar = () => {
@@ -43,6 +44,7 @@ const GlobalSidebar = () => {
     
     // Health Tracking
     { id: 'meals', label: 'Meals', icon: Utensils, route: '/Dashboard/meals' },
+    { id: 'calorie-tracker', label: 'Calorie Tracker', icon: Flame, route: '/Dashboard/calorie-tracker' },
     { id: 'water', label: 'Water', icon: Droplets, route: '/Dashboard/water' },
     { id: 'sleep', label: 'Sleep', icon: Bed, route: '/Dashboard/sleep' },
     { id: 'workout', label: 'Workouts', icon: Dumbbell, route: '/Dashboard/workout' },

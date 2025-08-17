@@ -30,8 +30,15 @@ ChartJS.register(
 );
 
 // Progress Bar Component
-export const ProgressBar = ({ value, max, color = "from-cyan-400 to-purple-400", showLabel = true }) => {
+export const ProgressBar = ({ value, max, color = "from-cyan-400 to-purple-400", showLabel = true, size = "md" }) => {
   const percentage = Math.min((value / max) * 100, 100);
+  
+  const sizeClasses = {
+    sm: "h-1",
+    md: "h-2", 
+    lg: "h-3",
+    xl: "h-4"
+  };
   
   return (
     <div className="w-full">
@@ -41,9 +48,9 @@ export const ProgressBar = ({ value, max, color = "from-cyan-400 to-purple-400",
           <span>{max}</span>
         </div>
       )}
-      <div className="w-full bg-white/10 rounded-full h-2">
+      <div className="w-full bg-white/10 rounded-full">
         <motion.div 
-          className={`h-2 rounded-full bg-gradient-to-r ${color} transition-all duration-500`}
+          className={`${sizeClasses[size]} rounded-full bg-gradient-to-r ${color} transition-all duration-500`}
           initial={{ width: 0 }}
           animate={{ width: `${percentage}%` }}
         />
@@ -53,7 +60,7 @@ export const ProgressBar = ({ value, max, color = "from-cyan-400 to-purple-400",
 };
 
 // Bar Chart Component using Charts.js
-export const BarChart = ({ data, height = 200, color = "from-blue-400 to-cyan-400" }) => {
+export const BarChart = ({ data, height = 200, color = "from-blue-400 to-cyan-400", target, colors = ["rgba(59, 130, 246, 0.8)", "rgba(6, 182, 212, 0.8)"] }) => {
   if (!data || data.length === 0) {
     return <div className="text-white/60 text-center py-4">No data available</div>;
   }
@@ -62,14 +69,24 @@ export const BarChart = ({ data, height = 200, color = "from-blue-400 to-cyan-40
     labels: data.map(item => item.label),
     datasets: [
       {
-        label: 'Value',
+        label: 'Consumed',
         data: data.map(item => item.value),
-        backgroundColor: 'rgba(59, 130, 246, 0.8)',
-        borderColor: 'rgba(59, 130, 246, 1)',
+        backgroundColor: colors[0],
+        borderColor: colors[0].replace('0.8', '1'),
         borderWidth: 1,
         borderRadius: 4,
         borderSkipped: false,
       },
+      ...(target ? [{
+        label: 'Target',
+        data: data.map(() => target),
+        backgroundColor: colors[1],
+        borderColor: colors[1].replace('0.8', '1'),
+        borderWidth: 1,
+        borderRadius: 4,
+        borderSkipped: false,
+        type: 'bar'
+      }] : [])
     ],
   };
 
@@ -483,4 +500,4 @@ export const TrendIndicator = ({ value, previousValue, label }) => {
       </div>
     </div>
   );
-}; 
+};

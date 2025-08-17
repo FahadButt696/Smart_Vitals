@@ -27,6 +27,7 @@ import Analytics from './pages/Dashboard/Analytics';
 import Reports from './pages/Dashboard/Reports';
 import MentalHealth from './pages/Dashboard/MentalHealth';
 import MealPlanGenerator from './pages/Dashboard/MealPlanGenerator';
+import CalorieTracker from './pages/Dashboard/CalorieTracker';
 
 function App() {
   const location = useLocation();
@@ -53,6 +54,7 @@ function App() {
         <Route path="/Dashboard" element={<Dashboard />}>
           <Route path="profile" element={<Profile />} />
           <Route path="meals" element={<MealLogger />} />
+          <Route path="calorie-tracker" element={<CalorieTracker />} />
           <Route path="water" element={<WaterTracker />} />
           <Route path="sleep" element={<SleepTracker />} />
           <Route path="weight" element={<WeightTracker />} />

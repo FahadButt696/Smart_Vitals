@@ -14,6 +14,7 @@ import mentalHealthRoutes from './routes/mentalHealthRoutes.js'
 import dietPlanRoutes from './routes/dietPlanRoutes.js'
 import aiRecommendationRoutes from './routes/aiRecommendationRoutes.js'
 import clerkWebhookRoutes from './routes/clerkWebhook.js'
+import calorieRoutes from './routes/calorieRoutes.js'
 import { clerkAuthMiddleware } from './middleware/clerkMiddleWare.js';
 
 // Load environment variables
@@ -53,7 +54,12 @@ app.use("/uploads", express.static("uploads"));
 
 // CORS configuration
 app.use(cors({
-  origin: ["http://localhost:5173", "http://localhost:5174"],
+  origin: [
+    "http://localhost:5173", 
+    "http://localhost:5174",
+    "https://your-frontend-domain.vercel.app", // Replace with your actual Vercel domain
+    "https://your-frontend-domain.netlify.app"  // Replace with your actual Netlify domain
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
@@ -139,6 +145,13 @@ try {
   console.error("❌ Error registering clerk webhook routes:", error);
 }
 
+try {
+  app.use("/api/calorie", calorieRoutes);
+  console.log("✅ Calorie routes registered");
+} catch (error) {
+  console.error("❌ Error registering calorie routes:", error);
+}
+
 // Debug mental health routes
 console.log("Registering mental health routes...");
 try {
@@ -155,7 +168,20 @@ app.get("/api/mental-health/test", (req, res) => {
 
 // Health check
 app.get('/', (req, res) => {
-  res.send('Smart Vitals API Server is running...');
+  res.json({ 
+    message: 'Smart Vitals API Server is running...',
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
+// Railway health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'healthy',
+    timestamp: new Date().toISOString()
+  });
 });
 
 // Error handling middleware

@@ -47,8 +47,11 @@ const mealSchema = new mongoose.Schema({
   // Sum of all calculatedNutrition for this meal
   totalNutrition: nutrientSchema,
 
-  // Image path for the meal photo
+  // Image path for the meal photo (Cloudinary URL)
   imagePath: String,
+  
+  // Cloudinary public ID for image management
+  imagePublicId: String,
 
   timestamp: { type: Date, default: Date.now }
 }, { timestamps: true });

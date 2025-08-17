@@ -18,7 +18,8 @@ import {
   Droplets,
   Leaf,
   Loader2,
-  Search
+  Search,
+  RefreshCw
 } from "lucide-react";
 import AIRecommendationCard from "@/components/custom/AIRecommendationCard";
 import { useAIRecommendations } from "@/hooks/useAIRecommendations";
@@ -93,13 +94,36 @@ const MealLoggerEnhanced = () => {
       const data = await response.json();
       
       if (response.ok) {
+        console.log('📊 Received meals data:', data.meals);
+        
+        // Log nutrition data for debugging
+        data.meals?.forEach((meal, index) => {
+          console.log(`🍽️ Meal ${index + 1}:`, {
+            id: meal._id,
+            mealType: meal.mealType,
+            totalNutrition: meal.totalNutrition,
+            mealItems: meal.mealItems?.map(item => ({
+              name: item.name,
+              nutrients: item.nutrients,
+              calculatedNutrition: item.calculatedNutrition
+            }))
+          });
+        });
+        
         setTodayMeals(data.meals || []);
         
-        // Calculate nutrition summary
+        // Calculate nutrition summary with backward compatibility
         const totalCalories = data.meals?.reduce((sum, meal) => sum + (meal.totalNutrition?.calories || 0), 0) || 0;
         const totalProtein = data.meals?.reduce((sum, meal) => sum + (meal.totalNutrition?.protein || 0), 0) || 0;
-        const totalCarbs = data.meals?.reduce((sum, meal) => sum + (meal.totalNutrition?.totalCarbs || 0), 0) || 0;
-        const totalFat = data.meals?.reduce((sum, meal) => sum + (meal.totalNutrition?.totalFat || 0), 0) || 0;
+        const totalCarbs = data.meals?.reduce((sum, meal) => sum + (meal.totalNutrition?.carbs || meal.totalNutrition?.totalCarbs || 0), 0) || 0;
+        const totalFat = data.meals?.reduce((sum, meal) => sum + (meal.totalNutrition?.fat || meal.totalNutrition?.totalFat || 0), 0) || 0;
+        
+        console.log('📈 Calculated nutrition summary:', {
+          totalCalories,
+          totalProtein,
+          totalCarbs,
+          totalFat
+        });
         
         setNutritionSummary({
           totalCalories,
@@ -131,7 +155,8 @@ const MealLoggerEnhanced = () => {
       const data = await response.json();
       
       if (response.ok) {
-        setSelectedImage(data.imagePath);
+        // Update to use the new imageData structure from Cloudinary
+        setSelectedImage(data.imageData?.url || data.imagePath); // Fallback for backward compatibility
         setDetectedItems(data.items || []);
         
         // Extract all unique groups from detected items
@@ -150,8 +175,6 @@ const MealLoggerEnhanced = () => {
       setIsLoading(false);
     }
   };
-
-
 
   // Add manual meal item to the meal
   const addManualMealItem = async () => {
@@ -210,8 +233,8 @@ const MealLoggerEnhanced = () => {
         nutrients: {
           calories: totalCalories,
           protein: 0,
-          totalCarbs: 0,
-          totalFat: 0
+          carbs: 0,
+          fat: 0
         }
       };
 
@@ -256,6 +279,27 @@ const MealLoggerEnhanced = () => {
     const servingMultiplier = selectedServing.servingWeight || 1;
     const totalCalories = baseCalories * servingMultiplier * quantity;
 
+    // Ensure we have all nutrition values with proper fallbacks
+    const baseNutrition = selectedFood.nutrition || {};
+    const scaledNutrition = {
+      calories: totalCalories,
+      protein: (baseNutrition.protein || baseNutrition.protein_g || 0) * servingMultiplier * quantity,
+      carbs: (baseNutrition.totalCarbs || baseNutrition.carbohydrates || baseNutrition.carbs || 0) * servingMultiplier * quantity,
+      fat: (baseNutrition.totalFat || baseNutrition.fat || baseNutrition.total_fat || 0) * servingMultiplier * quantity,
+      fiber: (baseNutrition.fiber || 0) * servingMultiplier * quantity,
+      sugar: (baseNutrition.sugar || 0) * servingMultiplier * quantity,
+      sodium: (baseNutrition.sodium || 0) * servingMultiplier * quantity,
+      cholesterol: (baseNutrition.cholesterol || 0) * servingMultiplier * quantity
+    };
+
+    console.log('🍎 Adding item to meal:', {
+      name: selectedFood.name,
+      baseNutrition: baseNutrition,
+      scaledNutrition: scaledNutrition,
+      servingMultiplier,
+      quantity
+    });
+
     const newItem = {
       name: selectedFood.name,
       group: selectedFood.group,
@@ -266,14 +310,7 @@ const MealLoggerEnhanced = () => {
         servingWeight: selectedServing.servingWeight
       },
       quantity: quantity,
-      nutrients: {
-        ...selectedFood.nutrition,
-        calories: totalCalories,
-        // Scale other nutrients by serving size and quantity
-        protein: (selectedFood.nutrition?.protein || 0) * servingMultiplier * quantity,
-        totalCarbs: (selectedFood.nutrition?.totalCarbs || 0) * servingMultiplier * quantity,
-        totalFat: (selectedFood.nutrition?.totalFat || 0) * servingMultiplier * quantity
-      }
+      nutrients: scaledNutrition
     };
 
     setMealItems([...mealItems, newItem]);
@@ -294,6 +331,13 @@ const MealLoggerEnhanced = () => {
     setError(null);
 
     try {
+      // Prepare image data for the backend
+      const imageData = selectedImage ? {
+        url: selectedImage,
+        // If we have the full imageData object, use it; otherwise create a minimal one
+        publicId: null // This will be set by the backend if available
+      } : null;
+
       const response = await fetch('http://localhost:5000/api/meal/save', {
         method: 'POST',
         headers: {
@@ -303,7 +347,7 @@ const MealLoggerEnhanced = () => {
           userId: user.id,
           mealType: selectedMealType,
           mealItems: mealItems,
-          imagePath: selectedImage
+          imageData: imageData
         })
       });
 
@@ -494,6 +538,16 @@ const MealLoggerEnhanced = () => {
           >
             <Camera className="inline mr-2" />
             Take Photo
+          </motion.button>
+          
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => fetchTodayMeals()}
+            className="p-4 bg-gradient-to-r from-green-400 to-blue-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200 whitespace-nowrap"
+          >
+            <RefreshCw className="inline mr-2" />
+            Refresh
           </motion.button>
         </div>
 
@@ -794,8 +848,8 @@ const MealLoggerEnhanced = () => {
                           </div>
                           <div className="text-white/60 text-xs">
                             P: {(meal.totalNutrition?.protein || 0).toFixed(1)}g |
-                            C: {(meal.totalNutrition?.totalCarbs || 0).toFixed(1)}g |
-                            F: {(meal.totalNutrition?.totalFat || 0).toFixed(1)}g
+                            C: {(meal.totalNutrition?.carbs || meal.totalNutrition?.totalCarbs || 0).toFixed(1)}g |
+                            F: {(meal.totalNutrition?.fat || meal.totalNutrition?.totalFat || 0).toFixed(1)}g
                           </div>
                           <button
                             onClick={() => deleteMeal(meal._id)}
@@ -1235,7 +1289,7 @@ const MealLoggerEnhanced = () => {
     {selectedImage && (
       <div className="text-center mb-6">
         <img 
-          src={`http://localhost:5000${selectedImage}`} 
+          src={selectedImage.startsWith('http') ? selectedImage : `http://localhost:5000${selectedImage}`}
           alt="Uploaded food" 
           className="w-32 h-32 object-cover rounded-xl mx-auto"
         />
