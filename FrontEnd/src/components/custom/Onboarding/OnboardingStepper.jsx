@@ -139,7 +139,7 @@ const OnboardingStepper = ({ onStepChange }) => {
       setShowSuccessMessage(true);
       
       // Show toast notification
-      toast.success('Registration successful! Welcome to Smart Vitals! You can generate AI recommendations from the dashboard later.', {
+      toast.success('Registration successful! Welcome to Smart Vitals! Generating your personalized AI recommendations...', {
         duration: 5000,
         position: 'top-center',
         style: {
@@ -150,6 +150,40 @@ const OnboardingStepper = ({ onStepChange }) => {
           backdropFilter: 'blur(10px)',
         },
       });
+
+      // Generate AI recommendations for new user
+      try {
+        console.log("🤖 Generating AI recommendations for new user...");
+        const aiResponse = await axios.post(
+          `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/ai-recommendations/generate`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            withCredentials: true,
+          }
+        );
+        
+        if (aiResponse.ok || aiResponse.status === 200) {
+          console.log("✅ AI recommendations generated successfully");
+          toast.success('AI recommendations generated! Check your dashboard for personalized health tips.', {
+            duration: 4000,
+            position: 'top-center',
+            style: {
+              background: 'linear-gradient(135deg, #10b981, #059669)',
+              color: '#fff',
+              borderRadius: '12px',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              backdropFilter: 'blur(10px)',
+            },
+          });
+        }
+      } catch (aiError) {
+        console.error("❌ Error generating AI recommendations:", aiError);
+        // Don't fail the onboarding if AI recommendations fail
+      }
 
       // Redirect after 3 seconds
       setTimeout(() => {

@@ -600,7 +600,7 @@ const DashboardOverview = () => {
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-400"></div>
               <span className="ml-2 text-white/60">Generating personalized recommendations...</span>
             </div>
-          ) : recommendations ? (
+          ) : recommendations && Object.keys(recommendations).some(key => recommendations[key] && recommendations[key].length > 0) ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {recommendations.mealLog && recommendations.mealLog.length > 0 && (
                   <MultipleAIRecommendations
@@ -668,14 +668,44 @@ const DashboardOverview = () => {
               </div>
           ) : (
             <div className="text-center py-8">
-              <p className="text-white/60 mb-4">No AI recommendations available yet.</p>
-              <p className="text-white/40 text-sm mb-4">Complete your onboarding to get personalized AI recommendations.</p>
-              <button
-                onClick={() => window.location.href = '/onboarding'}
-                className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-200"
-              >
-                Complete Onboarding
-              </button>
+              <div className="w-16 h-16 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Bot className="w-8 h-8 text-purple-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-2">Get Personalized AI Recommendations</h3>
+              <p className="text-white/60 mb-4">Complete your onboarding to receive personalized health and fitness tips powered by AI.</p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <button
+                  onClick={async () => {
+                    try {
+                      const token = await getToken();
+                      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/ai-recommendations/generate`, {
+                        method: 'POST',
+                        headers: {
+                          'Authorization': `Bearer ${token}`,
+                          'Content-Type': 'application/json'
+                        }
+                      });
+                      if (response.ok) {
+                        toast.success('AI recommendations generated! Refreshing...');
+                        setTimeout(() => window.location.reload(), 1000);
+                      } else {
+                        toast.error('Failed to generate recommendations. Please complete onboarding first.');
+                      }
+                    } catch (error) {
+                      toast.error('Failed to generate recommendations. Please complete onboarding first.');
+                    }
+                  }}
+                  className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-200 font-medium"
+                >
+                  Try Generate AI Tips
+                </button>
+                <button
+                  onClick={() => navigate('/onboarding')}
+                  className="px-6 py-3 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all duration-200 font-medium border border-white/20"
+                >
+                  Complete Onboarding
+                </button>
+              </div>
             </div>
           )}
         </div>

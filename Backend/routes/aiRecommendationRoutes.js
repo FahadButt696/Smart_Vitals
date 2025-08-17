@@ -72,7 +72,38 @@ router.post("/trigger-cron", async (req, res) => {
 });
 
 router.get("/test", (req, res) => {
-  res.json({ message: "AI recommendation routes are working!" });
+  res.json({ 
+    message: "AI recommendation routes are working!",
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    geminiKey: process.env.GEMINI_API_KEY ? 'Set' : 'Not set'
+  });
+});
+
+// Test endpoint to check if a user has recommendations
+router.get("/check/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const rec = await AiRecommendation.findOne({ userId });
+    
+    if (rec) {
+      res.json({ 
+        hasRecommendations: true, 
+        lastUpdated: rec.lastUpdated,
+        categories: Object.keys(rec.recommendations).filter(key => 
+          rec.recommendations[key] && rec.recommendations[key].length > 0
+        )
+      });
+    } else {
+      res.json({ 
+        hasRecommendations: false, 
+        message: "No recommendations found for this user" 
+      });
+    }
+  } catch (error) {
+    console.error("Error checking recommendations:", error);
+    res.status(500).json({ error: "Failed to check recommendations" });
+  }
 });
 
 export default router;

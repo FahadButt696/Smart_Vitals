@@ -57,6 +57,8 @@ export const API_ENDPOINTS = {
   // AI recommendations
   AI_RECOMMENDATIONS: {
     BASE: `${API_BASE_URL}/api/ai-recommendations`,
+    GET: () => `${API_BASE_URL}/api/ai-recommendations/me`,
+    GENERATE: () => `${API_BASE_URL}/api/ai-recommendations/generate`,
   },
   
   // Symptom checker

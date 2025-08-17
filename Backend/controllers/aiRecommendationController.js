@@ -8,21 +8,21 @@ function buildGeminiPrompt(user) {
 You are a knowledgeable, empathetic health and fitness expert assistant. Based on the detailed user profile below, generate 4 unique, actionable, and personalized recommendations for each category listed.
 
 User Profile:
-- Age: ${user.age}
-- Gender: ${user.gender}
-- Height: ${user.height.value} ${user.height.unit}
-- Weight: ${user.weight.value} ${user.weight.unit}
-- Goal: ${user.goal}
-- Target Weight: ${user.targetWeight}
-- Activity Level: ${user.activityLevel}
-- Dietary Preference: ${user.dietaryPreference}
+- Age: ${user.age || "Not specified"}
+- Gender: ${user.gender || "Not specified"}
+- Height: ${user.height?.value ? `${user.height.value} ${user.height.unit}` : "Not specified"}
+- Weight: ${user.weight?.value ? `${user.weight.value} ${user.weight.unit}` : "Not specified"}
+- Goal: ${user.goal || "Not specified"}
+- Target Weight: ${user.targetWeight || "Not specified"}
+- Activity Level: ${user.activityLevel || "Not specified"}
+- Dietary Preference: ${user.dietaryPreference || "Not specified"}
 - Medical Conditions: ${user.medicalConditions || "None"}
 - Allergies: ${user.allergies || "None"}
 - Medications: ${user.medications || "None"}
-- Workout Days Per Week: ${user.workoutDaysPerWeek}
-- Workout Preferences: ${user.workoutPreferences.length > 0 ? user.workoutPreferences.join(", ") : "None"}
-- Meal Plan Type: ${user.mealPlanType}
-- Water Intake Goal: ${user.waterIntakeGoal} ml
+- Workout Days Per Week: ${user.workoutDaysPerWeek || "Not specified"}
+- Workout Preferences: ${user.workoutPreferences && user.workoutPreferences.length > 0 ? user.workoutPreferences.join(", ") : "None"}
+- Meal Plan Type: ${user.mealPlanType || "Not specified"}
+- Water Intake Goal: ${user.waterIntakeGoal || 2000} ml
 - Wants Mental Support: ${user.wantsMentalSupport ? "Yes" : "No"}
 
 Please respond ONLY in JSON format with these keys exactly. Each category should contain an array of 4 unique recommendations:
@@ -88,9 +88,9 @@ Make each recommendation:
 
 // Fallback recommendations when Gemini API fails - now with 4 per category
 function createFallbackRecommendations(user) {
-  const goal = user.goal.toLowerCase();
-  const activityLevel = user.activityLevel.toLowerCase();
-  const dietaryPreference = user.dietaryPreference.toLowerCase();
+  const goal = (user.goal || "maintain").toLowerCase();
+  const activityLevel = (user.activityLevel || "moderately active").toLowerCase();
+  const dietaryPreference = (user.dietaryPreference || "normal").toLowerCase();
   
   return {
     mealLog: [
@@ -100,7 +100,7 @@ function createFallbackRecommendations(user) {
       `Monitor your portion sizes and use smaller plates to help with ${goal.includes('weight') ? 'weight management' : 'portion control'}.`
     ],
     workoutTracker: [
-      `With ${user.workoutDaysPerWeek} workout days per week, you're on a great track! Focus on ${goal.includes('muscle') ? 'strength training' : goal.includes('weight') ? 'cardio and strength mix' : 'maintaining variety'}.`,
+      `With ${user.workoutDaysPerWeek || 3} workout days per week, you're on a great track! Focus on ${goal.includes('muscle') ? 'strength training' : goal.includes('weight') ? 'cardio and strength mix' : 'maintaining variety'}.`,
       `Try incorporating high-intensity interval training (HIIT) 2-3 times per week to maximize your workout efficiency.`,
       `Don't forget to include rest days and stretching sessions to prevent injury and improve recovery.`,
       `Track your workout progress by logging sets, reps, and weights to see your strength improvements over time.`
