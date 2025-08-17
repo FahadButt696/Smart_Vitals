@@ -54,16 +54,75 @@ app.use("/uploads", express.static("uploads"));
 
 // CORS configuration
 app.use(cors({
-  origin: [
-    "http://localhost:5173", 
-    "http://localhost:5174",
-    "https://smart-vitals.vercel.app", // Your actual Vercel domain
-    process.env.FRONTEND_URL // Dynamic frontend URL from environment
-  ].filter(Boolean), // Remove any undefined values
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or Postman)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      "http://localhost:5173", 
+      "http://localhost:5174",
+      "https://smart-vitals.vercel.app",
+      "https://smartvitals.vercel.app",
+      "https://smart-vitals-git-main.vercel.app",
+      "https://smart-vitals-git-develop.vercel.app",
+      process.env.FRONTEND_URL
+    ].filter(Boolean);
+    
+    // Check if origin is allowed
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    
+    // For mobile devices, be more permissive
+    if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      return callback(null, true);
+    }
+    
+    // Log blocked origins for debugging
+    console.log(`🚫 Blocked origin: ${origin}`);
+    return callback(null, true); // Temporarily allow all for mobile debugging
+  },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: [
+    'Content-Type', 
+    'Authorization', 
+    'X-Requested-With',
+    'Accept',
+    'Origin',
+    'Access-Control-Request-Method',
+    'Access-Control-Request-Headers'
+  ],
+  exposedHeaders: ['Content-Length', 'X-Requested-With'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+  maxAge: 86400 // Cache preflight for 24 hours
 }));
+
+// Add mobile-specific middleware
+app.use((req, res, next) => {
+  // Add mobile-friendly headers
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
+  
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+  
+  // Add mobile debugging info
+  const userAgent = req.get('User-Agent') || '';
+  const isMobile = /Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+  
+  if (isMobile) {
+    console.log(`📱 Mobile request: ${req.method} ${req.path} from ${req.ip}`);
+    console.log(`📱 User-Agent: ${userAgent}`);
+  }
+  
+  next();
+});
 
 // Routes
 console.log("Registering routes...");
@@ -168,11 +227,16 @@ app.get("/api/mental-health/test", (req, res) => {
 
 // Health check
 app.get('/', (req, res) => {
+  const userAgent = req.get('User-Agent') || '';
+  const isMobile = /Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+  
   res.json({ 
     message: 'Smart Vitals API Server is running...',
     status: 'healthy',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
+    environment: process.env.NODE_ENV || 'development',
+    mobile: isMobile,
+    userAgent: userAgent
   });
 });
 
@@ -184,10 +248,78 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Mobile-specific health check
+app.get('/mobile-health', (req, res) => {
+  const userAgent = req.get('User-Agent') || '';
+  const isMobile = /Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+  
+  res.json({
+    status: 'healthy',
+    mobile: isMobile,
+    userAgent: userAgent,
+    timestamp: new Date().toISOString(),
+    cors: {
+      origin: req.get('Origin') || 'No origin',
+      method: req.method,
+      headers: req.headers
+    }
+  });
+});
+
+// Test endpoint for mobile debugging
+app.get('/api/test-mobile', (req, res) => {
+  const userAgent = req.get('User-Agent') || '';
+  const isMobile = /Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+  
+  res.json({
+    message: 'Mobile test endpoint working',
+    mobile: isMobile,
+    userAgent: userAgent,
+    timestamp: new Date().toISOString(),
+    headers: {
+      origin: req.get('Origin'),
+      referer: req.get('Referer'),
+      'user-agent': userAgent
+    }
+  });
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ message: 'Something went wrong!', error: err.message });
+  const userAgent = req.get('User-Agent') || '';
+  const isMobile = /Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+  
+  console.error('🚨 Error occurred:', {
+    message: err.message,
+    stack: err.stack,
+    method: req.method,
+    path: req.path,
+    ip: req.ip,
+    userAgent: userAgent,
+    isMobile: isMobile,
+    timestamp: new Date().toISOString()
+  });
+  
+  // Mobile-specific error handling
+  if (isMobile) {
+    console.log(`📱 Mobile error on ${req.method} ${req.path}`);
+    
+    // For mobile, provide more detailed error info
+    res.status(500).json({ 
+      message: 'Mobile request failed', 
+      error: err.message,
+      path: req.path,
+      method: req.method,
+      timestamp: new Date().toISOString(),
+      mobile: true
+    });
+  } else {
+    // Standard error response for desktop
+    res.status(500).json({ 
+      message: 'Something went wrong!', 
+      error: err.message 
+    });
+  }
 });
 
 const PORT = process.env.PORT || 5000;

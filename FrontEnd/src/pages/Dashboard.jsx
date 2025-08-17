@@ -46,6 +46,7 @@ import { BarChart, ProgressBar, DoughnutChart, TrendIndicator, LineChart, Metric
 import AIRecommendationCard from "@/components/custom/AIRecommendationCard";
 import MultipleAIRecommendations from "@/components/custom/MultipleAIRecommendations";
 import { useAIRecommendations } from "@/hooks/useAIRecommendations";
+import MobileDebugPanel from "@/components/custom/MobileDebugPanel";
 
 // Dashboard Overview Component
 const DashboardOverview = () => {
@@ -710,6 +711,9 @@ const DashboardOverview = () => {
           )}
         </div>
       </motion.div>
+
+      {/* Mobile Debug Panel - Temporary for debugging */}
+      <MobileDebugPanel />
     </>
   );
 };
