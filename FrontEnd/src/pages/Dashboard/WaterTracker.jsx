@@ -116,7 +116,7 @@ const WaterTracker = () => {
 
   const fetchUserData = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/user/${user.id}`);
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/user/${user.id}`);
       
       if (response.ok) {
         const userData = await response.json();
@@ -135,7 +135,7 @@ const WaterTracker = () => {
   const fetchWaterData = async () => {
     try {
       setBackendError(false);
-      const response = await fetch(`http://localhost:5000/api/water?userId=${user.id}`);
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/water?userId=${user.id}`);
       
       if (response.ok) {
         const data = await response.json();
@@ -160,7 +160,7 @@ const WaterTracker = () => {
 
   const fetchWaterStats = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/water/stats?userId=${user.id}`);
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/water/stats?userId=${user.id}`);
       
       if (response.ok) {
         const data = await response.json();
@@ -190,7 +190,7 @@ const WaterTracker = () => {
 
     setAddingWater(true);
     try {
-      const response = await fetch('http://localhost:5000/api/water', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/water`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -227,7 +227,7 @@ const WaterTracker = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/api/water/${logId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/water/${logId}`, {
         method: 'DELETE'
       });
 
@@ -520,7 +520,7 @@ const WaterTracker = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/api/water/${logId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/water/${logId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'

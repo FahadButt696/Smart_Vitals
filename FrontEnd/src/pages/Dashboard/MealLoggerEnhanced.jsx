@@ -90,7 +90,7 @@ const MealLoggerEnhanced = () => {
     if (!user) return;
     
     try {
-      const response = await fetch(`http://localhost:5000/api/meal?userId=${user.id}`);
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/meal?userId=${user.id}`);
       const data = await response.json();
       
       if (response.ok) {
@@ -147,7 +147,7 @@ const MealLoggerEnhanced = () => {
       const formData = new FormData();
       formData.append('mealImage', file);
   
-      const response = await fetch('http://localhost:5000/api/meal/detect', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/meal/detect`, {
         method: 'POST',
         body: formData
       });
@@ -198,7 +198,7 @@ const MealLoggerEnhanced = () => {
       const totalCalories = caloriesPerServing * servingSize * manualQuantity;
 
       // Save the meal item directly to the database
-      const response = await fetch('http://localhost:5000/api/meal/manual', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/meal/manual`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -338,7 +338,7 @@ const MealLoggerEnhanced = () => {
         publicId: null // This will be set by the backend if available
       } : null;
 
-      const response = await fetch('http://localhost:5000/api/meal/save', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/meal/save`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

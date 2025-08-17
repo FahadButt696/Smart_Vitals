@@ -152,7 +152,7 @@ const SleepTracker = () => {
     if (!user) return;
     
     try {
-      const response = await fetch(`http://localhost:5000/api/user/profile?userId=${user.id}`);
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/user/profile?userId=${user.id}`);
       const data = await response.json();
       
       if (response.ok && data.user) {
@@ -168,7 +168,7 @@ const SleepTracker = () => {
     if (!user) return;
     
     try {
-      const response = await fetch(`http://localhost:5000/api/user/sleepGoal`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/user/sleepGoal`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -199,7 +199,7 @@ const SleepTracker = () => {
     
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:5000/api/sleep?userId=${user.id}`);
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/sleep?userId=${user.id}`);
       const data = await response.json();
       
       if (response.ok) {

@@ -102,7 +102,7 @@ const DashboardOverview = () => {
 
   const fetchWaterStats = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/water/stats?userId=${user.id}`);
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/water/stats?userId=${user.id}`);
       if (response.ok) {
         const data = await response.json();
         const stats = data.stats || {};
@@ -130,7 +130,7 @@ const DashboardOverview = () => {
 
   const fetchMealStats = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/meal?userId=${user.id}`);
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/meal?userId=${user.id}`);
       if (response.ok) {
         const data = await response.json();
         const todayMeals = data.meals?.filter(meal => {
@@ -173,7 +173,7 @@ const DashboardOverview = () => {
 
   const fetchSleepStats = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/sleep/stats?userId=${user.id}`);
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/sleep/stats?userId=${user.id}`);
       if (response.ok) {
         const data = await response.json();
         const stats = data.stats || {};
@@ -199,7 +199,7 @@ const DashboardOverview = () => {
 
   const fetchWorkoutStats = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/workout?userId=${user.id}`);
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/workout?userId=${user.id}`);
       if (response.ok) {
         const data = await response.json();
         const todayWorkouts = data.workouts?.filter(workout => {
@@ -236,7 +236,7 @@ const DashboardOverview = () => {
 
   const fetchWeightStats = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/weight?userId=${user.id}`);
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/weight?userId=${user.id}`);
       if (response.ok) {
         const data = await response.json();
         const weights = data.weights || [];

@@ -1,60 +1,91 @@
-// Backend API configuration
-export const API_BASE_URL = 'http://localhost:5000';
+// API Configuration
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
 // API endpoints
 export const API_ENDPOINTS = {
-  MENTAL_HEALTH: {
-    CHAT: `${API_BASE_URL}/api/mental-health/chat`,
-    CHAT_HISTORY: (userId) => `${API_BASE_URL}/api/mental-health/chat/me?userId=${userId}`,
-    INSIGHTS: (userId) => `${API_BASE_URL}/api/mental-health/insights/me?userId=${userId}`,
-  },
-  DIET_PLAN: {
-    GENERATE: `${API_BASE_URL}/api/diet-plan/generate`,
-    GET_ALL: (userId) => `${API_BASE_URL}/api/diet-plan?userId=${userId}`,
-    DELETE: (id) => `${API_BASE_URL}/api/diet-plan/${id}`,
-  },
+  // User endpoints
   USER: {
-    GET_BY_CLERK_ID: (clerkId) => `${API_BASE_URL}/api/user/clerk/${clerkId}`,
+    PROFILE: `${API_BASE_URL}/api/user/profile`,
     CREATE: `${API_BASE_URL}/api/user/create`,
-    UPDATE: (userId) => `${API_BASE_URL}/api/user/${userId}`,
+    GET: `${API_BASE_URL}/api/user`,
+    SLEEP_GOAL: `${API_BASE_URL}/api/user/sleepGoal`,
   },
-  AI_RECOMMENDATIONS: {
-    GET: () => `${API_BASE_URL}/api/ai-recommendations/me`,
-    GENERATE: () => `${API_BASE_URL}/api/ai-recommendations/generate`,
-  },
-  MEAL: {
-    GET_ALL: (userId) => `${API_BASE_URL}/api/meal?userId=${userId}`,
-    CREATE: `${API_BASE_URL}/api/meal`,
-    UPDATE: (id) => `${API_BASE_URL}/api/meal/${id}`,
-    DELETE: (id) => `${API_BASE_URL}/api/meal/${id}`,
-  },
+  
+  // Water tracking
   WATER: {
-    GET_STATS: (userId) => `${API_BASE_URL}/api/water/stats?userId=${userId}`,
-    LOG: `${API_BASE_URL}/api/water`,
-    GET_HISTORY: (userId) => `${API_BASE_URL}/api/water?userId=${userId}`,
+    BASE: `${API_BASE_URL}/api/water`,
+    STATS: `${API_BASE_URL}/api/water/stats`,
   },
+  
+  // Sleep tracking
   SLEEP: {
-    GET_STATS: (userId) => `${API_BASE_URL}/api/sleep/stats?userId=${userId}`,
-    LOG: `${API_BASE_URL}/api/sleep`,
-    GET_HISTORY: (userId) => `${API_BASE_URL}/api/sleep?userId=${userId}`,
+    BASE: `${API_BASE_URL}/api/sleep`,
+    STATS: `${API_BASE_URL}/api/sleep/stats`,
   },
+  
+  // Meal tracking
+  MEAL: {
+    BASE: `${API_BASE_URL}/api/meal`,
+    DETECT: `${API_BASE_URL}/api/meal/detect`,
+    SAVE: `${API_BASE_URL}/api/meal/save`,
+    MANUAL: `${API_BASE_URL}/api/meal/manual`,
+  },
+  
+  // Workout tracking
   WORKOUT: {
-    GET_ALL: (userId) => `${API_BASE_URL}/api/workout?userId=${userId}`,
-    CREATE: `${API_BASE_URL}/api/workout`,
-    UPDATE: (id) => `${API_BASE_URL}/api/workout/${id}`,
-    DELETE: (id) => `${API_BASE_URL}/api/workout/${id}`,
+    BASE: `${API_BASE_URL}/api/workout`,
+    STATS: `${API_BASE_URL}/api/workout/stats`,
   },
+  
+  // Weight tracking
   WEIGHT: {
-    GET_ALL: (userId) => `${API_BASE_URL}/api/weight?userId=${userId}`,
-    LOG: `${API_BASE_URL}/api/weight`,
-    UPDATE: (id) => `${API_BASE_URL}/api/weight/${id}`,
-    DELETE: (id) => `${API_BASE_URL}/api/weight/${id}`,
+    BASE: `${API_BASE_URL}/api/weight`,
+    STATS: `${API_BASE_URL}/api/weight/stats`,
   },
+  
+  // Mental health
+  MENTAL_HEALTH: {
+    BASE: `${API_BASE_URL}/api/mental-health`,
+    TEST: `${API_BASE_URL}/api/mental-health/test`,
+  },
+  
+  // Diet plan
+  DIET_PLAN: {
+    BASE: `${API_BASE_URL}/api/diet-plan`,
+  },
+  
+  // AI recommendations
+  AI_RECOMMENDATIONS: {
+    BASE: `${API_BASE_URL}/api/ai-recommendations`,
+  },
+  
+  // Symptom checker
   SYMPTOM_CHECK: {
-    CHECK: `${API_BASE_URL}/api/symptom-check`,
-    GET_HISTORY: (userId) => `${API_BASE_URL}/api/symptom-check?userId=${userId}`,
+    BASE: `${API_BASE_URL}/api/symptom-check`,
   },
-  // Add other API endpoints here as needed
+  
+  // Contact
+  CONTACT: {
+    BASE: `${API_BASE_URL}/api/contact`,
+  },
+  
+  // Calorie tracking
+  CALORIE: {
+    BASE: `${API_BASE_URL}/api/calorie`,
+  },
 };
 
-export default API_BASE_URL;
+// Helper function to get full URL for any endpoint
+export const getApiUrl = (endpoint) => {
+  return `${API_BASE_URL}${endpoint}`;
+};
+
+// Export the base URL for direct use if needed
+export { API_BASE_URL };
+
+// Log the current API configuration (for debugging)
+console.log('🌐 API Configuration:', {
+  baseUrl: API_BASE_URL,
+  environment: import.meta.env.MODE,
+  isProduction: API_BASE_URL !== 'http://localhost:5000'
+});
