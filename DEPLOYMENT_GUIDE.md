@@ -84,13 +84,15 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000
 
 ## 🔄 **STEP 3: Update CORS in Backend**
 
-After getting your frontend URL, update the CORS configuration in your Railway backend:
+✅ **COMPLETED!** Your frontend is deployed at [https://smart-vitals.vercel.app](https://smart-vitals.vercel.app)
+
+To complete the setup, update the CORS configuration in your Railway backend:
 
 1. Go to Railway dashboard
 2. Open your backend project
 3. Go to Variables tab
-4. Add: `FRONTEND_URL=https://your-frontend-url.vercel.app`
-5. Redeploy your backend
+4. Add: `FRONTEND_URL=https://smart-vitals.vercel.app`
+5. Redeploy your backend (automatic)
 
 ---
 
@@ -153,8 +155,8 @@ VITE_CLOUDINARY_CLOUD_NAME=...
 
 ## ✅ **Deployment Checklist**
 
-- [ ] Backend deployed to Railway
-- [ ] Frontend deployed to Vercel
+- [x] Backend deployed to Railway ✅
+- [x] Frontend deployed to Vercel ✅
 - [ ] Environment variables configured
 - [ ] CORS updated with frontend URL
 - [ ] Database connected

@@ -57,9 +57,9 @@ app.use(cors({
   origin: [
     "http://localhost:5173", 
     "http://localhost:5174",
-    "https://your-frontend-domain.vercel.app", // Replace with your actual Vercel domain
-    "https://your-frontend-domain.netlify.app"  // Replace with your actual Netlify domain
-  ],
+    "https://smart-vitals.vercel.app", // Your actual Vercel domain
+    process.env.FRONTEND_URL // Dynamic frontend URL from environment
+  ].filter(Boolean), // Remove any undefined values
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']

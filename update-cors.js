@@ -1,7 +1,7 @@
 // Script to update CORS configuration in Railway backend
 // Run this after deploying your frontend to Vercel
 
-const FRONTEND_URL = 'https://your-frontend-url.vercel.app'; // Replace with your actual Vercel URL
+const FRONTEND_URL = 'https://smart-vitals.vercel.app'; // Your actual Vercel URL
 
 console.log('🔧 Updating CORS Configuration');
 console.log('================================');
