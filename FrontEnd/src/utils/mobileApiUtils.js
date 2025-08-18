@@ -180,3 +180,102 @@ export const getMobileLoadingConfig = () => {
 
 // Export mobile detection for use in components
 export { detectMobile as isMobile };
+
+// Mobile API client for making requests
+export const mobileApiClient = {
+  get: async (endpoint, options = {}) => {
+    return mobileApiCall(endpoint, { ...options, method: 'GET' });
+  },
+  post: async (endpoint, data, options = {}) => {
+    return mobileApiCall(endpoint, { ...options, method: 'POST', body: JSON.stringify(data) });
+  },
+  put: async (endpoint, data, options = {}) => {
+    return mobileApiCall(endpoint, { ...options, method: 'PUT', body: JSON.stringify(data) });
+  },
+  delete: async (endpoint, options = {}) => {
+    return mobileApiCall(endpoint, { ...options, method: 'DELETE' });
+  }
+};
+
+// Test mobile connectivity
+export const testMobileConnectivity = async () => {
+  try {
+    const startTime = Date.now();
+    const response = await mobileFetch('https://httpbin.org/delay/1', { 
+      method: 'GET',
+      timeout: 10000 
+    });
+    const endTime = Date.now();
+    const latency = endTime - startTime;
+    
+    return {
+      success: true,
+      latency,
+      status: response.status,
+      timestamp: new Date().toISOString()
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message,
+      timestamp: new Date().toISOString()
+    };
+  }
+};
+
+// Mobile health check endpoint
+export const mobileHealthCheck = async () => {
+  try {
+    const response = await mobileApiCall('/health', { method: 'GET' });
+    return {
+      success: true,
+      status: 'healthy',
+      data: response,
+      timestamp: new Date().toISOString()
+    };
+  } catch (error) {
+    return {
+      success: false,
+      status: 'unhealthy',
+      error: error.message,
+      timestamp: new Date().toISOString()
+    };
+  }
+};
+
+// Get network status information
+export const getNetworkStatus = () => {
+  try {
+    if (typeof navigator === 'undefined') {
+      return { online: false, type: 'unknown' };
+    }
+    
+    const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    
+    return {
+      online: navigator.onLine,
+      type: connection ? connection.effectiveType : 'unknown',
+      downlink: connection ? connection.downlink : null,
+      rtt: connection ? connection.rtt : null,
+      saveData: connection ? connection.saveData : false
+    };
+  } catch (error) {
+    return {
+      online: true,
+      type: 'unknown',
+      error: error.message
+    };
+  }
+};
+
+// Check if device is online
+export const isOnline = () => {
+  try {
+    if (typeof navigator === 'undefined') {
+      return true; // Default to true for SSR
+    }
+    return navigator.onLine;
+  } catch (error) {
+    return true; // Default to true on error
+  }
+};
