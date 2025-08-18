@@ -284,6 +284,59 @@ app.get('/api/test-mobile', (req, res) => {
   });
 });
 
+// Simple test endpoint for debugging API connectivity
+app.get('/api/test', (req, res) => {
+  res.json({
+    message: 'API is working!',
+    timestamp: new Date().toISOString(),
+    routes: [
+      '/api/meal',
+      '/api/user',
+      '/api/water',
+      '/api/sleep',
+      '/api/weight',
+      '/api/workout',
+      '/api/contact',
+      '/api/symptom-check',
+      '/api/diet-plan',
+      '/api/ai-recommendations',
+      '/api/mental-health',
+      '/api/calorie'
+    ]
+  });
+});
+
+// Test endpoint for water stats without authentication
+app.get('/api/test-water', (req, res) => {
+  res.json({
+    message: 'Water API endpoint is accessible',
+    timestamp: new Date().toISOString(),
+    note: 'This is a test endpoint - actual data requires authentication'
+  });
+});
+
+// Test endpoint for debugging authentication headers
+app.get('/api/test-auth', (req, res) => {
+  const authHeader = req.headers.authorization;
+  const userAgent = req.get('User-Agent') || '';
+  const origin = req.get('Origin') || '';
+  
+  res.json({
+    message: 'Authentication test endpoint',
+    timestamp: new Date().toISOString(),
+    headers: {
+      authorization: authHeader ? 'Bearer [TOKEN]' : 'No token provided',
+      'user-agent': userAgent,
+      origin: origin,
+      'content-type': req.get('Content-Type'),
+      'x-mobile-client': req.get('X-Mobile-Client'),
+      'x-device-type': req.get('X-Device-Type')
+    },
+    hasToken: !!authHeader,
+    tokenPrefix: authHeader ? authHeader.substring(0, 10) + '...' : 'None'
+  });
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   const userAgent = req.get('User-Agent') || '';
