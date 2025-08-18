@@ -72,3 +72,4 @@ console.log('1. If upload succeeds, your Cloudinary setup is working!');
 console.log('2. Test the full API with: POST /api/meal/detect');
 console.log('3. Check server logs for detailed debugging information');
 
+

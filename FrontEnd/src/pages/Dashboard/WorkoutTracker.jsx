@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useUser, useAuth } from '@clerk/clerk-react';
+import { useUser, useAuth, SignedIn } from '@clerk/clerk-react';
 import { toast } from 'react-hot-toast';
 import { API_BASE_URL } from "@/config/api";
 import AIRecommendationCard from "@/components/custom/AIRecommendationCard";
@@ -84,6 +84,8 @@ const WorkoutTracker = () => {
   });
   const [workoutStats, setWorkoutStats] = useState(null);
   const [isLoadingStats, setIsLoadingStats] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [workoutLogs, setWorkoutLogs] = useState([]);
   
   const [workoutForm, setWorkoutForm] = useState({
     workoutName: '',
@@ -97,6 +99,14 @@ const WorkoutTracker = () => {
     isTemplate: false,
     templateName: ''
   });
+
+  // Fetch workouts when user is available
+  useEffect(() => {
+    if (user?.id) {
+      fetchWorkouts();
+      fetchWorkoutStats();
+    }
+  }, [user]);
 
   const [exerciseForm, setExerciseForm] = useState({
     name: '',
@@ -114,12 +124,16 @@ const WorkoutTracker = () => {
 
   // Fetch user workouts
   const fetchWorkouts = async () => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      console.log('No user ID available, skipping workout fetch');
+      return;
+    }
     
     try {
       setLoading(true);
+      setIsInitialLoading(true);
       const token = await getToken();
-      const response = await fetch(`${API_BASE_URL}/workout/user`, {
+      const response = await fetch(`${API_BASE_URL}/api/workout/user`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -142,10 +156,16 @@ const WorkoutTracker = () => {
         setError(data.message || 'Failed to fetch workouts');
       }
     } catch (err) {
-      setError('Failed to fetch workouts');
+      // Only set error for actual failures, not network timeouts
+      if (err.name === 'AbortError') {
+        console.log('Request was aborted due to timeout');
+      } else {
+        setError('Failed to fetch workouts');
+      }
       console.error('Error fetching workouts:', err);
     } finally {
       setLoading(false);
+      setIsInitialLoading(false);
     }
   };
 
@@ -157,7 +177,7 @@ const WorkoutTracker = () => {
       
       const token = await getToken();
       const params = new URLSearchParams(filters);
-      const response = await fetch(`${API_BASE_URL}/workout/exercises/database?${params}`, {
+      const response = await fetch(`${API_BASE_URL}/api/workout/exercises/database?${params}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -190,7 +210,7 @@ const WorkoutTracker = () => {
     try {
       setIsLoadingStats(true);
       const token = await getToken();
-      const response = await fetch(`${API_BASE_URL}/workout/stats`, {
+      const response = await fetch(`${API_BASE_URL}/api/workout/stats`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -258,7 +278,7 @@ const WorkoutTracker = () => {
       };
 
       const token = await getToken();
-      const response = await fetch(`${API_BASE_URL}/workout`, {
+      const response = await fetch(`${API_BASE_URL}/api/workout`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -342,7 +362,7 @@ const WorkoutTracker = () => {
       };
 
       const token = await getToken();
-      const response = await fetch(`${API_BASE_URL}/workout/${currentWorkout._id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/workout/${currentWorkout._id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -445,7 +465,7 @@ const WorkoutTracker = () => {
       };
 
       const token = await getToken();
-      const response = await fetch(`${API_BASE_URL}/workout`, {
+      const response = await fetch(`${API_BASE_URL}/api/workout`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -605,7 +625,7 @@ const WorkoutTracker = () => {
   const startWorkout = async (workoutId) => {
     try {
       const token = await getToken();
-      const response = await fetch(`${API_BASE_URL}/workout/${workoutId}/start`, {
+      const response = await fetch(`${API_BASE_URL}/api/workout/${workoutId}/start`, {
         method: 'POST',
         headers: { 
           'Authorization': `Bearer ${token}`,
@@ -626,7 +646,7 @@ const WorkoutTracker = () => {
   const completeWorkout = async (workoutId) => {
     try {
       const token = await getToken();
-      const response = await fetch(`${API_BASE_URL}/workout/${workoutId}/complete`, {
+      const response = await fetch(`${API_BASE_URL}/api/workout/${workoutId}/complete`, {
         method: 'POST',
         headers: { 
           'Authorization': `Bearer ${token}`,
@@ -649,11 +669,11 @@ const WorkoutTracker = () => {
 
   // Delete workout
   const deleteWorkout = async (workoutId) => {
-    if (!confirm('Are you sure you want to delete this workout?')) return;
+    // Proceed with deletion (removed confirmation for better UX)
     
     try {
       const token = await getToken();
-      const response = await fetch(`${API_BASE_URL}/workout/${workoutId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/workout/${workoutId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -724,7 +744,7 @@ const WorkoutTracker = () => {
   // Fetch workout logs
   const fetchWorkoutLogs = async () => {
     try {
-      setIsLoading(true);
+      setLoading(true);
       const token = await getToken();
       
       const response = await fetch(`${API_BASE_URL}/api/workout?userId=${user.id}`, {
@@ -750,22 +770,36 @@ const WorkoutTracker = () => {
         toast.error('Failed to load workout logs');
       }
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
     <SignedIn>
       <>
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6 px-2 sm:px-0 max-w-full overflow-hidden">
+          {/* Loading State */}
+          {isInitialLoading && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-blue-500/20 border border-blue-500/50 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4"
+            >
+              <div className="flex items-center space-x-2 text-blue-400">
+                <Loader2 className="animate-spin" />
+                <span className="text-sm sm:text-base">Loading your workout data...</span>
+              </div>
+            </motion.div>
+          )}
+
           {/* Error Display */}
           <AnimatePresence>
-            {error && (
+            {error && !isInitialLoading && (
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="bg-red-500/20 border border-red-500/50 rounded-lg p-4 mb-4"
+                className="bg-red-500/20 border border-red-500/50 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4"
               >
                 <div className="flex items-center space-x-2 text-red-400">
                   <span>{error}</span>
@@ -778,7 +812,7 @@ const WorkoutTracker = () => {
           </AnimatePresence>
 
           {/* Enhanced Tab Navigation */}
-          <div className="flex space-x-1 bg-white/10 backdrop-blur-sm rounded-lg p-1">
+          <div className="flex flex-wrap gap-1 bg-white/10 backdrop-blur-sm rounded-lg p-1 overflow-x-auto">
             {[
               { id: 'workouts', label: 'My Workouts', icon: Dumbbell, count: workouts.length },
               { id: 'database', label: 'Exercise Database', icon: Database, count: exerciseDatabase.length },
@@ -789,16 +823,16 @@ const WorkoutTracker = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-all relative ${
+                className={`flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-2 rounded-md transition-all relative text-xs sm:text-sm whitespace-nowrap ${
                   activeTab === tab.id
                     ? 'bg-gradient-to-r from-cyan-600 to-cyan-700 text-white shadow-lg'
                     : 'text-white/70 hover:text-white hover:bg-white/10'
                 }`}
               >
-                <tab.icon className="text-sm" />
-                <span>{tab.label}</span>
+                <tab.icon className="text-xs sm:text-sm" />
+                <span className="hidden xs:inline">{tab.label}</span>
                 {tab.count !== undefined && (
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                  <span className={`px-1 sm:px-2 py-1 rounded-full text-xs font-medium ${
                     activeTab === tab.id 
                       ? 'bg-white/20 text-white' 
                       : 'bg-white/10 text-white/60'
@@ -814,95 +848,101 @@ const WorkoutTracker = () => {
           {activeTab === 'workouts' && (
             <div className="space-y-6">
               {/* Enhanced Controls */}
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-                <div className="flex items-center space-x-4">
-                  <h3 className="text-white text-xl font-semibold">Your Workouts</h3>
-                  <button
-                    onClick={() => {
-                      fetchWorkouts();
-                      fetchWorkoutStats();
-                    }}
-                    className="p-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg transition-colors"
-                    title="Refresh Data"
-                  >
-                    <Loader2 className="text-sm" />
-                  </button>
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => setViewMode('grid')}
-                      className={`p-2 rounded-lg transition-all ${
-                        viewMode === 'grid' 
-                          ? 'bg-cyan-600 text-white' 
-                          : 'bg-white/10 text-white/60 hover:bg-white/20'
-                      }`}
-                    >
-                      <Expand className="text-sm" />
-                    </button>
-                    <button
-                      onClick={() => setViewMode('list')}
-                      className={`p-2 rounded-lg transition-all ${
-                        viewMode === 'list' 
-                          ? 'bg-cyan-600 text-white' 
-                          : 'bg-white/10 text-white/60 hover:bg-white/20'
-                      }`}
-                    >
-                      <Minimize className="text-sm" />
-                    </button>
+              <div className="flex flex-col space-y-4">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                    <h3 className="text-white text-base sm:text-lg lg:text-xl font-semibold">Your Workouts</h3>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => {
+                          fetchWorkouts();
+                          fetchWorkoutStats();
+                        }}
+                        className="p-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg transition-colors"
+                        title="Refresh Data"
+                      >
+                        <Loader2 className="text-sm" />
+                      </button>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => setViewMode('grid')}
+                          className={`p-2 rounded-lg transition-all ${
+                            viewMode === 'grid' 
+                              ? 'bg-cyan-600 text-white' 
+                              : 'bg-white/10 text-white/60 hover:bg-white/20'
+                          }`}
+                        >
+                          <Expand className="text-sm" />
+                        </button>
+                        <button
+                          onClick={() => setViewMode('list')}
+                          className={`p-2 rounded-lg transition-all ${
+                            viewMode === 'list' 
+                              ? 'bg-cyan-600 text-white' 
+                              : 'bg-white/10 text-white/60 hover:bg-white/20'
+                          }`}
+                        >
+                          <Minimize className="text-sm" />
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 
-                <div className="flex items-center space-x-3">
-                  <div className="relative">
+                <div className="flex flex-col space-y-3">
+                  <div className="relative w-full">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/50" />
                     <input
                       type="text"
                       placeholder="Search workouts..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10 pr-4 py-2 bg-white/10 text-white placeholder-white/50 rounded-lg border border-white/20 focus:border-cyan-400 focus:outline-none"
+                      className="w-full pl-10 pr-4 py-2 bg-white/10 text-white placeholder-white/50 rounded-lg border border-white/20 focus:border-cyan-400 focus:outline-none text-sm"
                     />
                   </div>
                   
-                  <button
-                    onClick={() => setShowFilters(!showFilters)}
-                    className={`p-2 rounded-lg transition-all ${
-                      showFilters 
-                        ? 'bg-cyan-600 text-white' 
-                        : 'bg-white/10 text-white/60 hover:bg-white/20'
-                    }`}
-                    title="Advanced Filters"
-                  >
-                    <Filter className="text-sm" />
-                  </button>
-                  
-                  <select
-                    value={filterType}
-                    onChange={(e) => setFilterType(e.target.value)}
-                    className="px-3 py-2 bg-white/10 text-white rounded-lg border border-white/20 focus:border-cyan-400 focus:outline-none"
-                  >
-                    <option value="all">All Types</option>
-                    <option value="strength">Strength</option>
-                    <option value="cardio">Cardio</option>
-                    <option value="flexibility">Flexibility</option>
-                    <option value="mixed">Mixed</option>
-                    <option value="sports">Sports</option>
-                    <option value="custom">Custom</option>
-                  </select>
-                  
-                  <div className="relative">
-                    <select
-                      value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value)}
-                      className="px-3 py-2 bg-white/10 text-white rounded-lg border border-white/20 focus:border-cyan-400 focus:outline-none pr-8"
+                  <div className="flex items-center gap-2 w-full overflow-x-auto pb-2">
+                    <button
+                      onClick={() => setShowFilters(!showFilters)}
+                      className={`p-2 rounded-lg transition-all whitespace-nowrap ${
+                        showFilters 
+                          ? 'bg-cyan-600 text-white' 
+                          : 'bg-white/10 text-white/60 hover:bg-white/20'
+                      }`}
+                      title="Advanced Filters"
                     >
-                      <option value="date">Date</option>
-                      <option value="name">Name</option>
-                      <option value="type">Type</option>
-                      <option value="duration">Duration</option>
-                      <option value="calories">Calories</option>
-                      <option value="volume">Volume</option>
+                      <Filter className="text-sm" />
+                    </button>
+                    
+                    <select
+                      value={filterType}
+                      onChange={(e) => setFilterType(e.target.value)}
+                      className="px-3 py-2 bg-white/10 text-white rounded-lg border border-white/20 focus:border-cyan-400 focus:outline-none text-sm whitespace-nowrap"
+                    >
+                      <option value="all">All Types</option>
+                      <option value="strength">Strength</option>
+                      <option value="cardio">Cardio</option>
+                      <option value="flexibility">Flexibility</option>
+                      <option value="mixed">Mixed</option>
+                      <option value="sports">Sports</option>
+                      <option value="custom">Custom</option>
                     </select>
-                    <ArrowUpDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-white/50 text-xs" />
+                    
+                    <div className="relative">
+                      <select
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value)}
+                        className="px-3 py-2 bg-white/10 text-white rounded-lg border border-white/20 focus:border-cyan-400 focus:outline-none pr-8 text-sm whitespace-nowrap"
+                      >
+                        <option value="date">Date</option>
+                        <option value="name">Name</option>
+                        <option value="type">Type</option>
+                        <option value="duration">Duration</option>
+                        <option value="calories">Calories</option>
+                        <option value="volume">Volume</option>
+                      </select>
+                      <ArrowUpDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-white/50 text-xs" />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -916,7 +956,7 @@ const WorkoutTracker = () => {
                     exit={{ opacity: 0, height: 0 }}
                     className="bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10 overflow-hidden"
                   >
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                       <div>
                         <label className="block text-white/70 text-sm mb-2">Date Range</label>
                         <select
@@ -986,7 +1026,7 @@ const WorkoutTracker = () => {
                 </div>
               ) : (
                 <div className={viewMode === 'grid' 
-                  ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                  ? "grid grid-cols-1 gap-4 sm:gap-6"
                   : "space-y-4"
                 }>
                   {filteredWorkouts.map((workout) => {
@@ -1000,21 +1040,21 @@ const WorkoutTracker = () => {
                           key={workout._id}
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="workout-tracker-card bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 hover:border-cyan-400/50 transition-all hover:shadow-lg hover:shadow-cyan-400/20 group"
+                          className="workout-tracker-card bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20 hover:border-cyan-400/50 transition-all hover:shadow-lg hover:shadow-cyan-400/20 group"
                         >
-                          <div className="flex items-start justify-between mb-4">
+                          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 space-y-3 sm:space-y-0">
                             <div className="flex items-center space-x-3">
                               <div className={`p-3 ${typeColor} rounded-lg shadow-lg group-hover:scale-110 transition-transform`}>
                                 <TypeIcon className="text-white text-lg" />
                               </div>
-                              <div>
-                                <h3 className="text-white font-semibold text-lg group-hover:text-cyan-300 transition-colors">
+                              <div className="flex-1 min-w-0">
+                                <h3 className="text-white font-semibold text-base sm:text-lg group-hover:text-cyan-300 transition-colors break-words">
                                   {workout.workoutName}
                                 </h3>
                                 <p className="text-white/60 text-sm">{typeLabel}</p>
                               </div>
                             </div>
-                            <div className={`px-3 py-1 rounded-full text-xs font-medium border ${
+                            <div className={`px-3 py-1 rounded-full text-xs font-medium border self-start ${
                               workout.status === 'completed' ? 'bg-green-500/20 text-green-400 border-green-500/30' :
                               workout.status === 'in_progress' ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' :
                               'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
@@ -1062,39 +1102,43 @@ const WorkoutTracker = () => {
                             )}
                           </div>
 
-                          <div className="flex gap-2 flex-wrap">
-                            {workout.status === 'planned' && (
+                          <div className="flex flex-col sm:flex-row gap-2">
+                            <div className="flex gap-2 flex-wrap">
+                              {workout.status === 'planned' && (
+                                <button
+                                  onClick={() => startWorkout(workout._id)}
+                                  className="flex items-center space-x-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-3 py-2 rounded-lg text-sm transition-all hover:scale-105 shadow-lg flex-1 sm:flex-none justify-center"
+                                >
+                                  <Play className="text-xs" />
+                                  <span>Start</span>
+                                </button>
+                              )}
+                              {workout.status === 'in_progress' && (
+                                <button
+                                  onClick={() => completeWorkout(workout._id)}
+                                  className="flex items-center space-x-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-3 py-2 rounded-lg text-sm transition-all hover:scale-105 shadow-lg flex-1 sm:flex-none justify-center"
+                                >
+                                  <Check className="text-xs" />
+                                  <span>Complete</span>
+                                </button>
+                              )}
+                            </div>
+                            <div className="flex gap-2 flex-wrap">
                               <button
-                                onClick={() => startWorkout(workout._id)}
-                                className="flex items-center space-x-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-3 py-2 rounded-lg text-sm transition-all hover:scale-105 shadow-lg"
+                                onClick={() => editWorkout(workout)}
+                                className="flex items-center space-x-1 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white px-3 py-2 rounded-lg text-sm transition-all hover:scale-105 shadow-lg flex-1 sm:flex-none justify-center"
                               >
-                                <Play className="text-xs" />
-                                <span>Start</span>
+                                <Edit3 className="text-xs" />
+                                <span>Edit</span>
                               </button>
-                            )}
-                            {workout.status === 'in_progress' && (
                               <button
-                                onClick={() => completeWorkout(workout._id)}
-                                className="flex items-center space-x-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-3 py-2 rounded-lg text-sm transition-all hover:scale-105 shadow-lg"
+                                onClick={() => deleteWorkout(workout._id)}
+                                className="flex items-center space-x-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-3 py-2 rounded-lg text-sm transition-all hover:scale-105 shadow-lg flex-1 sm:flex-none justify-center"
                               >
-                                <Check className="text-xs" />
-                                <span>Complete</span>
+                                <Trash2 className="text-xs" />
+                                <span>Delete</span>
                               </button>
-                            )}
-                            <button
-                              onClick={() => editWorkout(workout)}
-                              className="flex items-center space-x-1 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white px-3 py-2 rounded-lg text-sm transition-all hover:scale-105 shadow-lg"
-                            >
-                              <Edit3 className="text-xs" />
-                              <span>Edit</span>
-                            </button>
-                            <button
-                              onClick={() => deleteWorkout(workout._id)}
-                              className="flex items-center space-x-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-3 py-2 rounded-lg text-sm transition-all hover:scale-105 shadow-lg"
-                            >
-                              <Trash2 className="text-xs" />
-                              <span>Delete</span>
-                            </button>
+                            </div>
                           </div>
                         </motion.div>
                       );
@@ -1105,20 +1149,27 @@ const WorkoutTracker = () => {
                           key={workout._id}
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
-                          className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20 hover:border-cyan-400/50 transition-all hover:bg-white/15"
+                          className="bg-white/10 backdrop-blur-sm rounded-lg p-3 sm:p-4 border border-white/20 hover:border-cyan-400/50 transition-all hover:bg-white/15"
                         >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-4 flex-1">
+                          <div className="flex flex-col space-y-3">
+                            <div className="flex items-center space-x-3">
                               <div className={`p-3 ${typeColor} rounded-lg`}>
                                 <TypeIcon className="text-white text-lg" />
                               </div>
-                              <div className="flex-1">
-                                <h3 className="text-white font-semibold text-lg">{workout.workoutName}</h3>
+                              <div className="flex-1 min-w-0">
+                                <h3 className="text-white font-semibold text-base sm:text-lg break-words">{workout.workoutName}</h3>
                                 <p className="text-white/60 text-sm">{typeLabel}</p>
+                              </div>
+                              <div className={`px-3 py-1 rounded-full text-xs font-medium border ${
+                                workout.status === 'completed' ? 'bg-green-500/20 text-green-400 border-green-500/30' :
+                                workout.status === 'in_progress' ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' :
+                                'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+                              }`}>
+                                {workout.status.replace('_', ' ')}
                               </div>
                             </div>
                             
-                            <div className="flex items-center space-x-6 text-sm text-white/70">
+                            <div className="flex flex-wrap items-center gap-3 text-sm text-white/70">
                               <div className="flex items-center space-x-2">
                                 <Clock className="text-sm" />
                                 <span>{workout.plannedDuration || 0} min</span>
@@ -1127,12 +1178,6 @@ const WorkoutTracker = () => {
                                 <Weight className="text-sm" />
                                 <span>{workout.exercises?.length || 0} exercises</span>
                               </div>
-                              {workout.exercises && workout.exercises.length > 0 && (
-                                <div className="text-white/50 text-xs ml-6">
-                                  {workout.exercises.slice(0, 3).map(ex => ex.name).join(', ')}
-                                  {workout.exercises.length > 3 && ` +${workout.exercises.length - 3} more`}
-                                </div>
-                              )}
                               {workout.totalCaloriesBurned > 0 && (
                                 <div className="flex items-center space-x-2">
                                   <Flame className="text-sm" />
@@ -1141,49 +1186,50 @@ const WorkoutTracker = () => {
                               )}
                             </div>
                             
-                            <div className="flex items-center space-x-2">
-                              <div className={`px-3 py-1 rounded-full text-xs font-medium border ${
-                                workout.status === 'completed' ? 'bg-green-500/20 text-green-400 border-green-500/30' :
-                                workout.status === 'in_progress' ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' :
-                                'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
-                              }`}>
-                                {workout.status.replace('_', ' ')}
+                            {workout.exercises && workout.exercises.length > 0 && (
+                              <div className="text-white/50 text-xs">
+                                {workout.exercises.slice(0, 3).map(ex => ex.name).join(', ')}
+                                {workout.exercises.length > 3 && ` +${workout.exercises.length - 3} more`}
                               </div>
-                              
-                              <div className="flex space-x-1">
-                                {workout.status === 'planned' && (
-                                  <button
-                                    onClick={() => startWorkout(workout._id)}
-                                    className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-                                    title="Start Workout"
-                                  >
-                                    <Play className="text-xs" />
-                                  </button>
-                                )}
-                                {workout.status === 'in_progress' && (
-                                  <button
-                                    onClick={() => completeWorkout(workout._id)}
-                                    className="p-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
-                                    title="Complete Workout"
-                                  >
-                                    <Check className="text-xs" />
-                                  </button>
-                                )}
+                            )}
+                            
+                            <div className="flex flex-wrap gap-2">
+                              {workout.status === 'planned' && (
                                 <button
-                                  onClick={() => editWorkout(workout)}
-                                  className="p-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
-                                  title="Edit Workout"
+                                  onClick={() => startWorkout(workout._id)}
+                                  className="flex items-center space-x-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg transition-colors text-sm"
+                                  title="Start Workout"
                                 >
-                                  <Edit3 className="text-xs" />
+                                  <Play className="text-xs" />
+                                  <span>Start</span>
                                 </button>
+                              )}
+                              {workout.status === 'in_progress' && (
                                 <button
-                                  onClick={() => deleteWorkout(workout._id)}
-                                  className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
-                                  title="Delete Workout"
+                                  onClick={() => completeWorkout(workout._id)}
+                                  className="flex items-center space-x-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg transition-colors text-sm"
+                                  title="Complete Workout"
                                 >
-                                  <Trash2 className="text-xs" />
+                                  <Check className="text-xs" />
+                                  <span>Complete</span>
                                 </button>
-                              </div>
+                              )}
+                              <button
+                                onClick={() => editWorkout(workout)}
+                                className="flex items-center space-x-1 bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg transition-colors text-sm"
+                                title="Edit Workout"
+                              >
+                                <Edit3 className="text-xs" />
+                                <span>Edit</span>
+                              </button>
+                              <button
+                                onClick={() => deleteWorkout(workout._id)}
+                                className="flex items-center space-x-1 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg transition-colors text-sm"
+                                title="Delete Workout"
+                              >
+                                <Trash2 className="text-xs" />
+                                <span>Delete</span>
+                              </button>
                             </div>
                           </div>
                         </motion.div>
@@ -1213,7 +1259,7 @@ const WorkoutTracker = () => {
           {activeTab === 'templates' && (
             <div className="space-y-6">
               <div className="flex justify-between items-center">
-                <h3 className="text-white text-xl font-semibold">Workout Templates</h3>
+                <h3 className="text-white text-base sm:text-lg lg:text-xl font-semibold">Workout Templates</h3>
                 <button
                   onClick={() => {
                     setActiveTab('create');
@@ -1226,7 +1272,7 @@ const WorkoutTracker = () => {
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 gap-4 sm:gap-6">
                 {workouts.filter(w => w.isTemplate).map((template) => {
                   const TypeIcon = workoutTypeIcons[template.workoutType] || Dumbbell;
                   const typeColor = workoutTypeColors[template.workoutType] || 'bg-gray-500';
@@ -1237,7 +1283,7 @@ const WorkoutTracker = () => {
                       key={template._id}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 hover:border-cyan-400/50 transition-all hover:shadow-lg hover:shadow-cyan-400/20 group"
+                      className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20 hover:border-cyan-400/50 transition-all hover:shadow-lg hover:shadow-cyan-400/20 group"
                     >
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex items-center space-x-3">
@@ -1334,7 +1380,7 @@ const WorkoutTracker = () => {
           {activeTab === 'stats' && (
             <div className="space-y-6">
               <div className="flex justify-between items-center">
-                <h3 className="text-white text-xl font-semibold">Workout Analytics</h3>
+                <h3 className="text-white text-base sm:text-lg lg:text-xl font-semibold">Workout Analytics</h3>
                 <div className="flex space-x-2">
                   <button
                     onClick={() => fetchWorkoutStats()}
@@ -1351,8 +1397,8 @@ const WorkoutTracker = () => {
                   <Loader2 className="animate-spin text-cyan-400 text-3xl" />
                 </div>
               ) : workoutStats ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20">
                     <div className="flex items-center space-x-3">
                       <div className="p-3 bg-blue-500/20 rounded-lg">
                         <Dumbbell className="text-blue-400 text-xl" />
@@ -1364,7 +1410,7 @@ const WorkoutTracker = () => {
                     </div>
                   </div>
 
-                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20">
                     <div className="flex items-center space-x-3">
                       <div className="p-3 bg-green-500/20 rounded-lg">
                         <Clock className="text-green-400 text-xl" />
@@ -1376,7 +1422,7 @@ const WorkoutTracker = () => {
                     </div>
                   </div>
 
-                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20">
                     <div className="flex items-center space-x-3">
                       <div className="p-3 bg-red-500/20 rounded-lg">
                         <Flame className="text-red-400 text-xl" />
@@ -1388,7 +1434,7 @@ const WorkoutTracker = () => {
                     </div>
                   </div>
 
-                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20">
                     <div className="flex items-center space-x-3">
                       <div className="p-3 bg-purple-500/20 rounded-lg">
                         <Trophy className="text-purple-400 text-xl" />
@@ -1415,22 +1461,24 @@ const WorkoutTracker = () => {
               )}
 
               {/* AI Workout Recommendations */}
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                <h3 className="text-white text-xl font-semibold mb-4 flex items-center gap-2">
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20 overflow-hidden">
+                <h3 className="text-white text-base sm:text-lg lg:text-xl font-semibold mb-4 flex items-center gap-2">
                   <Dumbbell className="text-cyan-400" />
                   AI Workout Tips
                 </h3>
                 {recommendations?.workoutTracker ? (
-                  <AIRecommendationCard
-                    title="Workout & Fitness"
-                    recommendation={recommendations.workoutTracker}
-                    feature="workoutTracker"
-                    userId={user?.id}
-                  />
+                  <div className="overflow-hidden">
+                    <AIRecommendationCard
+                      title="Workout & Fitness"
+                      recommendation={recommendations.workoutTracker}
+                      feature="workoutTracker"
+                      userId={user?.id}
+                    />
+                  </div>
                 ) : (
                   <div className="text-center py-4">
-                    <p className="text-white/60 mb-2">No AI recommendations available yet.</p>
-                    <p className="text-white/40 text-sm">Complete your onboarding to get personalized AI recommendations.</p>
+                    <p className="text-white/60 mb-2 text-sm sm:text-base">No AI recommendations available yet.</p>
+                    <p className="text-white/40 text-xs sm:text-sm">Complete your onboarding to get personalized AI recommendations.</p>
                   </div>
                 )}
               </div>
@@ -1441,7 +1489,7 @@ const WorkoutTracker = () => {
           {activeTab === 'database' && (
             <div className="space-y-6">
               <div className="flex justify-between items-center">
-                <h3 className="text-white text-xl font-semibold">Exercise Database</h3>
+                <h3 className="text-white text-base sm:text-lg lg:text-xl font-semibold">Exercise Database</h3>
                 <div className="flex gap-2">
                   <button
                     onClick={() => fetchExerciseDatabase()}
@@ -1452,17 +1500,17 @@ const WorkoutTracker = () => {
                   <button
                     onClick={async () => {
                       try {
-                        const response = await fetch(`${API_BASE_URL}/workout/exercises/test`);
+                        const response = await fetch(`${API_BASE_URL}/api/workout/exercises/test`);
                         const data = await response.json();
                         console.log('Wger API Basic Test:', data);
                         if (data.success) {
-                          alert('Wger API basic test successful! Check console for details.');
+                          toast.success('Wger API basic test successful! Check console for details.');
                         } else {
-                          alert('Wger API basic test failed. Check console for details.');
+                          toast.error('Wger API basic test failed. Check console for details.');
                         }
                       } catch (err) {
                         console.error('Basic test failed:', err);
-                        alert('Basic test failed. Check console for details.');
+                        toast.error('Basic test failed. Check console for details.');
                       }
                     }}
                     className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors text-sm"
@@ -1473,17 +1521,17 @@ const WorkoutTracker = () => {
                   <button
                     onClick={async () => {
                       try {
-                        const response = await fetch(`${API_BASE_URL}/workout/exercises/debug`);
+                        const response = await fetch(`${API_BASE_URL}/api/workout/exercises/debug`);
                         const data = await response.json();
                         console.log('Wger API Debug:', data);
                         if (data.success) {
-                          alert('Wger API debug test successful! Check console for details.');
+                          toast.success('Wger API debug test successful! Check console for details.');
                         } else {
-                          alert('Wger API debug test failed. Check console for details.');
+                          toast.error('Wger API debug test failed. Check console for details.');
                         }
                       } catch (err) {
                         console.error('Debug test failed:', err);
-                        alert('Debug test failed. Check console for details.');
+                        toast.error('Debug test failed. Check console for details.');
                       }
                     }}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors text-sm"
@@ -1506,7 +1554,7 @@ const WorkoutTracker = () => {
                   <Loader2 className="animate-spin text-cyan-400 text-3xl" />
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   {exerciseDatabase.map((exercise) => (
                     <motion.div
                       key={exercise.exerciseId}
@@ -1552,7 +1600,7 @@ const WorkoutTracker = () => {
           {activeTab === 'create' && (
             <div className="space-y-6">
               <div className="flex justify-between items-center">
-                <h3 className="text-white text-xl font-semibold">
+                <h3 className="text-white text-base sm:text-lg lg:text-xl font-semibold">
                   {currentWorkout ? `Edit Workout: ${currentWorkout.workoutName}` : 'Create New Workout'}
                 </h3>
                 <div className="flex space-x-3">
@@ -1574,8 +1622,8 @@ const WorkoutTracker = () => {
               </div>
 
               {/* Workout Form */}
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20 overflow-hidden">
+                <div className="grid grid-cols-1 gap-6 mb-6">
                   <div>
                     <label className="block text-white/70 text-sm mb-2">Workout Name</label>
                     <input
@@ -1672,43 +1720,45 @@ const WorkoutTracker = () => {
                           {/* Sets */}
                           <div className="space-y-2">
                             {exercise.sets.map((set, setIndex) => (
-                              <div key={setIndex} className="flex items-center space-x-2 text-sm">
+                              <div key={setIndex} className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 text-sm">
                                 <span className="text-white/50 w-8">Set {setIndex + 1}</span>
-                                <input
-                                  type="number"
-                                  placeholder="Reps"
-                                  value={set.reps || ''}
-                                  onChange={(e) => updateSetValue(exerciseIndex, setIndex, 'reps', parseInt(e.target.value) || 0)}
-                                  className="w-16 px-2 py-1 bg-white/10 text-white rounded border border-white/20 focus:border-cyan-400 focus:outline-none"
-                                />
-                                <input
-                                  type="number"
-                                  placeholder="Weight"
-                                  value={set.weight?.value || ''}
-                                  onChange={(e) => updateSetValue(exerciseIndex, setIndex, 'weight', { ...set.weight, value: parseFloat(e.target.value) || 0 })}
-                                  className="w-20 px-2 py-1 bg-white/10 text-white rounded border border-white/20 focus:border-cyan-400 focus:outline-none"
-                                />
-                                <select
-                                  value={set.weight?.unit || 'kg'}
-                                  onChange={(e) => updateSetValue(exerciseIndex, setIndex, 'weight', { ...set.weight, unit: e.target.value })}
-                                  className="px-2 py-1 bg-white/10 text-white rounded border border-white/20 focus:border-cyan-400 focus:outline-none"
-                                >
-                                  <option value="kg">kg</option>
-                                  <option value="lbs">lbs</option>
-                                </select>
-                                <input
-                                  type="number"
-                                  placeholder="Rest (s)"
-                                  value={set.restTime || ''}
-                                  onChange={(e) => updateSetValue(exerciseIndex, setIndex, 'restTime', parseInt(e.target.value) || 60)}
-                                  className="w-20 px-2 py-1 bg-white/10 text-white rounded border border-white/20 focus:border-cyan-400 focus:outline-none"
-                                />
-                                <button
-                                  onClick={() => removeSetFromExercise(exerciseIndex, setIndex)}
-                                  className="text-red-400 hover:text-red-300"
-                                >
-                                  <X />
-                                </button>
+                                <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+                                  <input
+                                    type="number"
+                                    placeholder="Reps"
+                                    value={set.reps || ''}
+                                    onChange={(e) => updateSetValue(exerciseIndex, setIndex, 'reps', parseInt(e.target.value) || 0)}
+                                    className="w-16 px-2 py-1 bg-white/10 text-white rounded border border-white/20 focus:border-cyan-400 focus:outline-none"
+                                  />
+                                  <input
+                                    type="number"
+                                    placeholder="Weight"
+                                    value={set.weight?.value || ''}
+                                    onChange={(e) => updateSetValue(exerciseIndex, setIndex, 'weight', { ...set.weight, value: parseFloat(e.target.value) || 0 })}
+                                    className="w-20 px-2 py-1 bg-white/10 text-white rounded border border-white/20 focus:border-cyan-400 focus:outline-none"
+                                  />
+                                  <select
+                                    value={set.weight?.unit || 'kg'}
+                                    onChange={(e) => updateSetValue(exerciseIndex, setIndex, 'weight', { ...set.weight, unit: e.target.value })}
+                                    className="px-2 py-1 bg-white/10 text-white rounded border border-white/20 focus:border-cyan-400 focus:outline-none"
+                                  >
+                                    <option value="kg">kg</option>
+                                    <option value="lbs">lbs</option>
+                                  </select>
+                                  <input
+                                    type="number"
+                                    placeholder="Rest (s)"
+                                    value={set.restTime || ''}
+                                    onChange={(e) => updateSetValue(exerciseIndex, setIndex, 'restTime', parseInt(e.target.value) || 60)}
+                                    className="w-20 px-2 py-1 bg-white/10 text-white rounded border border-white/20 focus:border-cyan-400 focus:outline-none"
+                                  />
+                                  <button
+                                    onClick={() => removeSetFromExercise(exerciseIndex, setIndex)}
+                                    className="text-red-400 hover:text-red-300 p-1"
+                                  >
+                                    <X />
+                                  </button>
+                                </div>
                               </div>
                             ))}
                             <button
@@ -1724,7 +1774,7 @@ const WorkoutTracker = () => {
                   )}
                 </div>
 
-                <div className="flex gap-3">
+                <div className="flex flex-col sm:flex-row gap-3">
                   <button
                     onClick={currentWorkout ? updateWorkout : handleCreateWorkout}
                     disabled={loading || workoutForm.exercises.length === 0}
@@ -1732,37 +1782,39 @@ const WorkoutTracker = () => {
                   >
                     {loading ? <Loader2 className="animate-spin mx-auto" /> : (currentWorkout ? 'Update Workout' : 'Create Workout')}
                   </button>
-                  {currentWorkout && (
-                    <button
-                      onClick={() => {
-                        setCurrentWorkout(null);
-                        setWorkoutForm({
-                          workoutName: '',
-                          workoutType: 'strength',
-                          plannedDuration: 60,
-                          notes: '',
-                          location: 'Gym',
-                          exercises: [],
-                          difficulty: 'moderate',
-                          tags: [],
-                          isTemplate: false,
-                          templateName: ''
-                        });
-                      }}
-                      className="px-6 bg-gray-600 hover:bg-gray-700 text-white py-3 rounded-lg transition-colors font-medium"
-                    >
-                      Cancel Edit
-                    </button>
-                  )}
-                  {!currentWorkout && (
-                    <button
-                      onClick={saveWorkoutAsTemplate}
-                      disabled={loading || workoutForm.exercises.length === 0}
-                      className="px-6 bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg transition-colors font-medium"
-                    >
-                      Save as Template
-                    </button>
-                  )}
+                  <div className="flex gap-3">
+                    {currentWorkout && (
+                      <button
+                        onClick={() => {
+                          setCurrentWorkout(null);
+                          setWorkoutForm({
+                            workoutName: '',
+                            workoutType: 'strength',
+                            plannedDuration: 60,
+                            notes: '',
+                            location: 'Gym',
+                            exercises: [],
+                            difficulty: 'moderate',
+                            tags: [],
+                            isTemplate: false,
+                            templateName: ''
+                          });
+                        }}
+                        className="flex-1 sm:flex-none px-6 bg-gray-600 hover:bg-gray-700 text-white py-3 rounded-lg transition-colors font-medium"
+                      >
+                        Cancel Edit
+                      </button>
+                    )}
+                    {!currentWorkout && (
+                      <button
+                        onClick={saveWorkoutAsTemplate}
+                        disabled={loading || workoutForm.exercises.length === 0}
+                        className="flex-1 sm:flex-none px-6 bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg transition-colors font-medium"
+                      >
+                        Save as Template
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -1771,10 +1823,10 @@ const WorkoutTracker = () => {
 
         {/* Exercise Database Modal */}
         {showDatabaseModal && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-gray-900 rounded-xl p-6 w-full max-w-4xl max-h-[80vh] overflow-y-auto">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-white text-xl font-semibold">Exercise Database</h3>
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4">
+            <div className="bg-gray-900 rounded-xl p-4 sm:p-6 w-full max-w-4xl max-h-[80vh] overflow-y-auto">
+              <div className="flex justify-between items-center mb-4 sm:mb-6">
+                <h3 className="text-white text-base sm:text-lg lg:text-xl font-semibold">Exercise Database</h3>
                 <button
                   onClick={() => setShowDatabaseModal(false)}
                   className="text-white/60 hover:text-white"
@@ -1783,7 +1835,7 @@ const WorkoutTracker = () => {
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 {exerciseDatabase.map((exercise) => (
                   <div key={exercise.exerciseId} className="bg-white/5 rounded-lg p-4 border border-white/10">
                     {exercise.imageUrl && (
@@ -1814,10 +1866,10 @@ const WorkoutTracker = () => {
 
         {/* Custom Exercise Modal */}
         {showExerciseModal && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-gray-900 rounded-xl p-6 w-full max-w-md">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-white text-xl font-semibold">Create Custom Exercise</h3>
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4">
+            <div className="bg-gray-900 rounded-xl p-4 sm:p-6 w-full max-w-md">
+              <div className="flex justify-between items-center mb-4 sm:mb-6">
+                <h3 className="text-white text-base sm:text-lg lg:text-xl font-semibold">Create Custom Exercise</h3>
                 <button
                   onClick={() => setShowExerciseModal(false)}
                   className="text-white/60 hover:text-white"
@@ -1838,7 +1890,7 @@ const WorkoutTracker = () => {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   <div>
                     <label className="block text-white/70 text-sm mb-2">Category</label>
                     <select

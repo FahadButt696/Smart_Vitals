@@ -268,3 +268,4 @@ For technical support or feature requests:
 
 *Track your nutrition, achieve your goals, and build a healthier lifestyle with Smart Vitals.*
 
+

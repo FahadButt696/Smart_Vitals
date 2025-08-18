@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useUser, useAuth } from '@clerk/clerk-react';
+import { useUser, useAuth, SignedIn } from '@clerk/clerk-react';
 import { toast } from 'react-hot-toast';
 import { API_BASE_URL } from "@/config/api";
 import { 
@@ -27,6 +27,7 @@ import AIRecommendationCard from "@/components/custom/AIRecommendationCard";
 import { useAIRecommendations } from "@/hooks/useAIRecommendations";
 const MealLoggerEnhanced = () => {
   const { user } = useUser();
+  const { getToken } = useAuth();
   const { recommendations } = useAIRecommendations();
   const [showAddMeal, setShowAddMeal] = useState(false);
   const [showManualEntry, setShowManualEntry] = useState(false);
@@ -41,6 +42,7 @@ const MealLoggerEnhanced = () => {
   const [quantity, setQuantity] = useState(1);
   const [mealItems, setMealItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [error, setError] = useState(null);
   const [todayMeals, setTodayMeals] = useState([]);
   const [nutritionSummary, setNutritionSummary] = useState({
@@ -85,16 +87,21 @@ const MealLoggerEnhanced = () => {
 
   // Fetch today's meals on component mount
   useEffect(() => {
-    fetchTodayMeals();
+    if (user && user.id) {
+      fetchTodayMeals();
+    }
   }, [user]);
 
   const fetchTodayMeals = async () => {
     if (!user) return;
     
     try {
-      const response = await fetch(`${API_BASE_URL}/api/meal?userId=${user.id}`, {
+      setIsInitialLoading(true);
+      const token = await getToken();
+      // Use the correct endpoint and authentication
+      const response = await fetch(`${API_BASE_URL}/api/meal`, {
         headers: {
-          'Authorization': `Bearer ${user.session.access_token}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         signal: AbortSignal.timeout(15000) // 15 seconds for mobile
@@ -143,6 +150,12 @@ const MealLoggerEnhanced = () => {
       }
     } catch (err) {
       console.error('Error fetching meals:', err);
+      // Don't set error for network issues, just log them
+      if (err.name === 'AbortError') {
+        console.log('Request was aborted due to timeout');
+      }
+    } finally {
+      setIsInitialLoading(false);
     }
   };
 
@@ -157,9 +170,6 @@ const MealLoggerEnhanced = () => {
   
       const response = await fetch(`${API_BASE_URL}/api/meal/detect`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${user.session.access_token}`,
-        },
         body: formData,
         signal: AbortSignal.timeout(30000) // 30 seconds for mobile
       });
@@ -213,7 +223,6 @@ const MealLoggerEnhanced = () => {
       const response = await fetch(`${API_BASE_URL}/api/meal/manual`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${user.session.access_token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -355,7 +364,6 @@ const MealLoggerEnhanced = () => {
       const response = await fetch(`${API_BASE_URL}/api/meal/save`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${user.session.access_token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -515,16 +523,14 @@ const MealLoggerEnhanced = () => {
 
   // Delete meal function
   const deleteMeal = async (mealId) => {
-    if (!confirm('Are you sure you want to delete this meal?')) return;
+    // Proceed with deletion (removed confirmation for better UX)
     
     try {
-      const response = await fetch(`${API_BASE_URL}/api/meal/${mealId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/meal/${mealId}?userId=${user.id}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${user.session.access_token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ userId: user.id }),
         signal: AbortSignal.timeout(15000) // 15 seconds for mobile
       });
 
@@ -544,34 +550,36 @@ const MealLoggerEnhanced = () => {
         {/* Header with Action Buttons */}
         <div className="flex flex-col lg:flex-row gap-4 mb-6">
           <div className="flex-1">
-            <h2 className="text-2xl font-bold text-white mb-2">Meal Logger</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Meal Logger</h2>
             <p className="text-white/60">Track your daily meals and nutrition</p>
           </div>
           
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setShowAddMeal(true)}
-            className="p-4 bg-gradient-to-r from-cyan-400 to-purple-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200 whitespace-nowrap upload-btn"
-          >
-            <Camera className="inline mr-2" />
-            Take Photo
-          </motion.button>
-          
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => fetchTodayMeals()}
-            className="p-4 bg-gradient-to-r from-green-400 to-blue-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200 whitespace-nowrap"
-          >
-            <RefreshCw className="inline mr-2" />
-            Refresh
-          </motion.button>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowAddMeal(true)}
+              className="p-3 sm:p-4 bg-gradient-to-r from-cyan-400 to-purple-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200 whitespace-nowrap upload-btn text-sm sm:text-base"
+            >
+              <Camera className="inline mr-2" />
+              Take Photo
+            </motion.button>
+            
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => fetchTodayMeals()}
+              className="p-3 sm:p-4 bg-gradient-to-r from-green-400 to-blue-400 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200 whitespace-nowrap text-sm sm:text-base"
+            >
+              <RefreshCw className="inline mr-2" />
+              Refresh
+            </motion.button>
+          </div>
         </div>
 
         {/* Nutrition Summary */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-gradient-to-br from-orange-400/20 to-red-400/20 border border-orange-400/30 rounded-xl p-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <div className="bg-gradient-to-br from-orange-400/20 to-red-400/20 border border-orange-400/30 rounded-xl p-3 sm:p-4">
             <div className="flex items-center gap-2 mb-2">
               <Flame className="text-orange-400" />
               <span className="text-white font-medium">Calories</span>
@@ -584,7 +592,7 @@ const MealLoggerEnhanced = () => {
             </div>
           </div>
           
-          <div className="bg-gradient-to-br from-blue-400/20 to-cyan-400/20 border border-blue-400/30 rounded-xl p-4">
+          <div className="bg-gradient-to-br from-blue-400/20 to-cyan-400/20 border border-blue-400/30 rounded-xl p-3 sm:p-4">
             <div className="flex items-center gap-2 mb-2">
               <Leaf className="text-blue-400" />
               <span className="text-white font-medium">Protein</span>
@@ -594,7 +602,7 @@ const MealLoggerEnhanced = () => {
             </div>
           </div>
           
-          <div className="bg-gradient-to-br from-green-400/20 to-emerald-400/20 border border-green-400/30 rounded-xl p-4">
+          <div className="bg-gradient-to-br from-green-400/20 to-emerald-400/20 border border-green-400/30 rounded-xl p-3 sm:p-4">
             <div className="flex items-center gap-2 mb-2">
               <Utensils className="text-green-400" />
               <span className="text-white font-medium">Carbs</span>
@@ -604,7 +612,7 @@ const MealLoggerEnhanced = () => {
             </div>
           </div>
           
-          <div className="bg-gradient-to-br from-yellow-400/20 to-orange-400/20 border border-yellow-400/30 rounded-xl p-4">
+          <div className="bg-gradient-to-br from-yellow-400/20 to-orange-400/20 border border-yellow-400/30 rounded-xl p-3 sm:p-4">
             <div className="flex items-center gap-2 mb-2">
               <Droplets className="text-yellow-400" />
               <span className="text-white font-medium">Fat</span>
@@ -615,14 +623,14 @@ const MealLoggerEnhanced = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
           {/* AI Recommendations */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             className="lg:col-span-1"
           >
-            <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+            <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6">
               <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
                 <Leaf className="text-green-400" />
                 AI Nutrition Tips
@@ -649,7 +657,7 @@ const MealLoggerEnhanced = () => {
             animate={{ opacity: 1, x: 0 }}
             className="lg:col-span-2"
           >
-            <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+            <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6">
               {/* Professional Search and Filters */}
               <div className="mb-6 p-4 bg-white/5 rounded-xl border border-white/10">
                 <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
@@ -659,7 +667,7 @@ const MealLoggerEnhanced = () => {
                 
 
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4">
                   {/* Meal Type Filter */}
                   <div>
                     <label className="block text-white/80 text-sm mb-2">Meal Type</label>
@@ -668,9 +676,9 @@ const MealLoggerEnhanced = () => {
                       onChange={(e) => setSearchFilters({...searchFilters, mealType: e.target.value})}
                       className="w-full p-2 bg-white/10 border border-white/20 rounded-lg text-white text-sm focus:outline-none focus:border-cyan-400"
                     >
-                      <option value="all">All Types</option>
+                      <option value="all" className="bg-gray-800 text-white">All Types</option>
                       {mealTypes.map(type => (
-                        <option key={type.id} value={type.id}>{type.label}</option>
+                        <option key={type.id} value={type.id} className="bg-gray-800 text-white">{type.label}</option>
                       ))}
                     </select>
                   </div>
@@ -683,10 +691,10 @@ const MealLoggerEnhanced = () => {
                       onChange={(e) => setSearchFilters({...searchFilters, dateRange: e.target.value})}
                       className="w-full p-2 bg-white/10 border border-white/20 rounded-lg text-white text-sm focus:outline-none focus:border-cyan-400"
                     >
-                      <option value="today">Today</option>
-                      <option value="yesterday">Yesterday</option>
-                      <option value="week">This Week</option>
-                      <option value="month">This Month</option>
+                      <option value="today" className="bg-gray-800 text-white">Today</option>
+                      <option value="yesterday" className="bg-gray-800 text-white">Yesterday</option>
+                      <option value="week" className="bg-gray-800 text-white">This Week</option>
+                      <option value="month" className="bg-gray-800 text-white">This Month</option>
                     </select>
                   </div>
                   
@@ -716,8 +724,8 @@ const MealLoggerEnhanced = () => {
                 </div>
                 
                 {/* Sort Options */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
                     <label className="text-white/80 text-sm">Sort by:</label>
                     <div className="flex gap-2">
                       {[
@@ -954,12 +962,22 @@ const MealLoggerEnhanced = () => {
                   </button>
                 </div>
 
-                {/* Error Display */}
-                {error && (
-                  <div className="mb-4 p-4 bg-red-500/20 border border-red-500/30 rounded-xl text-red-300">
-                    {error}
-                  </div>
-                )}
+                        {/* Loading State */}
+        {isInitialLoading && (
+          <div className="mb-4 p-4 bg-blue-500/20 border border-blue-500/30 rounded-xl text-blue-300">
+            <div className="flex items-center gap-2">
+              <Loader2 className="animate-spin" />
+              Loading your meal data...
+            </div>
+          </div>
+        )}
+
+        {/* Error Display */}
+        {error && !isInitialLoading && (
+          <div className="mb-4 p-4 bg-red-500/20 border border-red-500/30 rounded-xl text-red-300">
+            {error}
+          </div>
+        )}
 
                 {/* Success Message Display */}
                 {successMessage && (

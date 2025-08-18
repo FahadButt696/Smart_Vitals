@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useUser, useAuth } from '@clerk/clerk-react';
+import { useUser, useAuth, SignedIn } from '@clerk/clerk-react';
 import { toast } from 'react-hot-toast';
 import AIRecommendationCard from "@/components/custom/AIRecommendationCard";
 import { useAIRecommendations } from "@/hooks/useAIRecommendations";
@@ -32,6 +32,7 @@ const SymptomChecker = () => {
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingUserData, setIsLoadingUserData] = useState(true);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   
   // Simplified state for text-based symptom input
   const [symptomText, setSymptomText] = useState('');
@@ -108,6 +109,7 @@ const SymptomChecker = () => {
     if (!userData) return;
     
     try {
+      setIsInitialLoading(true);
       // Check if backend is available
       const backendAvailable = await checkBackendStatus();
       if (!backendAvailable) {
@@ -116,7 +118,7 @@ const SymptomChecker = () => {
       }
 
       const token = await getToken();
-      const response = await fetch(`${API_BASE_URL}/symptom-check?userId=${user.id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/symptom-check?userId=${user.id}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -143,6 +145,8 @@ const SymptomChecker = () => {
         toast.error('Failed to fetch symptom history. Please try again.');
       }
       setSymptomHistory([]);
+    } finally {
+      setIsInitialLoading(false);
     }
   };
 
@@ -172,7 +176,7 @@ const SymptomChecker = () => {
       }
       
       const token = await getToken();
-      const response = await fetch(`${API_BASE_URL}/symptom-check/check`, {
+      const response = await fetch(`${API_BASE_URL}/api/symptom-check/check`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -227,7 +231,7 @@ const SymptomChecker = () => {
       }
 
       const token = await getToken();
-      const response = await fetch(`${API_BASE_URL}/symptom-check/${checkId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/symptom-check/${checkId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -278,7 +282,22 @@ const SymptomChecker = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <SignedIn>
+      <div className="space-y-6">
+        {/* Loading State */}
+        {isInitialLoading && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8 bg-blue-500/20 border border-blue-500/30 rounded-xl p-6 text-center"
+          >
+            <div className="flex items-center justify-center gap-3 text-blue-300">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-300"></div>
+              <span className="text-lg">Loading your symptom data...</span>
+            </div>
+          </motion.div>
+        )}
+
       {/* Header */}
       <div className="backdrop-blur-xl border border-white/20 rounded-2xl p-6">
         <div className="flex items-center gap-3 mb-4">
@@ -615,6 +634,7 @@ const SymptomChecker = () => {
         </div>
       </div>
     </div>
+  </SignedIn>
   );
 };
 

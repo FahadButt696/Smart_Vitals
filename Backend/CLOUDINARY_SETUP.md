@@ -276,3 +276,4 @@ cloudinary.config({
 
 Your Smart Vitals project is now ready for cloud deployment with professional-grade image management! 🚀
 
+

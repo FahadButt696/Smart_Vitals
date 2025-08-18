@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useUser } from '@clerk/clerk-react';
+import { useUser, useAuth, SignedIn } from '@clerk/clerk-react';
 import { toast } from 'react-hot-toast';
 import { API_BASE_URL } from "@/config/api";
 
@@ -44,6 +44,7 @@ const DATE_LIMITS = {
 
 const WeightTracker = () => {
   const { user } = useUser();
+  const { getToken } = useAuth();
   const { recommendations } = useAIRecommendations();
   const [weightLogs, setWeightLogs] = useState([]);
   const [stats, setStats] = useState({
@@ -58,6 +59,7 @@ const WeightTracker = () => {
   });
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingWeight, setEditingWeight] = useState(null);
@@ -69,6 +71,7 @@ const WeightTracker = () => {
   const [sortOrder, setSortOrder] = useState('desc'); // asc, desc
   const [showHelp, setShowHelp] = useState(false);
   const [lastSync, setLastSync] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
 
   // Form states
   const [formData, setFormData] = useState({
@@ -78,6 +81,50 @@ const WeightTracker = () => {
     time: new Date().toTimeString().slice(0, 5), // Add time field
     notes: ''
   });
+  
+  // Initialize form with user profile data
+  const initializeFormWithProfile = () => {
+    if (userProfile && userProfile.weightUnit) {
+      setFormData(prev => ({
+        ...prev,
+        unit: userProfile.weightUnit
+      }));
+    }
+  };
+
+  // Fetch user profile data (including initial weight from onboarding)
+  const fetchUserProfile = async () => {
+    if (!user?.id) return;
+    
+    try {
+      const token = await getToken();
+      const response = await fetch(`${API_BASE_URL}/api/user/${user.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        signal: AbortSignal.timeout(10000) // 10 second timeout
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setUserProfile(data);
+        console.log('User profile fetched:', data);
+        
+        // Initialize form with profile data
+        initializeFormWithProfile();
+        
+        // If we already have weight logs, recalculate stats with profile data
+        if (weightLogs && weightLogs.length > 0) {
+          setTimeout(() => calculateStatsWithProfileWeight(), 100);
+        }
+      } else {
+        console.warn('Failed to fetch user profile:', response.status);
+      }
+    } catch (error) {
+      console.warn('Error fetching user profile:', error);
+    }
+  };
 
   // Check if backend is available
   const checkBackendStatus = async () => {
@@ -178,6 +225,7 @@ const WeightTracker = () => {
   const fetchWeightLogs = async () => {
     try {
       setLoading(true);
+      setIsInitialLoading(true);
       
       if (!user?.id) {
         console.warn('No user ID available for fetching weight logs');
@@ -193,7 +241,12 @@ const WeightTracker = () => {
         return;
       }
 
-      const response = await fetch(`${API_BASE_URL}?userId=${user.id}`, {
+      const token = await getToken();
+      const response = await fetch(`${API_BASE_URL}/api/weight?userId=${user.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
         signal: AbortSignal.timeout(10000) // 10 second timeout
       });
       
@@ -211,6 +264,9 @@ const WeightTracker = () => {
         });
         setWeightLogs(data.logs || []);
         setLastSync(new Date());
+        
+        // Calculate stats after weight logs are set
+        setTimeout(() => calculateStatsWithProfileWeight(), 100);
       } else {
         throw new Error(data.message || 'Failed to fetch weight logs');
       }
@@ -225,6 +281,7 @@ const WeightTracker = () => {
       setWeightLogs([]);
     } finally {
       setLoading(false);
+      setIsInitialLoading(false);
     }
   };
 
@@ -263,7 +320,12 @@ const WeightTracker = () => {
         return;
       }
 
-      const response = await fetch(`${API_BASE_URL}/stats?userId=${user.id}`, {
+      const token = await getToken();
+      const response = await fetch(`${API_BASE_URL}/api/weight/stats?userId=${user.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
         signal: AbortSignal.timeout(10000) // 10 second timeout
       });
       
@@ -307,6 +369,36 @@ const WeightTracker = () => {
     }
   };
 
+  // Calculate stats using user profile weight as starting weight when no logs available
+  const calculateStatsWithProfileWeight = () => {
+    if (!weightLogs || weightLogs.length === 0) {
+      // No logs available, use profile weight as starting weight
+      if (userProfile && userProfile.weight) {
+        const profileWeight = {
+          weight: userProfile.weight,
+          unit: userProfile.weightUnit || 'kg',
+          timestamp: new Date().toISOString(),
+          notes: 'Initial weight from onboarding'
+        };
+        
+        setStats({
+          current: profileWeight,
+          starting: profileWeight,
+          totalChange: 0,
+          averageChange: 0,
+          trend: "stable",
+          totalEntries: 1,
+          thisWeek: 1,
+          thisMonth: 1
+        });
+        return;
+      }
+    }
+    
+    // If we have logs, let the backend handle stats calculation
+    fetchWeightStats();
+  };
+
   // Add weight log with comprehensive validation
   const addWeight = async (e) => {
     e.preventDefault();
@@ -323,9 +415,13 @@ const WeightTracker = () => {
     
     try {
       setSubmitting(true);
-      const response = await fetch(API_BASE_URL, {
+      const token = await getToken();
+      const response = await fetch(`${API_BASE_URL}/api/weight`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json' 
+        },
         body: JSON.stringify({
           userId: user.id,
           ...formData,
@@ -387,9 +483,13 @@ const WeightTracker = () => {
     
     try {
       setSubmitting(true);
-      const response = await fetch(`${API_BASE_URL}/${editingWeight._id}`, {
+      const token = await getToken();
+      const response = await fetch(`${API_BASE_URL}/api/weight/${editingWeight._id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json' 
+        },
         body: JSON.stringify({
           userId: user.id,
           ...formData,
@@ -436,15 +536,19 @@ const WeightTracker = () => {
       return;
     }
     
-    const confirmed = window.confirm(
-      'Are you sure you want to delete this weight log? This action cannot be undone.'
-    );
+    // Show confirmation toast
+    toast.success('Weight log deleted successfully!');
     
-    if (!confirmed) return;
+    // Proceed with deletion (removed confirmation for better UX)
     
     try {
-      const response = await fetch(`${API_BASE_URL}/${id}`, {
-        method: 'DELETE'
+      const token = await getToken();
+      const response = await fetch(`${API_BASE_URL}/api/weight/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
       
       if (!response.ok) {
@@ -770,8 +874,9 @@ const WeightTracker = () => {
 
   useEffect(() => {
     if (user && user.id) {
+      fetchUserProfile();
       fetchWeightLogs();
-      fetchWeightStats();
+      // fetchWeightStats(); // Will be called by calculateStatsWithProfileWeight if needed
     } else if (!user) {
       setLoading(false);
     }
@@ -869,9 +974,11 @@ const WeightTracker = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400"></div>
-      </div>
+      <SignedIn>
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400"></div>
+        </div>
+      </SignedIn>
     );
   }
 
@@ -879,37 +986,64 @@ const WeightTracker = () => {
   const filteredLogs = getFilteredAndSortedLogs();
 
   return (
-    <>
-      {/* Today's Progress */}
+    <SignedIn>
+      <>
+        {/* Loading State */}
+        {isInitialLoading && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8 bg-blue-500/20 border border-blue-500/30 rounded-xl p-6 text-center"
+          >
+            <div className="flex items-center justify-center gap-3 text-blue-300">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-300"></div>
+              <span className="text-lg">Loading your weight data...</span>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Today's Progress */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6 mb-8"
+        className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8"
       >
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <div>
-            <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+            <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
               <FaWeight className="text-cyan-400" />
               Today's Weight
             </h2>
-            <p className="text-white/60 mt-1">
-              {stats.current ? `Current: ${stats.current.weight} ${stats.current.unit}` : 'No weight logged today'}
+            <p className="text-white/60 mt-1 text-sm sm:text-base">
+              {stats.current ? `Current: ${stats.current.weight} ${stats.current.unit}` : 
+               stats.starting ? `Initial weight: ${stats.starting.weight} ${stats.starting.unit}` : 'No weight logged today'}
             </p>
           </div>
-          <div className="text-right">
-            <div className="text-3xl font-bold text-white">
-              {stats.current ? `${stats.current.weight} ${stats.current.unit}` : '--'}
+          <div className="text-center sm:text-right">
+            <div className="text-2xl sm:text-3xl font-bold text-white">
+              {stats.current ? `${stats.current.weight} ${stats.current.unit}` : 
+               stats.starting ? `${stats.starting.weight} ${stats.starting.unit}` : '--'}
             </div>
-            <div className="text-white/60">
-              {stats.totalChange !== 0 ? `${stats.totalChange > 0 ? '+' : ''}${stats.totalChange} ${stats.current?.unit || 'kg'} total change` : 'No change yet'}
+            <div className="text-white/60 text-sm">
+              {stats.totalChange !== 0 ? `${stats.totalChange > 0 ? '+' : ''}${stats.totalChange} ${stats.current?.unit || stats.starting?.unit || 'kg'} total change` : 'No change yet'}
             </div>
           </div>
         </div>
 
-        {stats.current && (
+        {(stats.current || stats.starting) && (
           <div className="flex items-center justify-between text-sm">
             <span className="text-white/60">Starting weight</span>
             <span className="text-white/60">{stats.starting ? `${stats.starting.weight} ${stats.starting.unit}` : 'Not set'}</span>
+          </div>
+        )}
+        
+        {/* Show info when displaying profile weight */}
+        {!stats.current && stats.starting && (
+          <div className="mt-4 p-3 bg-blue-500/20 border border-blue-500/30 rounded-lg">
+            <div className="flex items-center gap-2 text-blue-300 text-sm">
+              <FaInfoCircle className="text-blue-400" />
+              <span>Showing your initial weight from onboarding. Log your first weight entry to start tracking progress!</span>
+            </div>
           </div>
         )}
       </motion.div>
@@ -919,15 +1053,15 @@ const WeightTracker = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6 mb-8"
+        className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8"
       >
         <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
           <FaPlus className="text-cyan-400" />
           Quick Add Weight
         </h3>
         
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="sm:col-span-2">
             <label className="block text-white/70 text-sm mb-2">Weight</label>
             <div className="flex gap-2">
               <input
@@ -938,36 +1072,36 @@ const WeightTracker = () => {
                 placeholder="Enter weight"
                 className="flex-1 p-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:border-cyan-400 focus:outline-none"
               />
-                             <select
-                 value={formData.unit}
-                 onChange={(e) => handleInputChange('unit', e.target.value)}
-                 className="p-3 bg-gray-800 border border-white/20 rounded-xl text-white focus:border-cyan-400 focus:outline-none"
-               >
-                 <option value="kg" className="bg-gray-800 text-white">kg</option>
-                 <option value="lbs" className="bg-gray-800 text-white">lbs</option>
-               </select>
+              <select
+                value={formData.unit}
+                onChange={(e) => handleInputChange('unit', e.target.value)}
+                className="w-20 p-3 bg-gray-800 border border-white/20 rounded-xl text-white focus:border-cyan-400 focus:outline-none"
+              >
+                <option value="kg" className="bg-gray-800 text-white hover:bg-gray-700">kg</option>
+                <option value="lbs" className="bg-gray-800 text-white hover:bg-gray-700">lbs</option>
+              </select>
             </div>
           </div>
           
-                     <div className="flex-1">
-             <label className="block text-white/70 text-sm mb-2">Date</label>
-             <input
-               type="date"
-               value={formData.timestamp}
-               onChange={(e) => handleInputChange('timestamp', e.target.value)}
-               className="w-full p-3 bg-white/10 border border-white/20 rounded-xl text-white focus:border-cyan-400 focus:outline-none"
-             />
-           </div>
-           
-           <div className="flex-1">
-             <label className="block text-white/70 text-sm mb-2">Time</label>
-             <input
-               type="time"
-               value={formData.time}
-               onChange={(e) => handleInputChange('time', e.target.value)}
-               className="w-full p-3 bg-white/10 border border-white/20 rounded-xl text-white focus:border-cyan-400 focus:outline-none"
-             />
-           </div>
+          <div>
+            <label className="block text-white/70 text-sm mb-2">Date</label>
+            <input
+              type="date"
+              value={formData.timestamp}
+              onChange={(e) => handleInputChange('timestamp', e.target.value)}
+              className="w-full p-3 bg-white/10 border border-white/20 rounded-xl text-white focus:border-cyan-400 focus:outline-none"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-white/70 text-sm mb-2">Time</label>
+            <input
+              type="time"
+              value={formData.time}
+              onChange={(e) => handleInputChange('time', e.target.value)}
+              className="w-full p-3 bg-white/10 border border-white/20 rounded-xl text-white focus:border-cyan-400 focus:outline-none"
+            />
+          </div>
         </div>
 
         <div className="mt-4">
@@ -1003,41 +1137,41 @@ const WeightTracker = () => {
         </motion.button>
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8">
         {/* Enhanced Charts Section */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
-          className="backdrop-blur-xl border border-white/20 rounded-2xl p-6"
+          className="backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6"
         >
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-white flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <h3 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
               <FaChartLine className="text-cyan-400" />
               Weight Analytics
             </h3>
             
             {/* Chart View Toggle */}
-            <div className="flex items-center gap-2">
-              {['daily', 'weekly', 'monthly'].map((view) => (
-                <motion.button
-                  key={view}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => {
-                    console.log('🔄 Chart view changing from', chartView, 'to', view);
-                    setChartView(view);
-                  }}
-                  className={`px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 graph-view-btn ${
-                    chartView === view
-                      ? 'bg-gradient-to-r from-cyan-400 to-purple-400 text-white'
-                      : 'bg-white/10 text-white/70 hover:bg-white/20'
-                  }`}
-                >
-                  {view.charAt(0).toUpperCase() + view.slice(1)}
-                </motion.button>
-              ))}
-            </div>
+                      <div className="flex flex-wrap items-center gap-2">
+            {['daily', 'weekly', 'monthly'].map((view) => (
+              <motion.button
+                key={view}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => {
+                  console.log('🔄 Chart view changing from', chartView, 'to', view);
+                  setChartView(view);
+                }}
+                className={`px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 graph-view-btn ${
+                  chartView === view
+                    ? 'bg-gradient-to-r from-cyan-400 to-purple-400 text-white'
+                    : 'bg-white/10 text-white/70 hover:bg-white/20'
+                }`}
+              >
+                {view.charAt(0).toUpperCase() + view.slice(1)}
+              </motion.button>
+            ))}
+          </div>
           </div>
           
           
@@ -1060,9 +1194,9 @@ const WeightTracker = () => {
               const renderedChart = renderChart();
               console.log('🔍 renderChart returned:', renderedChart);
               return (
-                <div className="h-80">
-  {renderedChart}
-</div>
+                <div className="h-64 sm:h-80">
+                  {renderedChart}
+                </div>
               );
             } else {
               console.log('⚠️ No chart data, showing empty state for view:', chartView);
@@ -1103,9 +1237,9 @@ const WeightTracker = () => {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3 }}
-          className="backdrop-blur-xl border border-white/20 rounded-2xl p-6"
+          className="backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6"
         >
-          <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+          <h3 className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-6 flex items-center gap-2">
             <FaCalendarAlt className="text-cyan-400" />
             Statistics
           </h3>
@@ -1750,7 +1884,8 @@ const WeightTracker = () => {
           </motion.div>
         )}
       </AnimatePresence>
-    </>
+      </>
+    </SignedIn>
   );
 };
 

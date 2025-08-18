@@ -44,3 +44,4 @@ console.log('1. If all tests pass, your Cloudinary setup is ready!');
 console.log('2. If there are errors, check your .env file and Cloudinary credentials');
 console.log('3. Test image upload with: POST /api/meals/detect');
 
+

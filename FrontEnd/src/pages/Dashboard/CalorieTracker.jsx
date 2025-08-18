@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useUser, useAuth } from '@clerk/clerk-react';
+import { useUser, useAuth, SignedIn } from '@clerk/clerk-react';
 import { toast } from 'react-hot-toast';
 import { 
   Flame, 
@@ -32,6 +32,7 @@ import { API_BASE_URL } from "@/config/api";
 
 const CalorieTracker = () => {
   const { user } = useUser();
+  const { getToken } = useAuth();
   const { recommendations, isLoading: aiLoading, refreshRecommendations } = useAIRecommendations();
   
   // State for different time periods
@@ -81,6 +82,7 @@ const CalorieTracker = () => {
   // Loading states
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   
   // Refs for charts
   const chartRef = useRef(null);
@@ -146,9 +148,11 @@ const CalorieTracker = () => {
   const fetchCalorieData = async () => {
     try {
       setIsLoading(true);
-      const token = await user.getToken();
+      setIsInitialLoading(true);
       
-      const response = await fetch(`${API_BASE_URL}/api/calories?userId=${user.id}&period=${timePeriod}`, {
+      const token = await getToken();
+      // Use proper authentication
+      const response = await fetch(`${API_BASE_URL}/api/calorie?userId=${user.id}&period=${timePeriod}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -167,17 +171,21 @@ const CalorieTracker = () => {
         processChartData(data.data || []);
       } else {
         console.error('Failed to fetch calorie data');
-        toast.error('Failed to load calorie data');
+        // Don't show error toast for initial load failures
+        if (!isInitialLoading) {
+          toast.error('Failed to load calorie data');
+        }
       }
     } catch (error) {
       console.error('Error fetching calorie data:', error);
       if (error.name === 'AbortError') {
-        toast.error('Request timed out. Please check your connection.');
-      } else {
+        console.log('Request was aborted due to timeout');
+      } else if (!isInitialLoading) {
         toast.error('Failed to load calorie data');
       }
     } finally {
       setIsLoading(false);
+      setIsInitialLoading(false);
     }
   };
 
@@ -409,39 +417,55 @@ const CalorieTracker = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-cyan-400 mx-auto"></div>
-          <p className="text-white mt-4">Loading Calorie Tracker...</p>
+      <SignedIn>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-cyan-400 mx-auto"></div>
+            <p className="text-white mt-4">Loading Calorie Tracker...</p>
+          </div>
         </div>
-      </div>
+      </SignedIn>
     );
   }
 
   return (
     <SignedIn>
-      <div className="min-h-screen text-white p-6">
+      <div className="min-h-screen text-white p-4 sm:p-6">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="p-3 bg-gradient-to-r from-orange-400 to-red-500 rounded-xl">
-              <Flame className="text-2xl text-white" />
+        {/* Loading State */}
+        {isInitialLoading && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 sm:mb-8 bg-blue-500/20 border border-blue-500/30 rounded-xl p-4 sm:p-6 text-center"
+          >
+            <div className="flex items-center justify-center gap-3 text-blue-300">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-300"></div>
+              <span className="text-lg">Loading your calorie data...</span>
             </div>
-            <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">
+          </motion.div>
+        )}
+
+        <div className="mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4">
+            <div className="p-3 bg-gradient-to-r from-orange-400 to-red-500 rounded-xl self-start sm:self-center">
+              <Flame className="text-xl sm:text-2xl text-white" />
+            </div>
+            <div className="text-center sm:text-left">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">
                 Calorie Tracker
               </h1>
-              <p className="text-white/60">Track your daily nutrition and achieve your health goals</p>
+              <p className="text-white/60 text-sm sm:text-base">Track your daily nutrition and achieve your health goals</p>
             </div>
           </div>
           
           {/* Time Period Selector */}
-          <div className="flex gap-2 mb-6">
+          <div className="flex flex-wrap gap-2 mb-6">
             {['daily', 'weekly', 'monthly'].map((period) => (
               <button
                 key={period}
                 onClick={() => setTimePeriod(period)}
-                className={`px-6 py-3 rounded-xl font-medium transition-all ${
+                className={`px-3 sm:px-6 py-2 sm:py-3 rounded-xl text-sm sm:text-base font-medium transition-all ${
                   timePeriod === period
                     ? 'bg-gradient-to-r from-orange-400 to-red-500 text-white shadow-lg'
                     : 'bg-white/10 text-white/60 hover:bg-white/20'
@@ -453,20 +477,20 @@ const CalorieTracker = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
           {/* Left Column - Main Charts */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-6 sm:space-y-8">
             {/* Today's Overview */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6"
+              className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6"
             >
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-white">Today's Progress</h2>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-white">Today's Progress</h2>
                 <button
                   onClick={fetchTodayMeals}
-                  className="p-2 text-white/60 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                  className="p-2 text-white/60 hover:text-white hover:bg-white/10 rounded-lg transition-all self-start sm:self-center"
                 >
                   <RefreshCw className="w-5 h-5" />
                 </button>
@@ -513,13 +537,13 @@ const CalorieTracker = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6"
+              className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6"
             >
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-white">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-white">
                   {timePeriod.charAt(0).toUpperCase() + timePeriod.slice(1)} Calorie Trends
                 </h2>
-                <div className="flex items-center gap-2 text-white/60">
+                <div className="flex items-center gap-2 text-white/60 text-sm">
                   <div className="w-3 h-3 bg-orange-400 rounded-full"></div>
                   <span>Consumed</span>
                   <div className="w-3 h-3 bg-cyan-400 rounded-full ml-4"></div>
@@ -527,7 +551,7 @@ const CalorieTracker = () => {
                 </div>
               </div>
               
-              <div className="h-80" ref={chartRef}>
+              <div className="h-64 sm:h-80" ref={chartRef}>
                 <BarChart
                   data={chartData.calories}
                   target={userProfile.targetCalories}
@@ -542,10 +566,10 @@ const CalorieTracker = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6"
+              className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6"
             >
-              <h2 className="text-2xl font-bold text-white mb-6">Nutrition Distribution</h2>
-              <div className="h-80">
+              <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Nutrition Distribution</h2>
+              <div className="h-64 sm:h-80">
                 <DoughnutChart
                   data={[
                     { label: 'Protein', value: todayData.nutrition.protein, color: '#3b82f6' },
@@ -561,12 +585,12 @@ const CalorieTracker = () => {
           </div>
 
           {/* Right Column - Sidebar */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* User Profile & Goals */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6"
+              className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6"
             >
               <h3 className="text-xl font-bold text-white mb-4">Your Goals</h3>
               
@@ -583,7 +607,7 @@ const CalorieTracker = () => {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1 }}
-              className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6"
+              className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6"
             >
               <h3 className="text-xl font-bold text-white mb-4">Today's Meals</h3>
               
@@ -625,7 +649,7 @@ const CalorieTracker = () => {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
-              className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6"
+              className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-4 sm:p-6"
             >
               <div className="flex items-center gap-2 mb-4">
                 <Lightbulb className="text-yellow-400" />
