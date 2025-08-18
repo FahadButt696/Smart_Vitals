@@ -7,7 +7,7 @@ import { useUser, useAuth } from "@clerk/clerk-react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import ProgressDots from "./ProgressDots";
-import { API_BASE_URL } from "../../../config/api.js";
+import { API_BASE_URL } from "@/config/api";
 
 // Step components
 import Step1_BasicInfo from "./Step1_BasicInfo";

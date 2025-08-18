@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { isMobile, getConnectionQuality, getMobileLoadingConfig } from '../utils/mobileApiUtils';
+import { isMobile, getConnectionQuality, getMobileLoadingConfig } from '@/utils/mobileApiUtils';
 
 // Hook for mobile-specific optimizations
 export const useMobileOptimization = () => {

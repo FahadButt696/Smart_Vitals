@@ -1,6 +1,7 @@
-import { SignedIn, useUser } from "@clerk/clerk-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useUser, useAuth } from '@clerk/clerk-react';
+import { toast } from 'react-hot-toast';
 import { 
   Flame, 
   TrendingUp, 
@@ -27,7 +28,7 @@ import {
 import { BarChart, ProgressBar, DoughnutChart, TrendIndicator, LineChart as LineChartComponent, MetricCard } from "@/components/custom/ChartComponents";
 import AIRecommendationCard from "@/components/custom/AIRecommendationCard";
 import { useAIRecommendations } from "@/hooks/useAIRecommendations";
-import { API_BASE_URL } from "../../config/api.js";
+import { API_BASE_URL } from "@/config/api";
 
 const CalorieTracker = () => {
   const { user } = useUser();

@@ -1,26 +1,8 @@
-import { useUser, useAuth } from "@clerk/clerk-react";
-import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
-import { 
-  User, 
-  Mail, 
-  Calendar, 
-  Weight, 
-  Ruler, 
-  Target, 
-  Edit3, 
-  Save,
-  Camera,
-  Heart,
-  Dumbbell,
-  Droplets,
-  Bed,
-  Activity,
-  AlertCircle,
-  CheckCircle
-} from "lucide-react";
-import toast from "react-hot-toast";
-import { API_BASE_URL } from "../../config/api.js";
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useUser, useAuth } from '@clerk/clerk-react';
+import { toast } from 'react-hot-toast';
+import { API_BASE_URL } from "@/config/api";
 
 const Profile = () => {
   const { user: clerkUser, isLoaded } = useUser();

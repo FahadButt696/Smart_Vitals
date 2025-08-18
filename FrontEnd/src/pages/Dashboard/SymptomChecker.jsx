@@ -4,7 +4,7 @@ import { useUser, useAuth } from '@clerk/clerk-react';
 import { toast } from 'react-hot-toast';
 import AIRecommendationCard from "@/components/custom/AIRecommendationCard";
 import { useAIRecommendations } from "@/hooks/useAIRecommendations";
-import { API_BASE_URL } from "../../config/api.js";
+import { API_BASE_URL } from "@/config/api";
 import { 
   Thermometer, 
   AlertTriangle, 

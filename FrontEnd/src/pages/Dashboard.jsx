@@ -48,7 +48,7 @@ import MultipleAIRecommendations from "@/components/custom/MultipleAIRecommendat
 import { useAIRecommendations } from "@/hooks/useAIRecommendations";
 import MobileDebugPanel from "@/components/custom/MobileDebugPanel";
 import ErrorBoundary from "@/components/custom/ErrorBoundary";
-import { API_BASE_URL } from './config/api.js';
+import { API_BASE_URL } from '@/config/api';
 
 // Dashboard Overview Component
 const DashboardOverview = () => {

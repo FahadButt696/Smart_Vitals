@@ -27,7 +27,7 @@ import { BarChart, ProgressBar, LineChart, DoughnutChart } from '@/components/cu
 import AIRecommendationCard from "@/components/custom/AIRecommendationCard";
 import { useAIRecommendations } from "@/hooks/useAIRecommendations";
 import toast from 'react-hot-toast';
-import { API_BASE_URL } from "../../config/api.js";
+import { API_BASE_URL } from "@/config/api";
 
 const SleepTracker = () => {
   const { user } = useUser();

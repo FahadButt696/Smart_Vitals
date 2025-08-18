@@ -193,6 +193,9 @@ export const getApiUrl = (endpoint) => {
 // Export the base URL for direct use if needed
 export { API_BASE_URL };
 
+// Export API endpoints for components that need them
+export { API_ENDPOINTS };
+
 // Log the current API configuration (for debugging)
 console.log('🌐 API Configuration:', {
   baseUrl: API_BASE_URL,

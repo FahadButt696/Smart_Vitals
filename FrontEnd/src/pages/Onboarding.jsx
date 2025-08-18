@@ -5,7 +5,7 @@ import { dark1, basicInfo, bodyMetrics, healthGoals, fitnessPreference, logoChat
 import { useState, useEffect } from "react";
 import { useUser, useAuth } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
-import { API_BASE_URL } from "../config/api.js";
+import { API_BASE_URL } from "@/config/api";
 
 const Onboarding = () => {
   const [currentStep, setCurrentStep] = useState(0);

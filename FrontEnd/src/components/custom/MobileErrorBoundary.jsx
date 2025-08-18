@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { isMobile, getConnectionQuality } from '../../utils/mobileApiUtils';
+import { isMobile, getConnectionQuality } from '@/utils/mobileApiUtils';
 
 class MobileErrorBoundary extends React.Component {
   constructor(props) {

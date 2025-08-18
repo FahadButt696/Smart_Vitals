@@ -6,7 +6,7 @@ import { TextAreaWithLabel } from './Textarea';
 import { FaUser, FaEnvelope, FaCommentDots } from 'react-icons/fa';
 import { Contact } from '@/assets/Assets';
 import { useUser } from '@clerk/clerk-react';
-import { API_BASE_URL } from '../../config/api.js';
+import { API_BASE_URL } from '@/config/api';
 
 export default function ContactPage() {
   const { user, isLoaded } = useUser();

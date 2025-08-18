@@ -1,6 +1,8 @@
-import { SignedIn, useUser, useAuth } from "@clerk/clerk-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useUser, useAuth } from '@clerk/clerk-react';
+import { toast } from 'react-hot-toast';
+import { API_BASE_URL } from "@/config/api";
 import AIRecommendationCard from "@/components/custom/AIRecommendationCard";
 import { useAIRecommendations } from "@/hooks/useAIRecommendations";
 import { 
@@ -46,8 +48,6 @@ import {
   Baby,
   Dumbbell as Strength
 } from "lucide-react";
-import { toast } from 'react-hot-toast';
-import { API_BASE_URL } from "../../config/api.js";
 
 const WorkoutTracker = () => {
   const { user } = useUser();

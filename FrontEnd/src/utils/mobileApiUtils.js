@@ -1,5 +1,5 @@
 // Mobile-specific API utilities for better mobile experience
-import { API_BASE_URL } from '../config/api.js';
+import { API_BASE_URL } from '@/config/api';
 
 // Enhanced mobile detection
 export const detectMobile = () => {

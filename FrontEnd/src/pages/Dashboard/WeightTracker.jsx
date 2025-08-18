@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '@clerk/clerk-react';
 import { toast } from 'react-hot-toast';
-import { API_BASE_URL } from "../../config/api.js";
+import { API_BASE_URL } from "@/config/api";
 
 import { 
   FaWeight, 
