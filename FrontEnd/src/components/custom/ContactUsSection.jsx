@@ -6,6 +6,7 @@ import { TextAreaWithLabel } from './Textarea';
 import { FaUser, FaEnvelope, FaCommentDots } from 'react-icons/fa';
 import { Contact } from '@/assets/Assets';
 import { useUser } from '@clerk/clerk-react';
+import { API_BASE_URL } from '../../config/api.js';
 
 export default function ContactPage() {
   const { user, isLoaded } = useUser();
@@ -46,12 +47,15 @@ export default function ContactPage() {
       setError('');
       setIsLoading(true);
       
-      const response = await fetch('http://localhost:5000/api/contact', {
+      // Use API configuration instead of hardcoded localhost
+      const response = await fetch(`${API_BASE_URL}/api/contact`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ name, email, message }),
+        // Add mobile-specific timeout
+        signal: AbortSignal.timeout(30000) // 30 seconds for mobile
       });
 
       const data = await response.json();
@@ -64,7 +68,13 @@ export default function ContactPage() {
       }
     } catch (error) {
       console.error('Error sending contact form:', error);
-      setError('Network error. Please check your connection and try again.');
+      
+      // Better error handling for mobile
+      if (error.name === 'AbortError') {
+        setError('Request timed out. Please check your connection and try again.');
+      } else {
+        setError('Network error. Please check your connection and try again.');
+      }
     } finally {
       setIsLoading(false);
     }

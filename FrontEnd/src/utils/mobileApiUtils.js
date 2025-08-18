@@ -1,15 +1,13 @@
-// Mobile-specific API utilities
-import { mobileFetch, mobileFetchWithRetry } from '@/config/api.js';
+// Mobile-specific API utilities for better mobile experience
+import { API_BASE_URL } from '../config/api.js';
 
-// Safe mobile detection with fallbacks
-const detectMobile = () => {
+// Enhanced mobile detection
+export const detectMobile = () => {
   try {
-    // Check if we're in a browser environment
     if (typeof window === 'undefined' || typeof navigator === 'undefined') {
       return false;
     }
     
-    // Multiple detection methods for better compatibility
     const userAgent = navigator.userAgent || '';
     const platform = navigator.platform || '';
     
@@ -25,203 +23,160 @@ const detectMobile = () => {
     // Screen size detection
     const isSmallScreen = window.innerWidth <= 768;
     
-    return isMobileUA || isMobilePlatform || (hasTouch && isSmallScreen);
+    // Connection detection
+    const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    const isSlowConnection = connection && (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g');
+    
+    return isMobileUA || isMobilePlatform || (hasTouch && isSmallScreen) || isSlowConnection;
   } catch (error) {
     console.warn('Mobile detection failed, defaulting to desktop:', error);
     return false;
   }
 };
 
-// Safe network information with fallbacks
-const getNetworkInfo = () => {
-  try {
-    // Check if Network Information API is available
-    if ('connection' in navigator && navigator.connection) {
-      return {
-        effectiveType: navigator.connection.effectiveType || 'unknown',
-        downlink: navigator.connection.downlink || 0,
-        rtt: navigator.connection.rtt || 0,
-        online: navigator.onLine
-      };
+// Mobile-optimized fetch with better error handling
+export const mobileFetch = async (url, options = {}) => {
+  const isMobile = detectMobile();
+  
+  const config = {
+    ...options,
+    timeout: isMobile ? 30000 : 15000, // 30 seconds for mobile, 15 for desktop
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      ...options.headers
     }
+  };
+
+  // Add mobile-specific headers
+  if (isMobile) {
+    config.headers['X-Mobile-Client'] = 'true';
+    config.headers['X-Device-Type'] = 'mobile';
     
-    // Fallback to basic online status
-    return {
-      effectiveType: 'unknown',
-      downlink: 0,
-      rtt: 0,
-      online: navigator.onLine
-    };
+    if (navigator.userAgent) {
+      config.headers['User-Agent'] = navigator.userAgent;
+    }
+  }
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), config.timeout);
+
+    const response = await fetch(url, {
+      ...config,
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    return response;
   } catch (error) {
-    console.warn('Network info detection failed:', error);
-    return {
-      effectiveType: 'unknown',
-      downlink: 0,
-      rtt: 0,
-      online: true // Assume online if we can't detect
-    };
+    if (error.name === 'AbortError') {
+      throw new Error('Request timeout - mobile network may be slow');
+    }
+    throw error;
   }
 };
 
-// Mobile API wrapper with better error handling
-export class MobileApiClient {
-  constructor(baseUrl) {
-    this.baseUrl = baseUrl;
-    this.isMobile = detectMobile();
-    this.networkInfo = getNetworkInfo();
-    this.retryCount = 0;
-    this.maxRetries = 3;
-  }
-
-  // Generic API call with mobile optimization
-  async request(endpoint, options = {}) {
-    const url = `${this.baseUrl}${endpoint}`;
-    
-    try {
-      if (this.isMobile) {
-        // Use mobile-optimized fetch with retry
-        const response = await mobileFetchWithRetry(url, options);
-        return await response.json();
-      } else {
-        // Standard fetch for desktop
-        const response = await fetch(url, options);
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        return await response.json();
-      }
-    } catch (error) {
-      console.error(`🚨 API Error on ${endpoint}:`, error);
+// Retry wrapper for mobile with exponential backoff
+export const mobileFetchWithRetry = async (url, options = {}, retryCount = 0) => {
+  const isMobile = detectMobile();
+  const maxRetries = isMobile ? 3 : 1;
+  const baseDelay = isMobile ? 1000 : 0;
+  
+  try {
+    return await mobileFetch(url, options);
+  } catch (error) {
+    if (retryCount < maxRetries) {
+      console.log(`🔄 Mobile API retry ${retryCount + 1}/${maxRetries} for ${url}`);
       
-      // Mobile-specific error handling
-      if (this.isMobile) {
-        console.log(`📱 Mobile API error details:`, {
-          endpoint,
-          error: error.message,
-          userAgent: navigator.userAgent || 'Unknown',
-          timestamp: new Date().toISOString(),
-          networkInfo: this.networkInfo
-        });
-      }
+      // Exponential backoff for retries
+      const delay = baseDelay * Math.pow(2, retryCount);
+      await new Promise(resolve => setTimeout(resolve, delay));
       
-      throw error;
+      return mobileFetchWithRetry(url, options, retryCount + 1);
     }
+    throw error;
   }
+};
 
-  // GET request
-  async get(endpoint, params = {}) {
-    const queryString = new URLSearchParams(params).toString();
-    const url = queryString ? `${endpoint}?${queryString}` : endpoint;
+// Mobile-optimized API calls
+export const mobileApiCall = async (endpoint, options = {}) => {
+  const url = `${API_BASE_URL}${endpoint}`;
+  
+  try {
+    const response = await mobileFetchWithRetry(url, options);
+    return await response.json();
+  } catch (error) {
+    console.error(`Mobile API call failed for ${endpoint}:`, error);
     
-    return this.request(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      }
-    });
-  }
-
-  // POST request
-  async post(endpoint, data = {}) {
-    return this.request(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify(data)
-    });
-  }
-
-  // PUT request
-  async put(endpoint, data = {}) {
-    return this.request(endpoint, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify(data)
-    });
-  }
-
-  // DELETE request
-  async delete(endpoint) {
-    return this.request(endpoint, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      }
-    });
-  }
-
-  // Health check specifically for mobile
-  async mobileHealthCheck() {
-    try {
-      const response = await this.get('/mobile-health');
-      console.log('📱 Mobile health check successful:', response);
-      return response;
-    } catch (error) {
-      console.error('📱 Mobile health check failed:', error);
+    // Enhanced error messages for mobile
+    if (error.message.includes('timeout')) {
+      throw new Error('Request timed out. Please check your connection and try again.');
+    } else if (error.message.includes('Failed to fetch')) {
+      throw new Error('Network error. Please check your connection and try again.');
+    } else {
       throw error;
     }
   }
+};
 
-  // Test mobile connectivity
-  async testMobileConnectivity() {
-    try {
-      const response = await this.get('/api/test-mobile');
-      console.log('📱 Mobile connectivity test successful:', response);
-      return response;
-    } catch (error) {
-      console.error('📱 Mobile connectivity test failed:', error);
-      throw error;
+// Mobile-specific toast configuration
+export const mobileToastConfig = {
+  duration: 4000,
+  position: 'top-center',
+  style: {
+    background: 'linear-gradient(135deg, #0ea5e9, #8b5cf6)',
+    color: '#fff',
+    borderRadius: '12px',
+    border: '1px solid rgba(255, 255, 255, 0.2)',
+    backdropFilter: 'blur(10px)',
+    fontSize: '14px', // Smaller font for mobile
+    maxWidth: '90vw', // Responsive width
+  },
+};
+
+// Mobile connection quality detection
+export const getConnectionQuality = () => {
+  try {
+    const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    
+    if (!connection) {
+      return 'unknown';
     }
+    
+    const { effectiveType, downlink, rtt } = connection;
+    
+    if (effectiveType === '4g' && downlink > 10) {
+      return 'excellent';
+    } else if (effectiveType === '4g' || effectiveType === '3g') {
+      return 'good';
+    } else if (effectiveType === '2g' || effectiveType === 'slow-2g') {
+      return 'poor';
+    } else {
+      return 'moderate';
+    }
+  } catch (error) {
+    return 'unknown';
   }
+};
 
-  // Get current network status
-  getNetworkStatus() {
-    return this.networkInfo;
-  }
-
-  // Check if device is online
-  isOnline() {
-    return this.networkInfo.online;
-  }
-}
-
-// Create default instance with error handling
-let mobileApiClient;
-try {
-  mobileApiClient = new MobileApiClient(import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000');
-} catch (error) {
-  console.error('Failed to create MobileApiClient:', error);
-  // Fallback to basic client
-  mobileApiClient = {
-    isMobile: false,
-    get: async () => { throw new Error('Mobile API client not available'); },
-    post: async () => { throw new Error('Mobile API client not available'); },
-    put: async () => { throw new Error('Mobile API client not available'); },
-    delete: async () => { throw new Error('Mobile API client not available'); },
-    mobileHealthCheck: async () => { throw new Error('Mobile API client not available'); },
-    testMobileConnectivity: async () => { throw new Error('Mobile API client not available'); },
-    getNetworkStatus: () => ({ online: true, effectiveType: 'unknown' }),
-    isOnline: () => true
+// Mobile-specific loading states
+export const getMobileLoadingConfig = () => {
+  const isMobile = detectMobile();
+  const connectionQuality = getConnectionQuality();
+  
+  return {
+    showSpinner: isMobile,
+    timeout: connectionQuality === 'poor' ? 45000 : 30000,
+    retryAttempts: connectionQuality === 'poor' ? 5 : 3,
+    showProgress: isMobile && connectionQuality !== 'excellent',
   };
-}
+};
 
-// Export individual methods for convenience
-export const {
-  get: mobileGet,
-  post: mobilePost,
-  put: mobilePut,
-  delete: mobileDelete,
-  mobileHealthCheck,
-  testMobileConnectivity,
-  getNetworkStatus,
-  isOnline
-} = mobileApiClient;
-
-export { mobileApiClient };
+// Export mobile detection for use in components
+export { detectMobile as isMobile };

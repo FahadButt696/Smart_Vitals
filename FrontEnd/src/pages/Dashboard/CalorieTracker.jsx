@@ -27,6 +27,7 @@ import {
 import { BarChart, ProgressBar, DoughnutChart, TrendIndicator, LineChart as LineChartComponent, MetricCard } from "@/components/custom/ChartComponents";
 import AIRecommendationCard from "@/components/custom/AIRecommendationCard";
 import { useAIRecommendations } from "@/hooks/useAIRecommendations";
+import { API_BASE_URL } from "../../config/api.js";
 
 const CalorieTracker = () => {
   const { user } = useUser();
@@ -142,10 +143,18 @@ const CalorieTracker = () => {
   };
 
   const fetchCalorieData = async () => {
-    setIsLoading(true);
     try {
-      // Fetch calorie data for different time periods
-      const response = await fetch(`http://localhost:5000/api/calories?userId=${user.id}&period=${timePeriod}`);
+      setIsLoading(true);
+      const token = await user.getToken();
+      
+      const response = await fetch(`${API_BASE_URL}/api/calories?userId=${user.id}&period=${timePeriod}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        signal: AbortSignal.timeout(15000) // 15 seconds for mobile
+      });
+
       if (response.ok) {
         const data = await response.json();
         setCalorieData(prev => ({
@@ -155,11 +164,17 @@ const CalorieTracker = () => {
         
         // Process chart data
         processChartData(data.data || []);
+      } else {
+        console.error('Failed to fetch calorie data');
+        toast.error('Failed to load calorie data');
       }
     } catch (error) {
       console.error('Error fetching calorie data:', error);
-      // Generate sample data for demonstration
-      generateSampleData();
+      if (error.name === 'AbortError') {
+        toast.error('Request timed out. Please check your connection.');
+      } else {
+        toast.error('Failed to load calorie data');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -213,7 +228,16 @@ const CalorieTracker = () => {
 
   const fetchTodayMeals = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/meal?userId=${user.id}`);
+      const token = await user.getToken();
+      
+      const response = await fetch(`${API_BASE_URL}/api/meal?userId=${user.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        signal: AbortSignal.timeout(15000) // 15 seconds for mobile
+      });
+
       if (response.ok) {
         const data = await response.json();
         const todayMeals = data.meals?.filter(meal => {
@@ -244,6 +268,9 @@ const CalorieTracker = () => {
       }
     } catch (error) {
       console.error('Error fetching today\'s meals:', error);
+      if (error.name === 'AbortError') {
+        toast.error('Request timed out. Please check your connection.');
+      }
       // Set default data for demonstration
       setTodayData(prev => ({
         ...prev,

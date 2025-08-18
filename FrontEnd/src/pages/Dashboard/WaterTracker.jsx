@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useUser } from '@clerk/clerk-react';
+import { useUser, useAuth } from '@clerk/clerk-react';
 import { 
   FaTint, 
   FaPlus, 
@@ -27,6 +27,7 @@ import { BarChart, ProgressBar, LineChart, DoughnutChart } from '@/components/cu
 import AIRecommendationCard from "@/components/custom/AIRecommendationCard";
 import { useAIRecommendations } from "@/hooks/useAIRecommendations";
 import toast from 'react-hot-toast';
+import { API_BASE_URL } from "../../config/api.js";
 
 const WaterTracker = () => {
   const { user } = useUser();
@@ -116,7 +117,7 @@ const WaterTracker = () => {
 
   const fetchUserData = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/user/${user.id}`);
+      const response = await fetch(`${API_BASE_URL}/api/user/${user.id}`);
       
       if (response.ok) {
         const userData = await response.json();
@@ -135,7 +136,7 @@ const WaterTracker = () => {
   const fetchWaterData = async () => {
     try {
       setBackendError(false);
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/water?userId=${user.id}`);
+      const response = await fetch(`${API_BASE_URL}/api/water?userId=${user.id}`);
       
       if (response.ok) {
         const data = await response.json();
@@ -160,7 +161,7 @@ const WaterTracker = () => {
 
   const fetchWaterStats = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/water/stats?userId=${user.id}`);
+      const response = await fetch(`${API_BASE_URL}/api/water/stats?userId=${user.id}`);
       
       if (response.ok) {
         const data = await response.json();
@@ -190,7 +191,7 @@ const WaterTracker = () => {
 
     setAddingWater(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/water`, {
+      const response = await fetch(`${API_BASE_URL}/api/water`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -227,7 +228,7 @@ const WaterTracker = () => {
     }
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/water/${logId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/water/${logId}`, {
         method: 'DELETE'
       });
 
@@ -520,7 +521,7 @@ const WaterTracker = () => {
     }
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/water/${logId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/water/${logId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'

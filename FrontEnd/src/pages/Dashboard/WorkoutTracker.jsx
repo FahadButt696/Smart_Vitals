@@ -46,9 +46,8 @@ import {
   Baby,
   Dumbbell as Strength
 } from "lucide-react";
-
-
-const API_BASE_URL = 'http://localhost:5000/api';
+import { toast } from 'react-hot-toast';
+import { API_BASE_URL } from "../../config/api.js";
 
 const WorkoutTracker = () => {
   const { user } = useUser();
@@ -721,6 +720,39 @@ const WorkoutTracker = () => {
         default: return 0;
       }
     });
+
+  // Fetch workout logs
+  const fetchWorkoutLogs = async () => {
+    try {
+      setIsLoading(true);
+      const token = await getToken();
+      
+      const response = await fetch(`${API_BASE_URL}/api/workout?userId=${user.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        signal: AbortSignal.timeout(15000) // 15 seconds for mobile
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setWorkoutLogs(data);
+      } else {
+        console.error('Failed to fetch workout logs');
+        toast.error('Failed to load workout logs');
+      }
+    } catch (error) {
+      console.error('Error fetching workout logs:', error);
+      if (error.name === 'AbortError') {
+        toast.error('Request timed out. Please check your connection.');
+      } else {
+        toast.error('Failed to load workout logs');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <SignedIn>

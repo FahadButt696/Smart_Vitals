@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useUser } from '@clerk/clerk-react';
+import { useUser, useAuth } from '@clerk/clerk-react';
 import { 
   FaBed,
   FaMoon,
@@ -27,6 +27,7 @@ import { BarChart, ProgressBar, LineChart, DoughnutChart } from '@/components/cu
 import AIRecommendationCard from "@/components/custom/AIRecommendationCard";
 import { useAIRecommendations } from "@/hooks/useAIRecommendations";
 import toast from 'react-hot-toast';
+import { API_BASE_URL } from "../../config/api.js";
 
 const SleepTracker = () => {
   const { user } = useUser();
@@ -152,7 +153,7 @@ const SleepTracker = () => {
     if (!user) return;
     
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/user/profile?userId=${user.id}`);
+      const response = await fetch(`${API_BASE_URL}/api/user/profile?userId=${user.id}`);
       const data = await response.json();
       
       if (response.ok && data.user) {
@@ -168,7 +169,7 @@ const SleepTracker = () => {
     if (!user) return;
     
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/user/sleepGoal`, {
+      const response = await fetch(`${API_BASE_URL}/api/user/sleepGoal`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -199,7 +200,7 @@ const SleepTracker = () => {
     
     try {
       setLoading(true);
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/sleep?userId=${user.id}`);
+      const response = await fetch(`${API_BASE_URL}/api/sleep?userId=${user.id}`);
       const data = await response.json();
       
       if (response.ok) {
@@ -277,7 +278,7 @@ const SleepTracker = () => {
         return;
       }
   
-      const response = await fetch('http://localhost:5000/api/sleep', {
+      const response = await fetch(`${API_BASE_URL}/api/sleep`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -340,7 +341,7 @@ const SleepTracker = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/api/sleep/${editingLog._id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/sleep/${editingLog._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -371,7 +372,7 @@ const SleepTracker = () => {
 
   const deleteSleep = async (logId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/sleep/${logId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/sleep/${logId}`, {
         method: 'DELETE',
       });
 

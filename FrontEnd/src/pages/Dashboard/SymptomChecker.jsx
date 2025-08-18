@@ -4,6 +4,7 @@ import { useUser, useAuth } from '@clerk/clerk-react';
 import { toast } from 'react-hot-toast';
 import AIRecommendationCard from "@/components/custom/AIRecommendationCard";
 import { useAIRecommendations } from "@/hooks/useAIRecommendations";
+import { API_BASE_URL } from "../../config/api.js";
 import { 
   Thermometer, 
   AlertTriangle, 
@@ -35,14 +36,12 @@ const SymptomChecker = () => {
   // Simplified state for text-based symptom input
   const [symptomText, setSymptomText] = useState('');
 
-  const API_BASE_URL = 'http://localhost:5000/api';
-
   // Check if backend is available
   const checkBackendStatus = async () => {
     try {
-      const response = await fetch('http://localhost:5000/', { 
+      const response = await fetch(`${API_BASE_URL}/`, { 
         method: 'GET',
-        signal: AbortSignal.timeout(5000) // 5 second timeout
+        signal: AbortSignal.timeout(10000) // 10 second timeout for mobile
       });
       return response.ok;
     } catch (error) {
@@ -67,12 +66,12 @@ const SymptomChecker = () => {
         }
         
         const token = await getToken();
-        const response = await fetch(`http://localhost:5000/api/user/${user.id}`, {
+        const response = await fetch(`${API_BASE_URL}/api/user/${user.id}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           },
-          signal: AbortSignal.timeout(10000) // 10 second timeout
+          signal: AbortSignal.timeout(15000) // 15 second timeout for mobile
         });
         
         if (response.ok) {

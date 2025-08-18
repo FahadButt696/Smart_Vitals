@@ -48,6 +48,7 @@ import MultipleAIRecommendations from "@/components/custom/MultipleAIRecommendat
 import { useAIRecommendations } from "@/hooks/useAIRecommendations";
 import MobileDebugPanel from "@/components/custom/MobileDebugPanel";
 import ErrorBoundary from "@/components/custom/ErrorBoundary";
+import { API_BASE_URL } from './config/api.js';
 
 // Dashboard Overview Component
 const DashboardOverview = () => {
@@ -104,7 +105,15 @@ const DashboardOverview = () => {
 
   const fetchWaterStats = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/water/stats?userId=${user.id}`);
+      const token = await getToken();
+      const response = await fetch(`${API_BASE_URL}/api/water/stats?userId=${user.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        signal: AbortSignal.timeout(15000) // 15 seconds for mobile
+      });
+      
       if (response.ok) {
         const data = await response.json();
         const stats = data.stats || {};
@@ -127,12 +136,23 @@ const DashboardOverview = () => {
       }
     } catch (error) {
       console.error('Error fetching water stats:', error);
+      if (error.name === 'AbortError') {
+        toast.error('Request timed out. Please check your connection.');
+      }
     }
   };
 
   const fetchMealStats = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/meal?userId=${user.id}`);
+      const token = await getToken();
+      const response = await fetch(`${API_BASE_URL}/api/meal?userId=${user.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        signal: AbortSignal.timeout(15000) // 15 seconds for mobile
+      });
+      
       if (response.ok) {
         const data = await response.json();
         const todayMeals = data.meals?.filter(meal => {
@@ -170,12 +190,23 @@ const DashboardOverview = () => {
       }
     } catch (error) {
       console.error('Error fetching meal stats:', error);
+      if (error.name === 'AbortError') {
+        toast.error('Request timed out. Please check your connection.');
+      }
     }
   };
 
   const fetchSleepStats = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/sleep/stats?userId=${user.id}`);
+      const token = await getToken();
+      const response = await fetch(`${API_BASE_URL}/api/sleep/stats?userId=${user.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        signal: AbortSignal.timeout(15000) // 15 seconds for mobile
+      });
+      
       if (response.ok) {
         const data = await response.json();
         const stats = data.stats || {};
@@ -196,12 +227,23 @@ const DashboardOverview = () => {
       }
     } catch (error) {
       console.error('Error fetching sleep stats:', error);
+      if (error.name === 'AbortError') {
+        toast.error('Request timed out. Please check your connection.');
+      }
     }
   };
 
   const fetchWorkoutStats = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/workout?userId=${user.id}`);
+      const token = await getToken();
+      const response = await fetch(`${API_BASE_URL}/api/workout?userId=${user.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        signal: AbortSignal.timeout(15000) // 15 seconds for mobile
+      });
+      
       if (response.ok) {
         const data = await response.json();
         const todayWorkouts = data.workouts?.filter(workout => {
@@ -233,12 +275,23 @@ const DashboardOverview = () => {
       }
     } catch (error) {
       console.error('Error fetching workout stats:', error);
+      if (error.name === 'AbortError') {
+        toast.error('Request timed out. Please check your connection.');
+      }
     }
   };
 
   const fetchWeightStats = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/weight?userId=${user.id}`);
+      const token = await getToken();
+      const response = await fetch(`${API_BASE_URL}/api/weight?userId=${user.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        signal: AbortSignal.timeout(15000) // 15 seconds for mobile
+      });
+      
       if (response.ok) {
         const data = await response.json();
         const weights = data.weights || [];
@@ -260,6 +313,9 @@ const DashboardOverview = () => {
       }
     } catch (error) {
       console.error('Error fetching weight stats:', error);
+      if (error.name === 'AbortError') {
+        toast.error('Request timed out. Please check your connection.');
+      }
     }
   };
 
@@ -574,7 +630,7 @@ const DashboardOverview = () => {
                 onClick={async () => {
                   try {
                     const token = await getToken();
-                    const response = await fetch('http://localhost:5000/api/ai-recommendations/generate', {
+                    const response = await fetch(`${API_BASE_URL}/api/ai-recommendations/generate`, {
                       method: 'POST',
                       headers: {
                         'Authorization': `Bearer ${token}`,
@@ -680,7 +736,7 @@ const DashboardOverview = () => {
                   onClick={async () => {
                     try {
                       const token = await getToken();
-                      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/ai-recommendations/generate`, {
+                      const response = await fetch(`${API_BASE_URL}/api/ai-recommendations/generate`, {
                         method: 'POST',
                         headers: {
                           'Authorization': `Bearer ${token}`,

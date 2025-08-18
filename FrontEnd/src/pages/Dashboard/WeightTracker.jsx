@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '@clerk/clerk-react';
 import { toast } from 'react-hot-toast';
+import { API_BASE_URL } from "../../config/api.js";
 
 import { 
   FaWeight, 
@@ -78,14 +79,12 @@ const WeightTracker = () => {
     notes: ''
   });
 
-  const API_BASE_URL = 'http://localhost:5000/api/weight';
-
   // Check if backend is available
   const checkBackendStatus = async () => {
     try {
-      const response = await fetch('http://localhost:5000/', { 
+      const response = await fetch(`${API_BASE_URL}/`, { 
         method: 'GET',
-        signal: AbortSignal.timeout(5000) // 5 second timeout
+        signal: AbortSignal.timeout(10000) // 10 second timeout for mobile
       });
       return response.ok;
     } catch (error) {

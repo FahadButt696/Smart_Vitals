@@ -7,6 +7,7 @@ import { useUser, useAuth } from "@clerk/clerk-react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import ProgressDots from "./ProgressDots";
+import { API_BASE_URL } from "../../../config/api.js";
 
 // Step components
 import Step1_BasicInfo from "./Step1_BasicInfo";
@@ -121,8 +122,9 @@ const OnboardingStepper = ({ onStepChange }) => {
 
       console.log("📤 Sending payload:", payload);
 
+      // Use API configuration instead of hardcoded localhost
       const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/user/create`,
+        `${API_BASE_URL}/api/user/create`,
         payload,
         {
           headers: {
@@ -130,6 +132,8 @@ const OnboardingStepper = ({ onStepChange }) => {
             "Content-Type": "application/json",
           },
           withCredentials: true,
+          // Add mobile-specific timeout
+          timeout: 30000, // 30 seconds for mobile
         }
       );
 
@@ -155,7 +159,7 @@ const OnboardingStepper = ({ onStepChange }) => {
       try {
         console.log("🤖 Generating AI recommendations for new user...");
         const aiResponse = await axios.post(
-          `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/ai-recommendations/generate`,
+          `${API_BASE_URL}/api/ai-recommendations/generate`,
           {},
           {
             headers: {
@@ -163,6 +167,8 @@ const OnboardingStepper = ({ onStepChange }) => {
               "Content-Type": "application/json",
             },
             withCredentials: true,
+            // Add mobile-specific timeout
+            timeout: 30000, // 30 seconds for mobile
           }
         );
         
@@ -183,6 +189,10 @@ const OnboardingStepper = ({ onStepChange }) => {
       } catch (aiError) {
         console.error("❌ Error generating AI recommendations:", aiError);
         // Don't fail the onboarding if AI recommendations fail
+        toast.warning('Profile created successfully! AI recommendations will be generated later.', {
+          duration: 4000,
+          position: 'top-center',
+        });
       }
 
       // Redirect after 3 seconds
@@ -194,7 +204,18 @@ const OnboardingStepper = ({ onStepChange }) => {
       console.error("❌ Error creating user:", err);
       console.error("❌ Error details:", err.response?.data);
       
-      toast.error('Something went wrong. Please try again.', {
+      // Better error handling for mobile
+      let errorMessage = 'Something went wrong. Please try again.';
+      
+      if (err.code === 'ECONNABORTED') {
+        errorMessage = 'Request timed out. Please check your connection and try again.';
+      } else if (err.response?.status === 500) {
+        errorMessage = 'Server error. Please try again in a few minutes.';
+      } else if (err.response?.status === 400) {
+        errorMessage = err.response.data?.message || 'Invalid data. Please check your information.';
+      }
+      
+      toast.error(errorMessage, {
         duration: 4000,
         position: 'top-center',
         style: {

@@ -5,6 +5,7 @@ import { dark1, basicInfo, bodyMetrics, healthGoals, fitnessPreference, logoChat
 import { useState, useEffect } from "react";
 import { useUser, useAuth } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../config/api.js";
 
 const Onboarding = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -31,11 +32,15 @@ const Onboarding = () => {
           setIsCheckingStatus(true);
           const token = await getToken();
           console.log("🔑 Got token, checking user profile...");
-          const response = await fetch(`http://localhost:5000/api/user/me`, {
+          
+          // Use API configuration instead of hardcoded localhost
+          const response = await fetch(`${API_BASE_URL}/api/user/me`, {
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json'
-            }
+            },
+            // Add mobile-specific timeout
+            signal: AbortSignal.timeout(15000) // 15 seconds for mobile
           });
           
           if (response.ok) {
@@ -62,6 +67,11 @@ const Onboarding = () => {
           console.error("❌ Error checking onboarding status:", error);
           // On error, show onboarding (safer default)
           setOnboardingCompleted(false);
+          
+          // Show user-friendly error message for mobile
+          if (error.name === 'AbortError') {
+            console.log("⏰ Request timeout - mobile network may be slow");
+          }
         } finally {
           setIsCheckingStatus(false);
         }

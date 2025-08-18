@@ -1,6 +1,8 @@
-import { SignedIn, useUser } from "@clerk/clerk-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useUser, useAuth } from '@clerk/clerk-react';
+import { toast } from 'react-hot-toast';
+import { API_BASE_URL } from "../../config/api.js";
 import { 
   Camera, 
   Plus, 
@@ -90,7 +92,13 @@ const MealLoggerEnhanced = () => {
     if (!user) return;
     
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/meal?userId=${user.id}`);
+      const response = await fetch(`${API_BASE_URL}/api/meal?userId=${user.id}`, {
+        headers: {
+          'Authorization': `Bearer ${user.session.access_token}`,
+          'Content-Type': 'application/json'
+        },
+        signal: AbortSignal.timeout(15000) // 15 seconds for mobile
+      });
       const data = await response.json();
       
       if (response.ok) {
@@ -147,9 +155,13 @@ const MealLoggerEnhanced = () => {
       const formData = new FormData();
       formData.append('mealImage', file);
   
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/meal/detect`, {
+      const response = await fetch(`${API_BASE_URL}/api/meal/detect`, {
         method: 'POST',
-        body: formData
+        headers: {
+          'Authorization': `Bearer ${user.session.access_token}`,
+        },
+        body: formData,
+        signal: AbortSignal.timeout(30000) // 30 seconds for mobile
       });
   
       const data = await response.json();
@@ -198,9 +210,10 @@ const MealLoggerEnhanced = () => {
       const totalCalories = caloriesPerServing * servingSize * manualQuantity;
 
       // Save the meal item directly to the database
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/meal/manual`, {
+      const response = await fetch(`${API_BASE_URL}/api/meal/manual`, {
         method: 'POST',
         headers: {
+          'Authorization': `Bearer ${user.session.access_token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -211,7 +224,8 @@ const MealLoggerEnhanced = () => {
           quantity: manualQuantity,
           group: 'Manual Entry',
           calories: totalCalories
-        })
+        }),
+        signal: AbortSignal.timeout(15000) // 15 seconds for mobile
       });
 
       const data = await response.json();
@@ -338,9 +352,10 @@ const MealLoggerEnhanced = () => {
         publicId: null // This will be set by the backend if available
       } : null;
 
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/meal/save`, {
+      const response = await fetch(`${API_BASE_URL}/api/meal/save`, {
         method: 'POST',
         headers: {
+          'Authorization': `Bearer ${user.session.access_token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -348,7 +363,8 @@ const MealLoggerEnhanced = () => {
           mealType: selectedMealType,
           mealItems: mealItems,
           imageData: imageData
-        })
+        }),
+        signal: AbortSignal.timeout(30000) // 30 seconds for mobile
       });
 
       const data = await response.json();
@@ -502,12 +518,14 @@ const MealLoggerEnhanced = () => {
     if (!confirm('Are you sure you want to delete this meal?')) return;
     
     try {
-      const response = await fetch(`http://localhost:5000/api/meal/${mealId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/meal/${mealId}`, {
         method: 'DELETE',
         headers: {
+          'Authorization': `Bearer ${user.session.access_token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ userId: user.id })
+        body: JSON.stringify({ userId: user.id }),
+        signal: AbortSignal.timeout(15000) // 15 seconds for mobile
       });
 
       if (response.ok) {
@@ -1289,7 +1307,7 @@ const MealLoggerEnhanced = () => {
     {selectedImage && (
       <div className="text-center mb-6">
         <img 
-          src={selectedImage.startsWith('http') ? selectedImage : `http://localhost:5000${selectedImage}`}
+          src={selectedImage.startsWith('http') ? selectedImage : `${API_BASE_URL}${selectedImage}`}
           alt="Uploaded food" 
           className="w-32 h-32 object-cover rounded-xl mx-auto"
         />

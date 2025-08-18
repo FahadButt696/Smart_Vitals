@@ -20,6 +20,7 @@ import {
   CheckCircle
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { API_BASE_URL } from "../../config/api.js";
 
 const Profile = () => {
   const { user: clerkUser, isLoaded } = useUser();
@@ -78,7 +79,7 @@ const Profile = () => {
         return;
       }
   
-      const response = await fetch("http://localhost:5000/api/user/me", {
+      const response = await fetch(`${API_BASE_URL}/api/user/me`, {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -183,7 +184,7 @@ const Profile = () => {
       console.log("Saving profile data:", profileData);
       console.log("Height data being sent:", profileData.height);
       console.log("Weight data being sent:", profileData.weight);
-      const response = await fetch('http://localhost:5000/api/user/update', {
+      const response = await fetch(`${API_BASE_URL}/api/user/update`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
