@@ -210,9 +210,6 @@ const API_ENDPOINTS = {
   },
 };
 
-// Export API_ENDPOINTS
-export { API_ENDPOINTS };
-
 // Helper function to get full URL for any endpoint
 const getApiUrl = (endpoint) => {
   return `${API_BASE_URL}${endpoint}`;
