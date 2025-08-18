@@ -155,6 +155,9 @@ export const API_ENDPOINTS = {
   MENTAL_HEALTH: {
     BASE: `${API_BASE_URL}/api/mental-health`,
     TEST: `${API_BASE_URL}/api/mental-health/test`,
+    CHAT: `${API_BASE_URL}/api/mental-health/chat`,
+    CHAT_HISTORY: (userId) => `${API_BASE_URL}/api/mental-health/chat-history/${userId}`,
+    INSIGHTS: (userId) => `${API_BASE_URL}/api/mental-health/insights/${userId}`,
   },
   
   // Diet plan
@@ -192,9 +195,6 @@ export const getApiUrl = (endpoint) => {
 
 // Export the base URL for direct use if needed
 export { API_BASE_URL };
-
-// Export API endpoints for components that need them
-export { API_ENDPOINTS };
 
 // Log the current API configuration (for debugging)
 console.log('🌐 API Configuration:', {
