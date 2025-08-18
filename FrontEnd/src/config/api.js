@@ -26,22 +26,36 @@ const detectMobile = () => {
     
     return isMobileUA || isMobilePlatform || (hasTouch && isSmallScreen);
   } catch (error) {
-    console.warn('Mobile detection failed, defaulting to desktop:', error);
+    // Silent fallback during build process
     return false;
   }
 };
 
-const isMobile = detectMobile();
-
-// Mobile-specific API configuration with fallbacks
-const MOBILE_CONFIG = {
-  timeout: isMobile ? 30000 : 15000, // 30 seconds for mobile, 15 for desktop
-  retryAttempts: isMobile ? 3 : 1,
-  retryDelay: isMobile ? 1000 : 0
+// Mobile detection and configuration
+let isMobile = false;
+let MOBILE_CONFIG = {
+  timeout: 15000, // Default to desktop timeout
+  retryAttempts: 1,
+  retryDelay: 0
 };
 
+// Only run mobile detection in browser environment
+if (typeof window !== 'undefined') {
+  isMobile = detectMobile();
+  MOBILE_CONFIG = {
+    timeout: isMobile ? 30000 : 15000, // 30 seconds for mobile, 15 for desktop
+    retryAttempts: isMobile ? 3 : 1,
+    retryDelay: isMobile ? 1000 : 0
+  };
+}
+
 // Helper function for mobile-optimized fetch with better error handling
-export const mobileFetch = async (url, options = {}) => {
+const mobileFetch = async (url, options = {}) => {
+  // Only run in browser environment
+  if (typeof window === 'undefined') {
+    throw new Error('mobileFetch can only be used in browser environment');
+  }
+
   const config = {
     ...options,
     timeout: MOBILE_CONFIG.timeout,
@@ -54,7 +68,7 @@ export const mobileFetch = async (url, options = {}) => {
 
   // Add mobile-specific headers safely
   try {
-    if (isMobile) {
+    if (isMobile && typeof navigator !== 'undefined') {
       config.headers['X-Mobile-Client'] = 'true';
       config.headers['X-Device-Type'] = 'mobile';
       
@@ -64,7 +78,7 @@ export const mobileFetch = async (url, options = {}) => {
       }
     }
   } catch (error) {
-    console.warn('Failed to add mobile headers:', error);
+    // Silent fallback during build
   }
 
   try {
@@ -89,15 +103,23 @@ export const mobileFetch = async (url, options = {}) => {
     }
     throw error;
   }
-};
+ };
 
 // Retry wrapper for mobile with better error handling
-export const mobileFetchWithRetry = async (url, options = {}, retryCount = 0) => {
+const mobileFetchWithRetry = async (url, options = {}, retryCount = 0) => {
+  // Only run in browser environment
+  if (typeof window === 'undefined') {
+    throw new Error('mobileFetchWithRetry can only be used in browser environment');
+  }
+
   try {
     return await mobileFetch(url, options);
   } catch (error) {
     if (retryCount < MOBILE_CONFIG.retryAttempts) {
-      console.log(`🔄 Mobile API retry ${retryCount + 1}/${MOBILE_CONFIG.retryAttempts} for ${url}`);
+      // Only log in browser environment
+      if (typeof console !== 'undefined' && console.log) {
+        console.log(`🔄 Mobile API retry ${retryCount + 1}/${MOBILE_CONFIG.retryAttempts} for ${url}`);
+      }
       
       // Exponential backoff for retries
       const delay = MOBILE_CONFIG.retryDelay * Math.pow(2, retryCount);
@@ -110,7 +132,7 @@ export const mobileFetchWithRetry = async (url, options = {}, retryCount = 0) =>
 };
 
 // API endpoints
-export const API_ENDPOINTS = {
+const API_ENDPOINTS = {
   // User endpoints
   USER: {
     PROFILE: `${API_BASE_URL}/api/user/profile`,
@@ -188,34 +210,39 @@ export const API_ENDPOINTS = {
   },
 };
 
+// Export API_ENDPOINTS
+export { API_ENDPOINTS };
+
 // Helper function to get full URL for any endpoint
-export const getApiUrl = (endpoint) => {
+const getApiUrl = (endpoint) => {
   return `${API_BASE_URL}${endpoint}`;
 };
 
-// Export the base URL for direct use if needed
-export { API_BASE_URL };
+// Export all functions and constants
+export { API_ENDPOINTS, getApiUrl, API_BASE_URL, mobileFetch, mobileFetchWithRetry };
 
-// Log the current API configuration (for debugging)
-console.log('🌐 API Configuration:', {
-  baseUrl: API_BASE_URL,
-  environment: import.meta.env.MODE,
-  isProduction: API_BASE_URL !== 'http://localhost:5000',
-  isMobile: isMobile,
-  userAgent: navigator.userAgent,
-  mobileConfig: MOBILE_CONFIG
-});
-
-// Mobile-specific debug info
-if (isMobile) {
-  console.log('📱 Mobile device detected:', {
-    userAgent: navigator.userAgent,
-    platform: navigator.platform,
-    vendor: navigator.vendor,
-    connection: navigator.connection ? {
-      effectiveType: navigator.connection.effectiveType,
-      downlink: navigator.connection.downlink,
-      rtt: navigator.connection.rtt
-    } : 'Not available'
+// Log the current API configuration (for debugging) - only in browser
+if (typeof window !== 'undefined' && typeof console !== 'undefined' && console.log) {
+  console.log('🌐 API Configuration:', {
+    baseUrl: API_BASE_URL,
+    environment: import.meta.env.MODE,
+    isProduction: API_BASE_URL !== 'http://localhost:5000',
+    isMobile: isMobile,
+    userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'Not available',
+    mobileConfig: MOBILE_CONFIG
   });
+
+  // Mobile-specific debug info
+  if (isMobile) {
+    console.log('📱 Mobile device detected:', {
+      userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'Not available',
+      platform: typeof navigator !== 'undefined' ? navigator.platform : 'Not available',
+      vendor: typeof navigator !== 'undefined' ? navigator.vendor : 'Not available',
+      connection: typeof navigator !== 'undefined' && navigator.connection ? {
+        effectiveType: navigator.connection.effectiveType,
+        downlink: navigator.connection.downlink,
+        rtt: navigator.connection.rtt
+      } : 'Not available'
+    });
+  }
 }
